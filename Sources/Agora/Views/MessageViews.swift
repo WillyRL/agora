@@ -25,16 +25,25 @@ struct ChatItemView: View {
                 }
             }
         case .botMessage(let from):
-            let sender = core.bot(named: from)
-            BotMessage(bot: sender ?? bot, name: sender?.title ?? from, date: item.date, badge: "to \(bot.title)") {
-                MessageContent(text: item.text, conversation: conversation)
+            // Hermes signs with the sender's display name; older messages with its Bot name.
+            let sender = core.bot(named: from) ?? core.allBots.first { $0.title.caseInsensitiveCompare(from) == .orderedSame }
+            BotMessage(bot: sender ?? bot, name: sender?.title ?? from, date: item.date, badge: "handed off to \(bot.title)") {
+                IncomingHandoffCard(handoff: Handoff(body: item.text), conversation: conversation)
             }
+        case .kanbanUpdate(let update):
+            KanbanUpdateCard(update: update, date: item.date).padding(.leading, 40)
+        case .kanbanBrief(let brief):
+            KanbanBriefCard(brief: brief, bot: bot, date: item.date).padding(.leading, 40)
         case .routineResult:
             BotMessage(bot: bot, name: bot.title, date: item.date) {
                 RoutineCard(text: item.text)
             }
         case .tool(let tool):
-            ToolRow(tool: tool).padding(.leading, 40)
+            if let handoff = OutgoingHandoff(tool) {
+                OutgoingHandoffRow(handoff: handoff, tool: tool).padding(.leading, 40)
+            } else {
+                ToolRow(tool: tool, kanban: KanbanAction(tool)).padding(.leading, 40)
+            }
         case .notice:
             HStack(spacing: 6) {
                 Image(systemName: "info.circle")
@@ -134,6 +143,8 @@ struct RoutineCard: View {
 /// A compact tool row ("web_search · weather Jakarta today") that expands to its arguments and result.
 struct ToolRow: View {
     let tool: ToolActivity
+    /// A kanban tool, said in words instead of its name.
+    var kanban: KanbanAction? = nil
     @State private var expanded = false
 
     var body: some View {
@@ -143,8 +154,16 @@ struct ToolRow: View {
             } label: {
                 HStack(spacing: 6) {
                     stateIcon
-                    Text(tool.name).font(.system(size: 12, weight: .medium, design: .monospaced))
-                    if !tool.context.isEmpty {
+                    if let kanban {
+                        Image(systemName: kanban.symbol).font(.system(size: 11)).foregroundStyle(Theme.accent)
+                        Text(kanban.title).font(.system(size: 12, weight: .medium)).lineLimit(1)
+                        if !kanban.detail.isEmpty {
+                            Text(kanban.detail).font(.system(size: 11.5, design: .monospaced)).foregroundStyle(.secondary)
+                        }
+                    } else {
+                        Text(tool.name).font(.system(size: 12, weight: .medium, design: .monospaced))
+                    }
+                    if kanban == nil && !tool.context.isEmpty {
                         Text(tool.context).font(.system(size: 12)).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
                     }
                     if let progress = tool.progress {

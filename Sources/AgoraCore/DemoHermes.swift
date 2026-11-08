@@ -220,6 +220,53 @@ public final class DemoHermes: SocketFactory, HTTPClient, ControlSocket, Gateway
         "chat-default": [
             row(1, "user", "What's on today?", minutesAgo: 27),
             row(2, "assistant", "Three meetings (10:00 standup, 13:30 design review, 16:00 1:1) and the electricity bill is due Friday. Want me to block focus time before the review?", minutesAgo: 25, extra: ["finish_reason": "stop"]),
+            row(3, "user", "Get the launch post written and a chart of signups for it.", minutesAgo: 24),
+            row(4, "assistant", "I'll hand the post to Writer and put the chart on the board for Markets Analyst.", minutesAgo: 23.8, extra: [
+                "finish_reason": "tool_calls",
+                "tool_calls": [
+                    toolCall("h1", "message_agent", #"{"target": "writer", "message": "Draft a 150-word launch post for Agora 1.0. Lead with Quick Ask; link the GitHub page.", "constraints": "Plain words, no exclamation marks", "expecting": "The draft as Markdown"}"#),
+                    toolCall("h2", "message_agent", #"{"target": "ops", "message": "Heads up: launch post goes out at 16:00, expect a traffic bump.", "expects_reply": false}"#),
+                    toolCall("k1", "kanban_create", #"{"title": "Chart weekly signups for the launch post", "assignee": "markets"}"#),
+                ],
+            ]),
+            row(5, "tool", #"{"status": "queued", "delivery_id": "d_81f2", "to": "@writer"}"#, minutesAgo: 23.7, extra: ["tool_call_id": "h1", "tool_name": "message_agent"]),
+            row(6, "tool", #"{"error": "Ops's Bot Chat is open in another app, so the message was held and not sent. Close it there or retry later.", "reason": "runtime_coordination_required"}"#, minutesAgo: 23.7, extra: ["tool_call_id": "h2", "tool_name": "message_agent"]),
+            row(7, "tool", #"{"ok": true, "task_id": "t_3906c4a2", "status": "ready"}"#, minutesAgo: 23.6, extra: ["tool_call_id": "k1", "tool_name": "kanban_create"]),
+            row(8, "user", """
+                [kanban] Task t_3906c4a2 completed.
+                Title: Chart weekly signups for the launch post
+                Assignee: @markets
+                Board: launch
+
+                Check the result or decide the next step.
+                Result: Chart saved to charts/signups.html: 1,240 signups this week, up 38%.
+
+                This is an automatic task-status notification, not a request to decompose the task again.
+                """, minutesAgo: 12, extra: ["display_kind": "internal_notification"]),
+        ],
+        "chat-research": [
+            row(1, "user", """
+                # Kanban task t_5c21e0b7: Five papers on long-context evals
+
+                Assignee: research
+                Status:   running
+                Workspace: dir @ /Users/demo/projects/evals
+                Max runtime: 3600s
+
+                ## Body
+                Find the five papers worth reading first on long-context evaluation, with one line on each.
+
+                ## Done means
+                A comment with the five links and why each matters.
+
+                work kanban task t_5c21e0b7
+                """, minutesAgo: 100),
+            row(2, "user", "Message from 🤖 hermes (@default): The card is yours. Skip anything before 2024.\n\nReply needed: The list when it's done", minutesAgo: 99, extra: ["display_kind": "internal_notification"]),
+            row(3, "assistant", "Here are the five papers worth reading first.", minutesAgo: 95, extra: ["finish_reason": "stop"]),
+        ],
+        "chat-writer": [
+            row(1, "user", "Message from 🤖 Hermes (@default): Draft a 150-word launch post for Agora 1.0. Lead with Quick Ask; link the GitHub page.\n\nConstraints: Plain words, no exclamation marks\nReply needed: The draft as Markdown", minutesAgo: 23),
+            row(2, "assistant", "Here's the draft. It leads with Quick Ask and ends on the GitHub link.", minutesAgo: 21, extra: ["finish_reason": "stop"]),
         ],
     ]
 

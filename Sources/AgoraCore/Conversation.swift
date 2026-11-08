@@ -43,6 +43,10 @@ public struct ChatItem: Sendable, Identifiable, Equatable {
         case botMessage(from: String)
         /// A Routine's result or another background completion.
         case routineResult
+        /// News about a kanban task this chat created (done, blocked, ready for review …).
+        case kanbanUpdate(KanbanUpdate)
+        /// The task a kanban card gave this Bot: the brief that starts a card's chat.
+        case kanbanBrief(KanbanBrief)
         case tool(ToolActivity)
         /// Something Agora or Hermes wants you to know (an error, "interrupted" …).
         case notice
@@ -183,6 +187,19 @@ public final class Conversation: Identifiable {
             let (text, images) = content(row["content"])
             switch role {
             case "user":
+                if let update = KanbanUpdate(text: text) {
+                    out.append(ChatItem(id: id, kind: .kanbanUpdate(update), text: text, date: date))
+                    continue
+                }
+                if let brief = KanbanBrief(text: text) {
+                    out.append(ChatItem(id: id, kind: .kanbanBrief(brief), text: text, date: date))
+                    continue
+                }
+                // Before the routine check: the gateway stores another Bot's message as an internal notification too.
+                if let m = text.firstMatch(of: botMessagePattern) {
+                    out.append(ChatItem(id: id, kind: .botMessage(from: String(m.1)), text: String(text[m.range.upperBound...]), images: images, date: date))
+                    continue
+                }
                 if let k = kind, routineKinds.contains(k) {
                     let shown = meta["display_text"].nonEmptyString ?? text
                     out.append(ChatItem(id: id, kind: .routineResult, text: routineText(full: text, shown: shown), date: date))
@@ -334,7 +351,11 @@ public final class Conversation: Identifiable {
             if let shown = p["display_text"].nonEmptyString ?? p["text"].nonEmptyString, p["display_kind"].string != "hidden" {
                 let id = "start-\(p["turn_id"].string ?? UUID().uuidString)"
                 if !items.contains(where: { $0.id == id }) {
-                    if let m = shown.firstMatch(of: Conversation.botMessagePattern) {
+                    if let update = KanbanUpdate(text: p["text"].nonEmptyString ?? shown) {
+                        items.append(ChatItem(id: id, kind: .kanbanUpdate(update), text: shown, date: Date()))
+                    } else if let brief = KanbanBrief(text: p["text"].nonEmptyString ?? shown) {
+                        items.append(ChatItem(id: id, kind: .kanbanBrief(brief), text: shown, date: Date()))
+                    } else if let m = shown.firstMatch(of: Conversation.botMessagePattern) {
                         lastTurnFromBot = String(m.1)
                         items.append(ChatItem(id: id, kind: .botMessage(from: String(m.1)), text: String(shown[m.range.upperBound...]), date: Date()))
                     } else if let k = p["display_kind"].string, Conversation.routineKinds.contains(k) || p["notification_category"].string != nil {
