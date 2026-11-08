@@ -478,21 +478,11 @@ struct NotificationSettings: View {
 
 /// Settings → General: automatic update checks (release builds only).
 struct UpdateSettings: View {
-    @Bindable var updater: AppUpdater
+    let updater: AppUpdater
     @State private var automatic = false
 
     var body: some View {
         if updater.isAvailable {
-            if updater.hasNightly {
-                Picker("Update channel", selection: $updater.channel) {
-                    ForEach(UpdateChannel.allCases) { Text($0.label).tag($0) }
-                }
-                .pickerStyle(.segmented)
-                Text(updater.channel == .nightly
-                    ? "Nightly builds come from the latest code every night: newest features, rougher edges. Switching back to Stable keeps this build until a newer stable release is out."
-                    : "Tagged releases only.")
-                    .font(.system(size: 11.5)).foregroundStyle(.secondary)
-            }
             Toggle("Check for updates automatically", isOn: $automatic)
                 .onAppear { automatic = updater.checksAutomatically }
                 .onChange(of: automatic) { _, on in updater.checksAutomatically = on }
@@ -502,8 +492,14 @@ struct UpdateSettings: View {
                     Text("Last checked \(last.formatted(.relative(presentation: .named)))").font(.system(size: 11.5)).foregroundStyle(.secondary)
                 }
             }
+            if AppFlavor.current == .nightly {
+                Text("This is Agora Nightly: built every night from the latest code. It updates to new nightly builds and keeps its own settings, separate from Agora.")
+                    .font(.system(size: 11.5)).foregroundStyle(.secondary)
+            }
         } else {
-            Text("This copy was built from source, so it doesn't update itself. Pull and rebuild, or install a release from GitHub to get updates in the app.")
+            Text(AppFlavor.current == .dev
+                ? "This is Agora Dev, built from source: it keeps its own settings and doesn't update itself. Rebuild to update it."
+                : "This copy doesn't update itself. Install a release from GitHub to get updates in the app.")
                 .font(.system(size: 11.5)).foregroundStyle(.secondary)
         }
     }

@@ -9,12 +9,20 @@ Needs macOS 15+ and Xcode 26+ (Swift 6.2).
 ```sh
 swift build
 swift test
-scripts/build-app.sh && open build/Agora.app   # the app bundle
+scripts/build-app.sh && open "build/Agora Dev.app"
 ```
+
+`build-app.sh` makes **Agora Dev** by default: its own app (`io.github.willyrl.agora.dev`, an orange DEV band on the icon) with its own settings and saved logins, so it never touches the Agora you use every day. It doesn't update itself, and its Quick Ask hotkey starts off. `scripts/build-app.sh stable` builds the regular **Agora** instead.
 
 Tests drive Agora Core against a fake Hermes that replays protocol conversations from `Tests/AgoraCoreTests/Fixtures`, so they need no Hermes and no network.
 
 **Password prompt after every rebuild?** macOS ties saved logins to the app's signature, and ad-hoc signed builds look like a new app every time. Run `scripts/make-signing-cert.sh` once per Mac: it creates a local signing certificate that `build-app.sh` then uses. On the next build macOS asks twice (once for `codesign`, once for Agora); enter your login password and click **Always Allow**.
+
+## Day to day
+
+- **Everyday app:** Agora (or Agora Nightly) from Releases. **Working on Agora:** Agora Dev from `build-app.sh`. The three install side by side.
+- **Changes:** work on a branch and open a pull request, so the tests run on GitHub. Merge to `main` when green; that night's Agora Nightly picks it up.
+- **Releases:** when Nightly has been fine for a while, tag a version (see `docs/releasing.md`).
 
 ## Recording fixtures
 
@@ -29,7 +37,7 @@ Recordings contain whatever your Hermes holds. **Check them for personal data be
 
 ## Without Hermes, and screenshots
 
-`AGORA_DEMO=1 build/Agora.app/Contents/MacOS/Agora` runs Agora against a made-up Hermes (`Sources/AgoraCore/DemoHermes.swift`). With it, `AGORA_SNAPSHOT=/tmp/shot AGORA_SNAPSHOT_STEPS="appearance:light,size:1280x860,bot:markets,wait:3"` saves screenshots of the screens you list; the steps are in `Sources/Agora/DebugSnapshot.swift`. The README screenshots in `docs/screenshots` come from there.
+`AGORA_DEMO=1 "build/Agora Dev.app/Contents/MacOS/Agora"` runs Agora against a made-up Hermes (`Sources/AgoraCore/DemoHermes.swift`). With it, `AGORA_SNAPSHOT=/tmp/shot AGORA_SNAPSHOT_STEPS="appearance:light,size:1280x860,bot:markets,wait:3"` saves screenshots of the screens you list; the steps are in `Sources/Agora/DebugSnapshot.swift`. The README screenshots in `docs/screenshots` come from there.
 
 ## Where things are
 

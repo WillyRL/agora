@@ -88,7 +88,7 @@ final class AppModel {
             store = UserDefaultsStore()
             env = AgoraEnvironment(
                 sockets: URLSessionSockets(), http: URLSessionHTTP(), control: UnixControlSocket(), starter: ProcessGatewayStarter(),
-                credentials: KeychainCredentialStore(), notifier: notifier, store: store, tailnet: TailscaleCLI())
+                credentials: KeychainCredentialStore(service: AppFlavor.current.keychainService), notifier: notifier, store: store, tailnet: TailscaleCLI())
         }
         let registry = ConnectionRegistry(store: store)
         core = AgoraCore(registry: registry, environment: env)

@@ -1,9 +1,9 @@
 name: Nightly
 
 # Every night, if main changed since the last nightly: test, build and replace the rolling `nightly`
-# pre-release (Agora-<version>-nightly.<date>.dmg/.zip) and its update feed, appcast-nightly.xml.
-# Copies of Agora set to the Nightly channel update from that feed; it also lists the latest stable
-# release, so they still get a newer stable one. Run it by hand from Actions → Nightly any time.
+# pre-release with "Agora Nightly" (Agora-<version>-nightly.<date>.dmg/.zip) and its update feed,
+# appcast-nightly.xml. Agora Nightly is its own app (io.github.willyrl.agora.nightly), installed next to
+# Agora, and updates only from this feed. Run it by hand from Actions → Nightly any time.
 # Uses the same optional secrets as release.yml.
 
 on:
@@ -56,9 +56,14 @@ jobs:
         if: steps.check.outputs.skip != 'true'
         id: version
         run: |
-          # Based on the latest stable tag (else Info.plist): 0.1.0-nightly.20261109
-          BASE="$(git describe --tags --abbrev=0 --match 'v[0-9]*' 2>/dev/null | sed 's/^v//' | sed 's/-.*//')"
-          [ -n "$BASE" ] || BASE="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' scripts/Info.plist)"
+          # Nightlies count toward the next version: after v0.1.0 they're 0.1.1-nightly.20261109.
+          # Before any stable tag, Info.plist's version is the one being worked toward.
+          LAST_TAG="$(git describe --tags --abbrev=0 --match 'v[0-9]*' --exclude '*-*' 2>/dev/null | sed 's/^v//' || true)"
+          if [ -n "$LAST_TAG" ]; then
+            IFS=. read -r MA MI PA <<< "$LAST_TAG"; BASE="$MA.$MI.$((PA + 1))"
+          else
+            BASE="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' scripts/Info.plist)"
+          fi
           VERSION="$BASE-nightly.$(date -u +%Y%m%d)"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "build=$(date -u +%Y%m%d%H%M)" >> "$GITHUB_OUTPUT"   # orders builds across Stable and Nightly
@@ -104,7 +109,7 @@ jobs:
         if: steps.check.outputs.skip != 'true'
         id: package
         run: |
-          scripts/package-release.sh "${{ steps.version.outputs.version }}" "${{ steps.version.outputs.build }}" | tee "$RUNNER_TEMP/package.log"
+          AGORA_FLAVOR=nightly scripts/package-release.sh "${{ steps.version.outputs.version }}" "${{ steps.version.outputs.build }}" | tee "$RUNNER_TEMP/package.log"
           grep -q '^notarized=1' "$RUNNER_TEMP/package.log" && echo "notarized=true" >> "$GITHUB_OUTPUT" || echo "notarized=false" >> "$GITHUB_OUTPUT"
 
       - name: Write the release notes
@@ -114,7 +119,7 @@ jobs:
           {
             echo "Built every night from \`main\` ($(git rev-parse --short HEAD)). Newest features, rougher edges: for the tested version, use the [latest release](https://github.com/$GITHUB_REPOSITORY/releases/latest)."
             echo
-            echo "Already on Agora? Settings → General → Update channel → **Nightly**, and it updates itself every night."
+            echo "**Agora Nightly** is a separate app: it installs next to Agora with its own settings and logins, and updates itself to each new nightly."
             echo
             echo "## Changes"
             echo
@@ -136,12 +141,10 @@ jobs:
           SPARKLE_BIN="$(scripts/get-sparkle-tools.sh "$RUNNER_TEMP/sparkle" | tail -1)"
           umask 077; printf '%s' "$SPARKLE_PRIVATE_KEY" > "$RUNNER_TEMP/sparkle.key"
           gh api markdown -f text="$(cat "$RUNNER_TEMP/notes.md")" -f mode=gfm -f context="$GITHUB_REPOSITORY" > "$RUNNER_TEMP/notes.html"
-          # The latest stable feed, so Nightly users also see a newer stable release (none yet is fine).
-          gh release download --pattern appcast.xml --output "$RUNNER_TEMP/stable.xml" 2>/dev/null || true
           SPARKLE_BIN="$SPARKLE_BIN" SPARKLE_KEY_FILE="$RUNNER_TEMP/sparkle.key" scripts/make-appcast.sh \
             "$V" "${{ steps.version.outputs.build }}" "dist/Agora-$V.zip" \
             "https://github.com/$GITHUB_REPOSITORY/releases/download/nightly/Agora-$V.zip" \
-            "$RUNNER_TEMP/notes.html" dist/appcast-nightly.xml "$RUNNER_TEMP/stable.xml"
+            "$RUNNER_TEMP/notes.html" dist/appcast-nightly.xml
           rm -f "$RUNNER_TEMP/sparkle.key"
 
       - name: Replace the nightly release

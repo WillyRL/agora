@@ -1,6 +1,8 @@
 #!/bin/zsh
-# Builds a universal Agora.app and packages it for a release: dist/Agora-<version>.dmg, .zip and SHA256SUMS.
+# Builds a universal app and packages it for a release: dist/Agora-<version>.dmg, .zip and SHA256SUMS.
 # Usage: scripts/package-release.sh <version> [build-number]
+#   AGORA_FLAVOR=stable (default) packages "Agora.app"; AGORA_FLAVOR=nightly packages "Agora Nightly.app",
+#   a separate app that updates from the nightly feed.
 #   The build number orders every build across Stable and Nightly, so releases use a UTC timestamp
 #   (YYYYMMDDHHMM); the default is the current time.
 #
@@ -16,13 +18,19 @@ NAME="Agora-$VERSION"
 DIST="dist"
 rm -rf "$DIST" && mkdir -p "$DIST"
 
-# In-app updates: the feed Agora checks, and the public half of the key each update is signed with.
-export AGORA_UPDATE_FEED="${AGORA_UPDATE_FEED:-https://github.com/WillyRL/agora/releases/latest/download/appcast.xml}"
-export AGORA_UPDATE_FEED_NIGHTLY="${AGORA_UPDATE_FEED_NIGHTLY:-https://github.com/WillyRL/agora/releases/download/nightly/appcast-nightly.xml}"
+FLAVOR="${AGORA_FLAVOR:-stable}"
+case "$FLAVOR" in
+  stable)  APP_NAME="Agora";         FEED="https://github.com/WillyRL/agora/releases/latest/download/appcast.xml" ;;
+  nightly) APP_NAME="Agora Nightly"; FEED="https://github.com/WillyRL/agora/releases/download/nightly/appcast-nightly.xml" ;;
+  *) echo "AGORA_FLAVOR must be stable or nightly" >&2; exit 2 ;;
+esac
+
+# In-app updates: the feed this app checks, and the public half of the key each update is signed with.
+export AGORA_UPDATE_FEED="${AGORA_UPDATE_FEED:-$FEED}"
 export AGORA_UPDATE_PUBLIC_KEY="${AGORA_UPDATE_PUBLIC_KEY:-vUKzzQ8xJvzr94JW5jI4oTDxQgqPSghMgaCrN/P6h20=}"
 
-AGORA_UNIVERSAL=1 AGORA_VERSION="$VERSION" AGORA_BUILD_NUMBER="$BUILD" AGORA_SIGN_IDENTITY="${AGORA_SIGN_IDENTITY:--}" scripts/build-app.sh release
-APP="build/Agora.app"
+AGORA_UNIVERSAL=1 AGORA_VERSION="$VERSION" AGORA_BUILD_NUMBER="$BUILD" AGORA_SIGN_IDENTITY="${AGORA_SIGN_IDENTITY:--}" scripts/build-app.sh "$FLAVOR"
+APP="build/$APP_NAME.app"
 codesign --verify --strict "$APP"
 lipo -info "$APP/Contents/MacOS/Agora"
 
@@ -46,7 +54,7 @@ ditto -c -k --sequesterRsrc --keepParent "$APP" "$DIST/$NAME.zip"
 STAGE="$(mktemp -d)"
 cp -R "$APP" "$STAGE/"
 ln -s /Applications "$STAGE/Applications"
-hdiutil create -volname "Agora $VERSION" -srcfolder "$STAGE" -ov -format UDZO "$DIST/$NAME.dmg" >/dev/null
+hdiutil create -volname "$APP_NAME $VERSION" -srcfolder "$STAGE" -ov -format UDZO "$DIST/$NAME.dmg" >/dev/null
 rm -rf "$STAGE"
 if [ "${AGORA_SIGN_IDENTITY:--}" != "-" ]; then
   codesign --force --timestamp --sign "$AGORA_SIGN_IDENTITY" "$DIST/$NAME.dmg"

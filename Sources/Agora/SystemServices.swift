@@ -103,7 +103,8 @@ enum HotkeyChoice: String, CaseIterable, Identifiable {
     }
 
     static var saved: HotkeyChoice {
-        get { HotkeyChoice(rawValue: UserDefaults.standard.string(forKey: "agora.hotkey") ?? "") ?? .optionSpace }
+        // Only one copy should own ⌥Space: Nightly and Dev start with the hotkey off.
+        get { HotkeyChoice(rawValue: UserDefaults.standard.string(forKey: "agora.hotkey") ?? "") ?? (AppFlavor.current == .stable ? .optionSpace : .off) }
         set { UserDefaults.standard.set(newValue.rawValue, forKey: "agora.hotkey") }
     }
 }

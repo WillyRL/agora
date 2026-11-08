@@ -1,14 +1,17 @@
 # Releasing Agora
 
-Two release lines, both built by GitHub Actions on GitHub's Mac runners:
+Agora comes in three separate apps, so they install side by side with their own settings and saved logins:
 
-| | Stable | Nightly |
-|---|---|---|
-| Workflow | `.github/workflows/release.yml` | `.github/workflows/nightly.yml` |
-| Made by | pushing a `v*` tag | every night at 19:00 UTC when `main` changed, or **Actions → Nightly → Run workflow** |
-| Version | from the tag: `0.2.0` | latest stable tag + date: `0.1.0-nightly.20261109` |
-| On GitHub | a release, marked latest (a tag with a dash, `v0.2.0-beta.1`, is a pre-release) | one rolling pre-release tagged `nightly`, replaced each night |
-| Update feed | `appcast.xml` on the release, read from `releases/latest/download/appcast.xml` | `appcast-nightly.xml`, read from `releases/download/nightly/appcast-nightly.xml`; it also lists the latest stable item |
+| | Agora (stable) | Agora Nightly | Agora Dev |
+|---|---|---|---|
+| Bundle ID | `io.github.willyrl.agora` | `io.github.willyrl.agora.nightly` | `io.github.willyrl.agora.dev` |
+| Made by | pushing a `v*` tag (`release.yml`) | every night at 19:00 UTC when `main` changed, or **Actions → Nightly → Run workflow** (`nightly.yml`) | `scripts/build-app.sh` on your Mac |
+| Version | from the tag: `0.2.0` | the next patch + date: `0.2.1-nightly.20261109` | Info.plist's |
+| On GitHub | a release, marked latest (a tag with a dash, `v0.2.0-beta.1`, is a pre-release) | one rolling pre-release tagged `nightly`, replaced each night | — |
+| Updates from | `releases/latest/download/appcast.xml` | `releases/download/nightly/appcast-nightly.xml` | doesn't update |
+| Icon | plain | dark NIGHTLY band | orange DEV band |
+
+`scripts/build-app.sh [dev|stable|nightly]` sets the bundle ID, name and icon; `scripts/package-release.sh` (with `AGORA_FLAVOR=stable|nightly`) adds the update feed and packages it.
 
 ## Make a stable release
 
@@ -18,9 +21,11 @@ git tag v0.2.0 && git push origin v0.2.0
 
 The workflow tests, builds a universal app (Apple Silicon + Intel) with the version stamped in, packages `Agora-<version>.dmg` and `.zip` with `SHA256SUMS`, publishes the release with generated notes, then signs the `.zip` and attaches the update feed. **Actions → Release → Run workflow** makes a draft instead, to look over first.
 
-Build numbers (`CFBundleVersion`) are UTC timestamps (`YYYYMMDDHHMM`), so builds from both lines order correctly for updates.
+Build numbers (`CFBundleVersion`) are UTC timestamps (`YYYYMMDDHHMM`), so every build is newer than the one before it.
 
 Locally, `scripts/package-release.sh <version>` does the same packaging into `dist/`, and `scripts/make-appcast.sh` writes a feed.
+
+**Fixing a released version** while `main` has moved on: branch from the tag (`git switch -c release/0.2 v0.2.0`), fix it there, tag `v0.2.1` on that branch, and bring the fix to `main` too.
 
 ## Secrets
 
@@ -42,4 +47,4 @@ Every update is checked against the public key built into Agora (`AGORA_UPDATE_P
 
 `scripts/build-app.sh` signs with `AGORA_SIGN_IDENTITY` when set (e.g. `"Developer ID Application: Name (TEAMID)"`), else the local certificate from `scripts/make-signing-cert.sh`, else ad hoc. Only a Developer ID gets the hardened runtime and a secure timestamp, which notarization needs; ad-hoc and self-signed builds can't load Sparkle under the hardened runtime.
 
-Only release builds update themselves: `package-release.sh` puts the feeds and public key into Info.plist. Builds from `build-app.sh` and the demo don't, so they never replace themselves with a release.
+Only release builds update themselves: `package-release.sh` puts the feed and public key into Info.plist. Agora Dev and the demo have neither, so they never replace themselves with a release.

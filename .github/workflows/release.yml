@@ -101,7 +101,7 @@ jobs:
       - name: Build and package
         id: package
         run: |
-          scripts/package-release.sh "${{ steps.version.outputs.version }}" "${{ steps.version.outputs.build }}" | tee "$RUNNER_TEMP/package.log"
+          AGORA_FLAVOR=stable scripts/package-release.sh "${{ steps.version.outputs.version }}" "${{ steps.version.outputs.build }}" | tee "$RUNNER_TEMP/package.log"
           grep -q '^notarized=1' "$RUNNER_TEMP/package.log" && echo "notarized=true" >> "$GITHUB_OUTPUT" || echo "notarized=false" >> "$GITHUB_OUTPUT"
 
       - name: Write the release notes
