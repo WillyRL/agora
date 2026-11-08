@@ -24,7 +24,8 @@ struct ChatView: View {
             HStack(spacing: 0) {
                 VStack(spacing: 0) {
                     if let conversation {
-                        MessageList(conversation: conversation, bot: bot)
+                        // A fresh scroll view per chat, so one chat's scroll offset never carries over to the next.
+                        MessageList(conversation: conversation, bot: bot).id(conversation.id)
                         BottomArea(conversation: conversation, bot: bot, draft: $draft, images: $images)
                     } else if let loadError {
                         ContentUnavailableView {
@@ -181,6 +182,7 @@ struct MessageList: View {
     @Environment(AgoraCore.self) private var core
     let conversation: Conversation
     let bot: Bot
+    @State private var position = ScrollPosition(edge: .bottom)
 
     var body: some View {
         ScrollView {
@@ -226,6 +228,15 @@ struct MessageList: View {
             .frame(maxWidth: .infinity)
         }
         .defaultScrollAnchor(.bottom)
+        .scrollPosition($position)
+        .task {
+            // The lazy stack guesses row heights and charts size themselves late, so the first
+            // bottom offset can land past the content and show a blank chat. Settle at the bottom again.
+            for delay in [0.05, 0.3] {
+                try? await Task.sleep(for: .seconds(delay))
+                position.scrollTo(edge: .bottom)
+            }
+        }
     }
 }
 
