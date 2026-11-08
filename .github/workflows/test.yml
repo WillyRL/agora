@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
 
+# bash -eo pipefail: a failing command inside a pipe (… | tee) fails the step too.
+defaults:
+  run:
+    shell: bash
+
 jobs:
   test:
     runs-on: macos-15

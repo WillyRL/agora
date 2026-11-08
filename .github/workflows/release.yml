@@ -32,6 +32,11 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
+# bash -eo pipefail: a failing command inside a pipe (… | tee) fails the step too.
+defaults:
+  run:
+    shell: bash
+
 jobs:
   release:
     runs-on: macos-15
@@ -129,13 +134,13 @@ jobs:
             echo
           } > "$RUNNER_TEMP/notes.md"
 
-      - name: Publish the release
+      - name: Create the release (as a draft until everything is attached)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           V="${{ steps.version.outputs.version }}"
-          FLAGS=(--title "Agora $V" --notes-file "$RUNNER_TEMP/notes.md" --generate-notes --verify-tag)
-          [ "${{ steps.version.outputs.draft }}" = "true" ] && FLAGS=(--title "Agora $V" --notes-file "$RUNNER_TEMP/notes.md" --generate-notes --draft --target "$GITHUB_SHA")
+          FLAGS=(--title "Agora $V" --notes-file "$RUNNER_TEMP/notes.md" --generate-notes --draft)
+          if [ "${{ steps.version.outputs.draft }}" = "true" ]; then FLAGS+=(--target "$GITHUB_SHA"); else FLAGS+=(--verify-tag); fi
           [ "${{ steps.version.outputs.prerelease }}" = "true" ] && FLAGS+=(--prerelease)
           gh release create "${{ steps.version.outputs.tag }}" dist/Agora-$V.dmg dist/Agora-$V.zip dist/SHA256SUMS "${FLAGS[@]}"
 
@@ -155,6 +160,12 @@ jobs:
             "$RUNNER_TEMP/notes.html" dist/appcast.xml
           rm -f "$RUNNER_TEMP/sparkle.key"
           gh release upload "$TAG" dist/appcast.xml --clobber
+
+      - name: Publish the release
+        if: steps.version.outputs.draft != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "${{ steps.version.outputs.tag }}" --draft=false
 
       - name: Clean up the keychain
         if: always() && env.MACOS_CERTIFICATE != ''

@@ -23,6 +23,11 @@ concurrency:
   group: nightly
   cancel-in-progress: false
 
+# bash -eo pipefail: a failing command inside a pipe (… | tee) fails the step too.
+defaults:
+  run:
+    shell: bash
+
 jobs:
   nightly:
     runs-on: macos-15
