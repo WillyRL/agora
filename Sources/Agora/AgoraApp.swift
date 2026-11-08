@@ -18,6 +18,11 @@ struct AgoraApp: App {
         .defaultSize(width: 1120, height: 740)
         .windowStyle(.hiddenTitleBar)
         .commands {
+            CommandGroup(after: .appInfo) {
+                if delegate.model.updater.isAvailable {
+                    Button("Check for Updates…") { delegate.model.updater.checkForUpdates() }
+                }
+            }
             CommandGroup(after: .newItem) {
                 Button("Quick Ask") { delegate.model.quickAsk.toggle() }
                     .keyboardShortcut("k", modifiers: .command)

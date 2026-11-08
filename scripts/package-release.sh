@@ -1,6 +1,8 @@
 #!/bin/zsh
 # Builds a universal Agora.app and packages it for a release: dist/Agora-<version>.dmg, .zip and SHA256SUMS.
 # Usage: scripts/package-release.sh <version> [build-number]
+#   The build number orders every build across Stable and Nightly, so releases use a UTC timestamp
+#   (YYYYMMDDHHMM); the default is the current time.
 #
 # Signing and notarization happen only when these are set (as the release workflow does from secrets):
 #   AGORA_SIGN_IDENTITY   "Developer ID Application: Name (TEAMID)", already in a keychain
@@ -9,10 +11,15 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 VERSION="${1:?usage: scripts/package-release.sh <version> [build-number]}"
-BUILD="${2:-1}"
+BUILD="${2:-$(date -u +%Y%m%d%H%M)}"
 NAME="Agora-$VERSION"
 DIST="dist"
 rm -rf "$DIST" && mkdir -p "$DIST"
+
+# In-app updates: the feed Agora checks, and the public half of the key each update is signed with.
+export AGORA_UPDATE_FEED="${AGORA_UPDATE_FEED:-https://github.com/WillyRL/agora/releases/latest/download/appcast.xml}"
+export AGORA_UPDATE_FEED_NIGHTLY="${AGORA_UPDATE_FEED_NIGHTLY:-https://github.com/WillyRL/agora/releases/download/nightly/appcast-nightly.xml}"
+export AGORA_UPDATE_PUBLIC_KEY="${AGORA_UPDATE_PUBLIC_KEY:-vUKzzQ8xJvzr94JW5jI4oTDxQgqPSghMgaCrN/P6h20=}"
 
 AGORA_UNIVERSAL=1 AGORA_VERSION="$VERSION" AGORA_BUILD_NUMBER="$BUILD" AGORA_SIGN_IDENTITY="${AGORA_SIGN_IDENTITY:--}" scripts/build-app.sh release
 APP="build/Agora.app"

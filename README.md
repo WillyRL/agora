@@ -42,7 +42,9 @@ Agora is a small SwiftUI app for talking to the Bots you run in Hermes. Hermes d
 
 ## Download
 
-Get the latest **Agora-<version>.dmg** from [Releases](https://github.com/WillyRL/agora/releases), open it and drag Agora into Applications. It runs natively on Apple Silicon and Intel. If a release isn't notarized yet, its notes explain how to open it the first time. Or build it yourself (it takes about a minute):
+Get the latest **Agora-<version>.dmg** from [Releases](https://github.com/WillyRL/agora/releases), open it and drag Agora into Applications. It runs natively on Apple Silicon and Intel. If a release isn't notarized yet, its notes explain how to open it the first time.
+
+Agora updates itself (**Agora → Check for Updates…**). Want the newest features early? The [Nightly](https://github.com/WillyRL/agora/releases/tag/nightly) build is made every night from `main`; switch with **Settings → General → Update channel → Nightly**, and back to Stable any time. Or build it yourself (it takes about a minute):
 
 ## Build and run
 
@@ -119,7 +121,9 @@ Push a version tag and the Release workflow tests, builds a universal app, packa
 git tag v0.2.0 && git push origin v0.2.0
 ```
 
-A tag with a dash (`v0.2.0-beta.1`) becomes a pre-release, and **Actions → Release → Run workflow** makes a draft to look over first. `scripts/package-release.sh <version>` does the same packaging locally. To have macOS open it without warnings, add the Developer ID and notarization secrets listed at the top of `.github/workflows/release.yml`.
+A tag with a dash (`v0.2.0-beta.1`) becomes a pre-release, and **Actions → Release → Run workflow** makes a draft to look over first. The **Nightly** workflow rebuilds the rolling `nightly` pre-release every night when `main` has changed (or on demand from Actions).
+
+Every release carries a signed update feed (`appcast.xml`, or `appcast-nightly.xml`) for Sparkle. Updates are signed with the `SPARKLE_PRIVATE_KEY` secret; its public half is in `scripts/package-release.sh`. Keep a copy of the private key somewhere safe: without it, installed copies can't take new updates. `scripts/package-release.sh <version>` does the same packaging locally. To have macOS open it without warnings, add the Developer ID and notarization secrets listed at the top of `.github/workflows/release.yml`.
 
 ## Contributing
 

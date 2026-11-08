@@ -4,18 +4,33 @@
 #   AGORA_VERSION=0.2.0       version shown in Finder and About (default: Info.plist's)
 #   AGORA_BUILD_NUMBER=42     build number (default: Info.plist's)
 #   AGORA_SIGN_IDENTITY=…     signing identity (default: local certificate, else ad hoc)
+#   AGORA_UPDATE_FEED=…, AGORA_UPDATE_PUBLIC_KEY=…   turn on in-app updates (release builds)
+#   AGORA_UPDATE_FEED_NIGHTLY=…                      also offer the Nightly channel
 set -euo pipefail
 cd "$(dirname "$0")/.."
 CONFIG="${1:-release}"
 ARCHS=()
 [ "${AGORA_UNIVERSAL:-}" = "1" ] && ARCHS=(--arch arm64 --arch x86_64)
 swift build -c "$CONFIG" --product Agora "${ARCHS[@]}"
-BIN="$(swift build -c "$CONFIG" "${ARCHS[@]}" --show-bin-path)/Agora"
+BINDIR="$(swift build -c "$CONFIG" "${ARCHS[@]}" --show-bin-path)"
 APP="build/Agora.app"
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp "$BIN" "$APP/Contents/MacOS/Agora"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Frameworks"
+cp "$BINDIR/Agora" "$APP/Contents/MacOS/Agora"
 cp scripts/Info.plist "$APP/Contents/Info.plist"
+
+# Sparkle (in-app updates). Agora isn't sandboxed, so Sparkle's XPC helpers aren't needed.
+ditto "$BINDIR/Sparkle.framework" "$APP/Contents/Frameworks/Sparkle.framework"
+rm -rf "$APP/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices" "$APP/Contents/Frameworks/Sparkle.framework/XPCServices"
+install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP/Contents/MacOS/Agora"
+
+# Release builds get the update feed and the public key that checks each update's signature.
+# Builds made from source don't, so they never replace themselves with a release.
+if [ -n "${AGORA_UPDATE_FEED:-}" ] && [ -n "${AGORA_UPDATE_PUBLIC_KEY:-}" ]; then
+  /usr/libexec/PlistBuddy -c "Add :SUFeedURL string ${AGORA_UPDATE_FEED}" "$APP/Contents/Info.plist"
+  /usr/libexec/PlistBuddy -c "Add :SUPublicEDKey string ${AGORA_UPDATE_PUBLIC_KEY}" "$APP/Contents/Info.plist"
+  [ -n "${AGORA_UPDATE_FEED_NIGHTLY:-}" ] && /usr/libexec/PlistBuddy -c "Add :AgoraNightlyFeedURL string ${AGORA_UPDATE_FEED_NIGHTLY}" "$APP/Contents/Info.plist"
+fi
 [ -n "${AGORA_VERSION:-}" ] && /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${AGORA_VERSION}" "$APP/Contents/Info.plist"
 [ -n "${AGORA_BUILD_NUMBER:-}" ] && /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${AGORA_BUILD_NUMBER}" "$APP/Contents/Info.plist"
 
@@ -45,8 +60,14 @@ if [ -z "$IDENTITY" ]; then
   echo "Note: signing ad hoc; macOS will ask for your keychain password after each rebuild. Run scripts/make-signing-cert.sh once to stop that."
   IDENTITY="-"
 fi
-# A real certificate gets a secure timestamp, which notarization requires.
-TIMESTAMP=(--timestamp=none)
-[ "$IDENTITY" != "-" ] && [ "$IDENTITY" != "Agora Local Signing" ] && TIMESTAMP=(--timestamp)
-codesign --force --deep --options runtime "${TIMESTAMP[@]}" --sign "$IDENTITY" "$APP" >/dev/null
+# A Developer ID gets the hardened runtime and a secure timestamp, which notarization requires. Ad-hoc
+# and self-signed builds have no Team ID, and the hardened runtime would then refuse to load Sparkle.
+OPTS=(--timestamp=none)
+[[ "$IDENTITY" == "Developer ID Application:"* ]] && OPTS=(--timestamp --options runtime)
+# Inside out: Sparkle's helpers, the framework, then the app (notarization rejects --deep signing).
+SPARKLE="$APP/Contents/Frameworks/Sparkle.framework"
+for part in "$SPARKLE/Versions/B/Autoupdate" "$SPARKLE/Versions/B/Updater.app" "$SPARKLE"; do
+  codesign --force "${OPTS[@]}" --sign "$IDENTITY" "$part" >/dev/null
+done
+codesign --force "${OPTS[@]}" --sign "$IDENTITY" "$APP" >/dev/null
 echo "Built $APP"

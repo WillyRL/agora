@@ -8,9 +8,13 @@ let package = Package(
         .executable(name: "Agora", targets: ["Agora"]),
         .library(name: "AgoraCore", targets: ["AgoraCore"]),
     ],
+    dependencies: [
+        // In-app updates (Check for Updates…), signed with our own EdDSA key.
+        .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.6.0"),
+    ],
     targets: [
         .target(name: "AgoraCore"),
-        .executableTarget(name: "Agora", dependencies: ["AgoraCore"]),
+        .executableTarget(name: "Agora", dependencies: ["AgoraCore", .product(name: "Sparkle", package: "Sparkle")]),
         .executableTarget(name: "agora-record", dependencies: ["AgoraCore"]),
         .testTarget(
             name: "AgoraCoreTests",

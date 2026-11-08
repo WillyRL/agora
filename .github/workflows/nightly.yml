@@ -1,0 +1,157 @@
+name: Nightly
+
+# Every night, if main changed since the last nightly: test, build and replace the rolling `nightly`
+# pre-release (Agora-<version>-nightly.<date>.dmg/.zip) and its update feed, appcast-nightly.xml.
+# Copies of Agora set to the Nightly channel update from that feed; it also lists the latest stable
+# release, so they still get a newer stable one. Run it by hand from Actions → Nightly any time.
+# Uses the same optional secrets as release.yml.
+
+on:
+  schedule:
+    - cron: "0 19 * * *"   # 19:00 UTC, 02:00 in Jakarta
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Build even if main hasn't changed since the last nightly"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+jobs:
+  nightly:
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+      MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+      SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # tags and history, for the version and the change list
+
+      - name: Anything new since the last nightly?
+        id: check
+        run: |
+          LAST="$(git rev-list -n 1 nightly 2>/dev/null || true)"
+          echo "last=$LAST" >> "$GITHUB_OUTPUT"
+          if [ "$LAST" = "$GITHUB_SHA" ] && [ "${{ inputs.force }}" != "true" ]; then
+            echo "Nothing new on main since the last nightly ($LAST); skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Work out the version
+        if: steps.check.outputs.skip != 'true'
+        id: version
+        run: |
+          # Based on the latest stable tag (else Info.plist): 0.1.0-nightly.20261109
+          BASE="$(git describe --tags --abbrev=0 --match 'v[0-9]*' 2>/dev/null | sed 's/^v//' | sed 's/-.*//')"
+          [ -n "$BASE" ] || BASE="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' scripts/Info.plist)"
+          VERSION="$BASE-nightly.$(date -u +%Y%m%d)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build=$(date -u +%Y%m%d%H%M)" >> "$GITHUB_OUTPUT"   # orders builds across Stable and Nightly
+          echo "Nightly $VERSION"
+
+      - name: Use the newest Xcode on the runner
+        if: steps.check.outputs.skip != 'true'
+        run: sudo xcode-select -s "$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)" && swift --version
+
+      - name: Test
+        if: steps.check.outputs.skip != 'true'
+        run: swift test
+
+      - name: Import the signing certificate
+        if: steps.check.outputs.skip != 'true' && env.MACOS_CERTIFICATE != ''
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/release.keychain-db"
+          KEYCHAIN_PASSWORD="$(uuidgen)"
+          echo "$MACOS_CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security import "$RUNNER_TEMP/cert.p12" -P "$MACOS_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" >/dev/null
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          rm "$RUNNER_TEMP/cert.p12"
+          IDENTITY="$(security find-identity -v -p codesigning "$KEYCHAIN" | grep -o '"Developer ID Application: [^"]*"' | head -1 | tr -d '"')"
+          if [ -z "$IDENTITY" ]; then echo "::error::No 'Developer ID Application' identity in MACOS_CERTIFICATE"; exit 1; fi
+          echo "AGORA_SIGN_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
+
+      - name: Build and package
+        if: steps.check.outputs.skip != 'true'
+        id: package
+        run: |
+          scripts/package-release.sh "${{ steps.version.outputs.version }}" "${{ steps.version.outputs.build }}" | tee "$RUNNER_TEMP/package.log"
+          grep -q '^notarized=1' "$RUNNER_TEMP/package.log" && echo "notarized=true" >> "$GITHUB_OUTPUT" || echo "notarized=false" >> "$GITHUB_OUTPUT"
+
+      - name: Write the release notes
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          V="${{ steps.version.outputs.version }}"; LAST="${{ steps.check.outputs.last }}"
+          {
+            echo "Built every night from \`main\` ($(git rev-parse --short HEAD)). Newest features, rougher edges: for the tested version, use the [latest release](https://github.com/$GITHUB_REPOSITORY/releases/latest)."
+            echo
+            echo "Already on Agora? Settings → General → Update channel → **Nightly**, and it updates itself every night."
+            echo
+            echo "## Changes"
+            echo
+            if [ -n "$LAST" ] && git merge-base --is-ancestor "$LAST" HEAD 2>/dev/null; then
+              git log --no-merges --pretty='- %s (%h)' "$LAST..HEAD" | head -50
+            else
+              git log --no-merges --pretty='- %s (%h)' -20
+            fi
+            echo
+            if [ "${{ steps.package.outputs.notarized }}" != "true" ]; then
+              echo "This build isn't notarized: on first launch, open it once, then **System Settings → Privacy & Security → Open Anyway** (or \`xattr -dr com.apple.quarantine /Applications/Agora.app\`)."
+            fi
+          } > "$RUNNER_TEMP/notes.md"
+
+      - name: Write the update feed
+        if: steps.check.outputs.skip != 'true' && env.SPARKLE_PRIVATE_KEY != ''
+        run: |
+          V="${{ steps.version.outputs.version }}"
+          SPARKLE_BIN="$(scripts/get-sparkle-tools.sh "$RUNNER_TEMP/sparkle" | tail -1)"
+          umask 077; printf '%s' "$SPARKLE_PRIVATE_KEY" > "$RUNNER_TEMP/sparkle.key"
+          gh api markdown -f text="$(cat "$RUNNER_TEMP/notes.md")" -f mode=gfm -f context="$GITHUB_REPOSITORY" > "$RUNNER_TEMP/notes.html"
+          # The latest stable feed, so Nightly users also see a newer stable release (none yet is fine).
+          gh release download --pattern appcast.xml --output "$RUNNER_TEMP/stable.xml" 2>/dev/null || true
+          SPARKLE_BIN="$SPARKLE_BIN" SPARKLE_KEY_FILE="$RUNNER_TEMP/sparkle.key" scripts/make-appcast.sh \
+            "$V" "${{ steps.version.outputs.build }}" "dist/Agora-$V.zip" \
+            "https://github.com/$GITHUB_REPOSITORY/releases/download/nightly/Agora-$V.zip" \
+            "$RUNNER_TEMP/notes.html" dist/appcast-nightly.xml "$RUNNER_TEMP/stable.xml"
+          rm -f "$RUNNER_TEMP/sparkle.key"
+
+      - name: Replace the nightly release
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          V="${{ steps.version.outputs.version }}"
+          git tag -f nightly "$GITHUB_SHA"
+          git push -f origin refs/tags/nightly
+          FILES=(dist/Agora-$V.dmg dist/Agora-$V.zip dist/SHA256SUMS)
+          [ -f dist/appcast-nightly.xml ] && FILES+=(dist/appcast-nightly.xml)
+          if gh release view nightly >/dev/null 2>&1; then
+            # Same release, so its download links stay the same; swap last night's files for tonight's.
+            for old in $(gh release view nightly --json assets -q '.assets[].name'); do
+              case " ${FILES[*]##*/} " in *" $old "*) ;; *) gh release delete-asset nightly "$old" -y ;; esac
+            done
+            gh release upload nightly "${FILES[@]}" --clobber
+            gh release edit nightly --title "Agora Nightly ($V)" --notes-file "$RUNNER_TEMP/notes.md" --prerelease --latest=false
+          else
+            gh release create nightly "${FILES[@]}" --title "Agora Nightly ($V)" --notes-file "$RUNNER_TEMP/notes.md" --prerelease --latest=false --verify-tag
+          fi
+
+      - name: Clean up the keychain
+        if: always() && env.MACOS_CERTIFICATE != ''
+        run: security delete-keychain "$RUNNER_TEMP/release.keychain-db" || true

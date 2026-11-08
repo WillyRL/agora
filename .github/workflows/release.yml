@@ -12,6 +12,9 @@ name: Release
 #   APPLE_TEAM_ID                your 10-character Team ID
 #   APPLE_APP_PASSWORD           an app-specific password from account.apple.com
 # Without them the release is signed ad hoc and the notes explain how to open it.
+#
+# In-app updates: each release also gets appcast.xml, the feed Agora checks, with the .zip signed by
+#   SPARKLE_PRIVATE_KEY          the EdDSA key from Sparkle's generate_keys (its public half is in package-release.sh)
 
 on:
   push:
@@ -39,6 +42,7 @@ jobs:
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+      SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -56,6 +60,7 @@ jobs:
           fi
           PRERELEASE=false; [[ "$VERSION" == *-* ]] && PRERELEASE=true
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build=$(date -u +%Y%m%d%H%M)" >> "$GITHUB_OUTPUT"   # orders builds across Stable and Nightly
           echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
           echo "draft=$DRAFT" >> "$GITHUB_OUTPUT"
           echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
@@ -86,7 +91,7 @@ jobs:
       - name: Build and package
         id: package
         run: |
-          scripts/package-release.sh "${{ steps.version.outputs.version }}" "${{ github.run_number }}" | tee "$RUNNER_TEMP/package.log"
+          scripts/package-release.sh "${{ steps.version.outputs.version }}" "${{ steps.version.outputs.build }}" | tee "$RUNNER_TEMP/package.log"
           grep -q '^notarized=1' "$RUNNER_TEMP/package.log" && echo "notarized=true" >> "$GITHUB_OUTPUT" || echo "notarized=false" >> "$GITHUB_OUTPUT"
 
       - name: Write the release notes
@@ -122,6 +127,23 @@ jobs:
           [ "${{ steps.version.outputs.draft }}" = "true" ] && FLAGS=(--title "Agora $V" --notes-file "$RUNNER_TEMP/notes.md" --generate-notes --draft --target "$GITHUB_SHA")
           [ "${{ steps.version.outputs.prerelease }}" = "true" ] && FLAGS+=(--prerelease)
           gh release create "${{ steps.version.outputs.tag }}" dist/Agora-$V.dmg dist/Agora-$V.zip dist/SHA256SUMS "${FLAGS[@]}"
+
+      - name: Publish the update feed
+        if: env.SPARKLE_PRIVATE_KEY != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V="${{ steps.version.outputs.version }}"; TAG="${{ steps.version.outputs.tag }}"
+          SPARKLE_BIN="$(scripts/get-sparkle-tools.sh "$RUNNER_TEMP/sparkle" | tail -1)"
+          umask 077; printf '%s' "$SPARKLE_PRIVATE_KEY" > "$RUNNER_TEMP/sparkle.key"
+          gh release view "$TAG" --json body -q .body > "$RUNNER_TEMP/notes-final.md"
+          gh api markdown -f text="$(cat "$RUNNER_TEMP/notes-final.md")" -f mode=gfm -f context="$GITHUB_REPOSITORY" > "$RUNNER_TEMP/notes.html"
+          SPARKLE_BIN="$SPARKLE_BIN" SPARKLE_KEY_FILE="$RUNNER_TEMP/sparkle.key" scripts/make-appcast.sh \
+            "$V" "${{ steps.version.outputs.build }}" "dist/Agora-$V.zip" \
+            "https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/Agora-$V.zip" \
+            "$RUNNER_TEMP/notes.html" dist/appcast.xml
+          rm -f "$RUNNER_TEMP/sparkle.key"
+          gh release upload "$TAG" dist/appcast.xml --clobber
 
       - name: Clean up the keychain
         if: always() && env.MACOS_CERTIFICATE != ''

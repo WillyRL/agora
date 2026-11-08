@@ -39,6 +39,7 @@ enum Destination: Hashable {
 final class AppModel {
     let core: AgoraCore
     let notifier = UserNotificationsNotifier()
+    let updater = AppUpdater()
     var destination: Destination = .today {
         didSet {
             // Opening a Side Chat always shows its Bot's list.
