@@ -5,8 +5,8 @@
     <link>https://github.com/WillyRL/agora</link>
     <item>
       <title>Agora 0.1.0-beta.3</title>
-      <pubDate>Sun, 08 Nov 2026 15:50:23 +0000</pubDate>
-      <sparkle:version>202611081548</sparkle:version>
+      <pubDate>Sun, 08 Nov 2026 15:55:21 +0000</pubDate>
+      <sparkle:version>202611081551</sparkle:version>
       <sparkle:shortVersionString>0.1.0-beta.3</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
       <sparkle:channel>beta</sparkle:channel>
@@ -23,8 +23,8 @@
 <li>Or in Terminal: <code class="notranslate">xattr -dr com.apple.quarantine /Applications/Agora.app</code></li>
 </ul>
 <p dir="auto">Check the download: <code class="notranslate">shasum -a 256 -c SHA256SUMS</code>.</p>
-<p dir="auto"><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/WillyRL/agora/compare/v0.1.0-beta.1...v0.1.0-beta.3"><tt>v0.1.0-beta.1...v0.1.0-beta.3</tt></a></p>]]></description>
-      <enclosure url="https://github.com/WillyRL/agora/releases/download/v0.1.0-beta.3/Agora-0.1.0-beta.3.zip" type="application/octet-stream" sparkle:edSignature="9E8SZcoa9eM4210NFqKLbrgdmx71BToLNHJukiP/LVTft+Y7S9ilobkjpzVs7m0pZPZLFyAXe5LMTF05K3dUBw==" length="5336414"/>
+<p dir="auto"><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/WillyRL/agora/compare/v0.1.0-beta.2...v0.1.0-beta.3"><tt>v0.1.0-beta.2...v0.1.0-beta.3</tt></a></p>]]></description>
+      <enclosure url="https://github.com/WillyRL/agora/releases/download/v0.1.0-beta.3/Agora-0.1.0-beta.3.zip" type="application/octet-stream" sparkle:edSignature="i4MtwBoNGy0xoiDMSyUKkqkz5TxRkL69Mdm94G0369334g+2/HLwan5k8o3CxxugVBxT382gBHYBfFb1cMMFCw==" length="5336416"/>
     </item>
 
   </channel>
