@@ -40,7 +40,9 @@ Agora is a small SwiftUI app for talking to the Bots you run in Hermes. Hermes d
 - macOS 15 or later, and Xcode 26 or later (Swift 6.2) to build it.
 - Hermes **v0.23 or later**, on this Mac or another machine you can reach.
 
-There's no downloadable build yet: Agora isn't notarized, so you build it yourself (it takes about a minute).
+## Download
+
+Get the latest **Agora-<version>.dmg** from [Releases](https://github.com/WillyRL/agora/releases), open it and drag Agora into Applications. It runs natively on Apple Silicon and Intel. If a release isn't notarized yet, its notes explain how to open it the first time. Or build it yourself (it takes about a minute):
 
 ## Build and run
 
@@ -108,6 +110,16 @@ swift run agora-record botchat /tmp/botchat.json <profile>
 | `docs/` | Decisions (`adr/`), the Hermes protocol as Agora uses it (`protocol/`), the design reference (`design/`) |
 
 Words used throughout the code and docs (Bot, Bot Chat, Side Chat, Routine, Connection…) are defined in `GLOSSARY.md`.
+
+### Making a release
+
+Push a version tag and the Release workflow tests, builds a universal app, packages `Agora-<version>.dmg` and `.zip` with `SHA256SUMS`, and publishes a GitHub Release:
+
+```sh
+git tag v0.2.0 && git push origin v0.2.0
+```
+
+A tag with a dash (`v0.2.0-beta.1`) becomes a pre-release, and **Actions → Release → Run workflow** makes a draft to look over first. `scripts/package-release.sh <version>` does the same packaging locally. To have macOS open it without warnings, add the Developer ID and notarization secrets listed at the top of `.github/workflows/release.yml`.
 
 ## Contributing
 

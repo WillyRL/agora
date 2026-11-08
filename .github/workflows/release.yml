@@ -1,0 +1,128 @@
+name: Release
+
+# Push a version tag to publish a release:
+#   git tag v0.2.0 && git push origin v0.2.0
+# A tag with a dash (v0.2.0-beta.1) becomes a pre-release.
+# Or run it by hand (Actions → Release → Run workflow) to get a draft release to look over first.
+#
+# Optional secrets, for an app macOS opens without warnings (Apple Developer Program needed):
+#   MACOS_CERTIFICATE            base64 of your "Developer ID Application" certificate exported as .p12
+#   MACOS_CERTIFICATE_PASSWORD   the .p12's password
+#   APPLE_ID                     your Apple ID email
+#   APPLE_TEAM_ID                your 10-character Team ID
+#   APPLE_APP_PASSWORD           an app-specific password from account.apple.com
+# Without them the release is signed ad hoc and the notes explain how to open it.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version, e.g. 0.2.0 (makes a draft release tagged v<version>)"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+      MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Work out the version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ inputs.version }}"; DRAFT=true
+          else
+            VERSION="${GITHUB_REF_NAME#v}"; DRAFT=false
+          fi
+          VERSION="${VERSION#v}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
+            echo "::error::'$VERSION' isn't a version like 1.2.3 or 1.2.3-beta.1"; exit 1
+          fi
+          PRERELEASE=false; [[ "$VERSION" == *-* ]] && PRERELEASE=true
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "draft=$DRAFT" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
+
+      - name: Use the newest Xcode on the runner
+        run: sudo xcode-select -s "$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)" && swift --version
+
+      - name: Test
+        run: swift test
+
+      - name: Import the signing certificate
+        if: env.MACOS_CERTIFICATE != ''
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/release.keychain-db"
+          KEYCHAIN_PASSWORD="$(uuidgen)"
+          echo "$MACOS_CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security import "$RUNNER_TEMP/cert.p12" -P "$MACOS_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" >/dev/null
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          rm "$RUNNER_TEMP/cert.p12"
+          IDENTITY="$(security find-identity -v -p codesigning "$KEYCHAIN" | grep -o '"Developer ID Application: [^"]*"' | head -1 | tr -d '"')"
+          if [ -z "$IDENTITY" ]; then echo "::error::No 'Developer ID Application' identity in MACOS_CERTIFICATE"; exit 1; fi
+          echo "AGORA_SIGN_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
+
+      - name: Build and package
+        id: package
+        run: |
+          scripts/package-release.sh "${{ steps.version.outputs.version }}" "${{ github.run_number }}" | tee "$RUNNER_TEMP/package.log"
+          grep -q '^notarized=1' "$RUNNER_TEMP/package.log" && echo "notarized=true" >> "$GITHUB_OUTPUT" || echo "notarized=false" >> "$GITHUB_OUTPUT"
+
+      - name: Write the release notes
+        run: |
+          V="${{ steps.version.outputs.version }}"
+          {
+            echo "## Install"
+            echo
+            echo "1. Download **Agora-$V.dmg** below, open it and drag **Agora** into **Applications**."
+            echo "2. Open Agora and choose where your Hermes runs: on this Mac, or on another machine."
+            echo
+            echo "Needs macOS 15 or later and Hermes v0.23 or later. Runs natively on Apple Silicon and Intel."
+            echo
+            if [ "${{ steps.package.outputs.notarized }}" != "true" ]; then
+              echo "### First launch"
+              echo
+              echo "This build isn't notarized by Apple yet, so macOS stops it the first time:"
+              echo
+              echo "- Open Agora once, then go to **System Settings → Privacy & Security**, scroll down and click **Open Anyway**."
+              echo "- Or in Terminal: \`xattr -dr com.apple.quarantine /Applications/Agora.app\`"
+              echo
+            fi
+            echo "Check the download: \`shasum -a 256 -c SHA256SUMS\`."
+            echo
+          } > "$RUNNER_TEMP/notes.md"
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V="${{ steps.version.outputs.version }}"
+          FLAGS=(--title "Agora $V" --notes-file "$RUNNER_TEMP/notes.md" --generate-notes --verify-tag)
+          [ "${{ steps.version.outputs.draft }}" = "true" ] && FLAGS=(--title "Agora $V" --notes-file "$RUNNER_TEMP/notes.md" --generate-notes --draft --target "$GITHUB_SHA")
+          [ "${{ steps.version.outputs.prerelease }}" = "true" ] && FLAGS+=(--prerelease)
+          gh release create "${{ steps.version.outputs.tag }}" dist/Agora-$V.dmg dist/Agora-$V.zip dist/SHA256SUMS "${FLAGS[@]}"
+
+      - name: Clean up the keychain
+        if: always() && env.MACOS_CERTIFICATE != ''
+        run: security delete-keychain "$RUNNER_TEMP/release.keychain-db" || true

@@ -1,15 +1,23 @@
 #!/bin/zsh
 # Builds Agora.app into ./build. Usage: scripts/build-app.sh [debug|release]
+#   AGORA_UNIVERSAL=1         build for Apple Silicon and Intel (releases)
+#   AGORA_VERSION=0.2.0       version shown in Finder and About (default: Info.plist's)
+#   AGORA_BUILD_NUMBER=42     build number (default: Info.plist's)
+#   AGORA_SIGN_IDENTITY=…     signing identity (default: local certificate, else ad hoc)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 CONFIG="${1:-release}"
-swift build -c "$CONFIG" --product Agora
-BIN="$(swift build -c "$CONFIG" --show-bin-path)/Agora"
+ARCHS=()
+[ "${AGORA_UNIVERSAL:-}" = "1" ] && ARCHS=(--arch arm64 --arch x86_64)
+swift build -c "$CONFIG" --product Agora "${ARCHS[@]}"
+BIN="$(swift build -c "$CONFIG" "${ARCHS[@]}" --show-bin-path)/Agora"
 APP="build/Agora.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/Agora"
 cp scripts/Info.plist "$APP/Contents/Info.plist"
+[ -n "${AGORA_VERSION:-}" ] && /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${AGORA_VERSION}" "$APP/Contents/Info.plist"
+[ -n "${AGORA_BUILD_NUMBER:-}" ] && /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${AGORA_BUILD_NUMBER}" "$APP/Contents/Info.plist"
 
 # App icon from assets/icon.svg (rendered with Quick Look, packed with iconutil).
 if [ ! -f build/AppIcon.icns ] || [ assets/icon.svg -nt build/AppIcon.icns ]; then
@@ -37,5 +45,8 @@ if [ -z "$IDENTITY" ]; then
   echo "Note: signing ad hoc; macOS will ask for your keychain password after each rebuild. Run scripts/make-signing-cert.sh once to stop that."
   IDENTITY="-"
 fi
-codesign --force --deep --options runtime --sign "$IDENTITY" "$APP" >/dev/null
+# A real certificate gets a secure timestamp, which notarization requires.
+TIMESTAMP=(--timestamp=none)
+[ "$IDENTITY" != "-" ] && [ "$IDENTITY" != "Agora Local Signing" ] && TIMESTAMP=(--timestamp)
+codesign --force --deep --options runtime "${TIMESTAMP[@]}" --sign "$IDENTITY" "$APP" >/dev/null
 echo "Built $APP"
