@@ -1,0 +1,18 @@
+{
+ "base": "coder-chat",
+ "description": "The Bot asks permission (canonical approval.request event, answered with approval.respond). Shapes: gateway/session_pending_controls.py.",
+ "exchanges": [
+  {"expect": {"method": "prompt.submit", "params": {"text": "Clean the build folder"}},
+   "result": {"admission_id": "adm-5", "status": "queued", "authority_epoch": 3},
+   "then": [
+    {"jsonrpc": "2.0", "method": "event", "params": {"type": "session.info", "session_id": "sess-coder-chat", "seq": 1, "payload": {"running": true, "execution_generation": 2, "revision": 5}}},
+    {"jsonrpc": "2.0", "method": "event", "params": {"type": "approval.request", "session_id": "sess-coder-chat", "seq": 2, "execution_generation": 2,
+     "payload": {"kind": "approval", "prompt_id": "ap_1", "execution_generation": 2, "command": "rm -rf build", "description": "recursive delete", "choices": ["once", "deny", "session", "always"], "timeout_s": 120}}}
+   ]},
+  {"expect": {"method": "approval.respond", "params": {"session_id": "sess-coder-chat", "profile": "coder", "execution_generation": 2, "prompt_id": "ap_1"}},
+   "result": {"status": "resolved", "prompt_id": "ap_1"},
+   "then": [
+    {"jsonrpc": "2.0", "method": "event", "params": {"type": "approval.settled", "session_id": "sess-coder-chat", "seq": 3, "execution_generation": 2, "payload": {"prompt_id": "ap_1", "execution_generation": 2}}}
+   ]}
+ ]
+}

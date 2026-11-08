@@ -1,0 +1,854 @@
+{
+ "base": "local-roster",
+ "description": "Create a Bot (profiles.create + ui_meta CAS write), edit one (re-read, merge, write; unknown keys kept), delete one (REST, registry ticket).",
+ "exchanges": [
+  {
+   "expect": {
+    "method": "profiles.create",
+    "params": {
+     "name": "travel",
+     "description": "Trips, bookings & itineraries",
+     "soul": "Organised and a little adventurous.",
+     "model": "claude-opus-5-5",
+     "provider": "anthropic"
+    }
+   },
+   "result": {
+    "ok": true,
+    "name": "travel",
+    "path": "/Users/me/.hermes/profiles/travel",
+    "soul_written": true,
+    "model_set": true,
+    "mirrored": {
+     "env": true,
+     "auth": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "profiles.configure",
+    "params": {
+     "name": "travel",
+     "ui_meta_expected_revisions": {
+      "hermes-bots": 0
+     }
+    }
+   },
+   "result": {
+    "ok": true,
+    "applied": {
+     "ui_meta": true,
+     "ui_meta_revisions": {
+      "hermes-bots": 1
+     }
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "profiles.list",
+    "params": {}
+   },
+   "result": {
+    "bot_mode_protocol": true,
+    "install_id": "df746216f18645d99417dbf6ba47e928",
+    "profiles": [
+     {
+      "canonical_session": null,
+      "description": "",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": true,
+      "last_session": {
+       "id": "local-20c003d1f002b1e7b737769273cf387140534073284b711cff6a37d701c45e47",
+       "last_active": 1793973646.982031,
+       "message_count": 2,
+       "preview": "Sample preview from default",
+       "resolved_id": "local-20c003d1f002b1e7b737769273cf387140534073284b711cff6a37d701c45e47",
+       "root_title": "Sample session",
+       "started_at": 1793973644.344116,
+       "title": "Sample session"
+      },
+      "model": "claude-opus-5-5",
+      "name": "default",
+      "path": "/Users/me/.hermes",
+      "provider": "anthropic",
+      "skill_count": 96,
+      "ui_meta": {
+       "hermes-bots": {
+        "color": "#8b5cf6",
+        "custom": true,
+        "group": "Hermes, Coder, Reviewer",
+        "groups": [
+         "Hermes, Coder, Reviewer"
+        ],
+        "imageKind": "shape",
+        "shape": "squircle",
+        "title": ""
+       },
+       "hermes-bots-groups": {
+        "rooms": {}
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 2,
+       "hermes-bots-groups": 13
+      },
+      "worker_session": null
+     },
+     {
+      "canonical_session": null,
+      "description": "",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "business-team",
+      "path": "/Users/me/.hermes/profiles/business-team",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "created": 1789215367013,
+        "imageKind": "shape",
+        "shape": "blobatar",
+        "title": ""
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": {
+       "id": "20261014_090501_9ad0c5",
+       "last_active": 1791944565.3982441,
+       "preview": "Sample preview from business-team",
+       "root_title": "Sample session",
+       "source": "kanban",
+       "title": "Sample session"
+      }
+     },
+     {
+      "canonical_session": null,
+      "description": "Chart Technical Analysts",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "chart-technical-analysts",
+      "path": "/Users/me/.hermes/profiles/chart-technical-analysts",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "created": 1789065792155,
+        "imageKind": "shape",
+        "shape": "blobatar",
+        "title": "Chart Technical Analysts"
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": null
+     },
+     {
+      "canonical_session": null,
+      "description": "This agent profile dedicated to Coding purposes",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "coder",
+      "path": "/Users/me/.hermes/profiles/coder",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "group": "Hermes, Coder, Reviewer",
+        "groups": [
+         "Hermes, Coder, Reviewer"
+        ]
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": {
+       "id": "local-b0e9e6e0d3b6727783247ad49ebcbdc17154cda0ffd47695a78ba20069c74ed3",
+       "last_active": 1793472132.6316202,
+       "preview": "Sample preview from coder",
+       "root_title": "Sample session",
+       "source": "oneshot",
+       "title": "Sample session"
+      }
+     },
+     {
+      "canonical_session": null,
+      "description": "DevOps/SRE: server health, logs, Docker/Easypanel, AWS, Cloudflare/Tailscale, de",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "devops",
+      "path": "/Users/me/.hermes/profiles/devops",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta_revisions": {},
+      "worker_session": null
+     },
+     {
+      "canonical_session": null,
+      "description": "Finance Assistant \u2014 Budgets, bills and receipts",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "finance-assistant",
+      "path": "/Users/me/.hermes/profiles/finance-assistant",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "color": null,
+        "created": 1788539709939,
+        "imageKind": "photo",
+        "shape": "blobatar",
+        "title": "Finance Assistant",
+        "sectionId": "money",
+        "pinned": true
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": null
+     },
+     {
+      "canonical_session": null,
+      "description": "Code review specialist. Reviews diffs, PRs, and code quality; finds bugs, securi",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "reviewer",
+      "path": "/Users/me/.hermes/profiles/reviewer",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "group": "Hermes, Coder, Reviewer",
+        "groups": [
+         "Hermes, Coder, Reviewer"
+        ],
+        "hidden": true
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": {
+       "id": "20261004_182456_dc49aa",
+       "last_active": 1791113220.231839,
+       "preview": "Sample preview from reviewer",
+       "root_title": "Sample session",
+       "source": "kanban",
+       "title": "Sample session"
+      }
+     },
+     {
+      "name": "travel",
+      "path": "/Users/me/.hermes/profiles/travel",
+      "is_default": false,
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "description": "Trips, bookings & itineraries",
+      "display_name": "",
+      "skill_count": 10,
+      "previous_names": [],
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "ui_meta": {
+       "hermes-bots": {
+        "title": "Travel",
+        "color": "#f97316",
+        "shape": "circle",
+        "imageKind": "shape",
+        "custom": true,
+        "created": 1793974000000
+       }
+      },
+      "has_avatar": false,
+      "canonical_session": null
+     }
+    ]
+   },
+   "then": []
+  },
+  {
+   "expect": {
+    "method": "profiles.configure",
+    "params": {
+     "name": "finance-assistant",
+     "description": "Money, budgets and the budget app"
+    }
+   },
+   "result": {
+    "ok": true,
+    "applied": {
+     "description": true,
+     "soul": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "profiles.list",
+    "params": {}
+   },
+   "result": {
+    "bot_mode_protocol": true,
+    "install_id": "df746216f18645d99417dbf6ba47e928",
+    "profiles": [
+     {
+      "canonical_session": null,
+      "description": "",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": true,
+      "last_session": {
+       "id": "local-20c003d1f002b1e7b737769273cf387140534073284b711cff6a37d701c45e47",
+       "last_active": 1793973646.982031,
+       "message_count": 2,
+       "preview": "Sample preview from default",
+       "resolved_id": "local-20c003d1f002b1e7b737769273cf387140534073284b711cff6a37d701c45e47",
+       "root_title": "Sample session",
+       "started_at": 1793973644.344116,
+       "title": "Sample session"
+      },
+      "model": "claude-opus-5-5",
+      "name": "default",
+      "path": "/Users/me/.hermes",
+      "provider": "anthropic",
+      "skill_count": 96,
+      "ui_meta": {
+       "hermes-bots": {
+        "color": "#8b5cf6",
+        "custom": true,
+        "group": "Hermes, Coder, Reviewer",
+        "groups": [
+         "Hermes, Coder, Reviewer"
+        ],
+        "imageKind": "shape",
+        "shape": "squircle",
+        "title": ""
+       },
+       "hermes-bots-groups": {
+        "rooms": {}
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 2,
+       "hermes-bots-groups": 13
+      },
+      "worker_session": null
+     },
+     {
+      "canonical_session": null,
+      "description": "",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "business-team",
+      "path": "/Users/me/.hermes/profiles/business-team",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "created": 1789215367013,
+        "imageKind": "shape",
+        "shape": "blobatar",
+        "title": ""
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": {
+       "id": "20261014_090501_9ad0c5",
+       "last_active": 1791944565.3982441,
+       "preview": "Sample preview from business-team",
+       "root_title": "Sample session",
+       "source": "kanban",
+       "title": "Sample session"
+      }
+     },
+     {
+      "canonical_session": null,
+      "description": "Chart Technical Analysts",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "chart-technical-analysts",
+      "path": "/Users/me/.hermes/profiles/chart-technical-analysts",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "created": 1789065792155,
+        "imageKind": "shape",
+        "shape": "blobatar",
+        "title": "Chart Technical Analysts"
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": null
+     },
+     {
+      "canonical_session": null,
+      "description": "This agent profile dedicated to Coding purposes",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "coder",
+      "path": "/Users/me/.hermes/profiles/coder",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "group": "Hermes, Coder, Reviewer",
+        "groups": [
+         "Hermes, Coder, Reviewer"
+        ]
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": {
+       "id": "local-b0e9e6e0d3b6727783247ad49ebcbdc17154cda0ffd47695a78ba20069c74ed3",
+       "last_active": 1793472132.6316202,
+       "preview": "Sample preview from coder",
+       "root_title": "Sample session",
+       "source": "oneshot",
+       "title": "Sample session"
+      }
+     },
+     {
+      "canonical_session": null,
+      "description": "DevOps/SRE: server health, logs, Docker/Easypanel, AWS, Cloudflare/Tailscale, de",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "devops",
+      "path": "/Users/me/.hermes/profiles/devops",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta_revisions": {},
+      "worker_session": null
+     },
+     {
+      "canonical_session": null,
+      "description": "Finance Assistant \u2014 Budgets, bills and receipts",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "finance-assistant",
+      "path": "/Users/me/.hermes/profiles/finance-assistant",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "color": null,
+        "created": 1788539709939,
+        "imageKind": "photo",
+        "shape": "blobatar",
+        "title": "Finance Assistant",
+        "sectionId": "money",
+        "pinned": true
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": null
+     },
+     {
+      "canonical_session": null,
+      "description": "Code review specialist. Reviews diffs, PRs, and code quality; finds bugs, securi",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "reviewer",
+      "path": "/Users/me/.hermes/profiles/reviewer",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "group": "Hermes, Coder, Reviewer",
+        "groups": [
+         "Hermes, Coder, Reviewer"
+        ],
+        "hidden": true
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": {
+       "id": "20261004_182456_dc49aa",
+       "last_active": 1791113220.231839,
+       "preview": "Sample preview from reviewer",
+       "root_title": "Sample session",
+       "source": "kanban",
+       "title": "Sample session"
+      }
+     },
+     {
+      "name": "travel",
+      "path": "/Users/me/.hermes/profiles/travel",
+      "is_default": false,
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "description": "Trips, bookings & itineraries",
+      "display_name": "",
+      "skill_count": 10,
+      "previous_names": [],
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "ui_meta": {
+       "hermes-bots": {
+        "title": "Travel",
+        "color": "#f97316",
+        "shape": "circle",
+        "imageKind": "shape",
+        "custom": true,
+        "created": 1793974000000
+       }
+      },
+      "has_avatar": false,
+      "canonical_session": null
+     }
+    ]
+   },
+   "then": []
+  },
+  {
+   "expect": {
+    "method": "profiles.configure",
+    "params": {
+     "name": "finance-assistant",
+     "ui_meta_expected_revisions": {
+      "hermes-bots": 1
+     }
+    }
+   },
+   "result": {
+    "ok": true,
+    "applied": {
+     "ui_meta": true,
+     "ui_meta_revisions": {
+      "hermes-bots": 2
+     }
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "profiles.list",
+    "params": {}
+   },
+   "result": {
+    "bot_mode_protocol": true,
+    "install_id": "df746216f18645d99417dbf6ba47e928",
+    "profiles": [
+     {
+      "canonical_session": null,
+      "description": "",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": true,
+      "last_session": {
+       "id": "local-20c003d1f002b1e7b737769273cf387140534073284b711cff6a37d701c45e47",
+       "last_active": 1793973646.982031,
+       "message_count": 2,
+       "preview": "Sample preview from default",
+       "resolved_id": "local-20c003d1f002b1e7b737769273cf387140534073284b711cff6a37d701c45e47",
+       "root_title": "Sample session",
+       "started_at": 1793973644.344116,
+       "title": "Sample session"
+      },
+      "model": "claude-opus-5-5",
+      "name": "default",
+      "path": "/Users/me/.hermes",
+      "provider": "anthropic",
+      "skill_count": 96,
+      "ui_meta": {
+       "hermes-bots": {
+        "color": "#8b5cf6",
+        "custom": true,
+        "group": "Hermes, Coder, Reviewer",
+        "groups": [
+         "Hermes, Coder, Reviewer"
+        ],
+        "imageKind": "shape",
+        "shape": "squircle",
+        "title": ""
+       },
+       "hermes-bots-groups": {
+        "rooms": {}
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 2,
+       "hermes-bots-groups": 13
+      },
+      "worker_session": null
+     },
+     {
+      "canonical_session": null,
+      "description": "",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "business-team",
+      "path": "/Users/me/.hermes/profiles/business-team",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "created": 1789215367013,
+        "imageKind": "shape",
+        "shape": "blobatar",
+        "title": ""
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": {
+       "id": "20261014_090501_9ad0c5",
+       "last_active": 1791944565.3982441,
+       "preview": "Sample preview from business-team",
+       "root_title": "Sample session",
+       "source": "kanban",
+       "title": "Sample session"
+      }
+     },
+     {
+      "canonical_session": null,
+      "description": "Chart Technical Analysts",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "chart-technical-analysts",
+      "path": "/Users/me/.hermes/profiles/chart-technical-analysts",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "created": 1789065792155,
+        "imageKind": "shape",
+        "shape": "blobatar",
+        "title": "Chart Technical Analysts"
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": null
+     },
+     {
+      "canonical_session": null,
+      "description": "This agent profile dedicated to Coding purposes",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "coder",
+      "path": "/Users/me/.hermes/profiles/coder",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "group": "Hermes, Coder, Reviewer",
+        "groups": [
+         "Hermes, Coder, Reviewer"
+        ]
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": {
+       "id": "local-b0e9e6e0d3b6727783247ad49ebcbdc17154cda0ffd47695a78ba20069c74ed3",
+       "last_active": 1793472132.6316202,
+       "preview": "Sample preview from coder",
+       "root_title": "Sample session",
+       "source": "oneshot",
+       "title": "Sample session"
+      }
+     },
+     {
+      "canonical_session": null,
+      "description": "DevOps/SRE: server health, logs, Docker/Easypanel, AWS, Cloudflare/Tailscale, de",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "devops",
+      "path": "/Users/me/.hermes/profiles/devops",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta_revisions": {},
+      "worker_session": null
+     },
+     {
+      "canonical_session": null,
+      "description": "Finance Assistant \u2014 Budgets, bills and receipts",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "finance-assistant",
+      "path": "/Users/me/.hermes/profiles/finance-assistant",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "color": null,
+        "created": 1788539709939,
+        "imageKind": "photo",
+        "shape": "blobatar",
+        "title": "Finance Assistant",
+        "sectionId": "money",
+        "pinned": true
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": null
+     },
+     {
+      "canonical_session": null,
+      "description": "Code review specialist. Reviews diffs, PRs, and code quality; finds bugs, securi",
+      "display_name": "",
+      "has_avatar": true,
+      "is_default": false,
+      "last_session": null,
+      "model": "",
+      "name": "reviewer",
+      "path": "/Users/me/.hermes/profiles/reviewer",
+      "provider": "",
+      "skill_count": 0,
+      "ui_meta": {
+       "hermes-bots": {
+        "group": "Hermes, Coder, Reviewer",
+        "groups": [
+         "Hermes, Coder, Reviewer"
+        ],
+        "hidden": true
+       }
+      },
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "worker_session": {
+       "id": "20261004_182456_dc49aa",
+       "last_active": 1791113220.231839,
+       "preview": "Sample preview from reviewer",
+       "root_title": "Sample session",
+       "source": "kanban",
+       "title": "Sample session"
+      }
+     },
+     {
+      "name": "travel",
+      "path": "/Users/me/.hermes/profiles/travel",
+      "is_default": false,
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "description": "Trips, bookings & itineraries",
+      "display_name": "",
+      "skill_count": 10,
+      "previous_names": [],
+      "ui_meta_revisions": {
+       "hermes-bots": 1
+      },
+      "ui_meta": {
+       "hermes-bots": {
+        "title": "Travel",
+        "color": "#f97316",
+        "shape": "circle",
+        "imageKind": "shape",
+        "custom": true,
+        "created": 1793974000000
+       }
+      },
+      "has_avatar": false,
+      "canonical_session": null
+     }
+    ]
+   },
+   "then": []
+  }
+ ],
+ "http": [
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/profiles/finance-assistant/soul"
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "content": "You manage my money.",
+     "exists": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "DELETE",
+    "path": "/api/profiles/devops"
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": true,
+     "path": "/Users/me/.hermes/profiles/devops"
+    }
+   }
+  }
+ ]
+}

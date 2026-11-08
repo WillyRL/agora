@@ -1,0 +1,17 @@
+{
+  "base": "sidechats",
+  "description": "A `hermes serve` (remote) resumes a saved Side Chat under a new live id: `session_id` is the live one, `session_key`/`stored_session_id` the saved one. REST history only knows the saved id.",
+  "exchanges": [
+    { "expect": { "method": "session.resume", "params": { "profile": "coder", "session_id": "sess-old" } },
+      "result": { "session_id": "live-77", "session_key": "sess-old", "stored_session_id": "sess-old", "resumed": "sess-old", "messages": [], "messages_omitted": true,
+        "message_count": 1, "running": false, "authority_epoch": 3, "replay_epoch": "ep-live-77", "last_sequence": 0, "subscription_id": "sub-live-77",
+        "revision": 5, "execution_generation": 0, "pending": [], "prompts": [], "open_requests": [], "info": { "title": "Lisbon trip" } } },
+    { "expect": { "method": "session.mutate", "params": { "session_id": "live-77", "operation": "archive", "payload": { "archived": true }, "expected_revision": 5 } },
+      "result": { "session_id": "live-77", "operation": "archive", "revision": 6 } }
+  ],
+  "http": [
+    { "expect": { "method": "GET", "path": "/api/sessions/sess-old/messages", "query": { "profile": "coder" } }, "repeat": true,
+      "reply": { "status": 200, "body": { "session_id": "sess-old", "messages": [
+        { "id": 1, "role": "user", "content": "Plan three days in Lisbon.", "timestamp": 1793974000.0 } ] } } }
+  ]
+}

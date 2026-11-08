@@ -1,0 +1,26 @@
+{
+ "base": "local-roster",
+ "description": "Hermes isn't running: the control socket is missing, so Agora runs `hermes gateway ensure --json` once and connects.",
+ "controlDown": true,
+ "ensure": {
+  "client_code_sha": "2bd378ed",
+  "detail": null,
+  "endpoint": {
+   "api_origin": "http://127.0.0.1:56904",
+   "authority_epoch": 3,
+   "capabilities": [
+    "durable-admission-v1",
+    "event-replay-v1",
+    "session-authority-v1"
+   ],
+   "code_sha": "2bd378ed",
+   "control_home": null,
+   "instance_id": "cc85826d737e41719fa42571c3668626",
+   "profile_id": "/Users/me/.hermes",
+   "runtime_protocol": 1,
+   "supervisor": "launchd"
+  },
+  "reason_code": null,
+  "state": "ready"
+ }
+}

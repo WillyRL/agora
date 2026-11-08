@@ -1,0 +1,269 @@
+{
+ "base": "coder-chat",
+ "description": "coder's Side Chats: listed over REST (Bot Chat, archived and cron rows filtered out), created blank, renamed, archived and deleted via session.mutate; archived from the list and brought back (Undo).",
+ "exchanges": [
+  {
+   "expect": {
+    "method": "session.create",
+    "params": {
+     "profile": "coder",
+     "source": "gui",
+     "request_id": "*"
+    }
+   },
+   "result": {
+    "session_id": "sess-side-1",
+    "stored_session_id": "sess-side-1",
+    "messages": [],
+    "messages_omitted": true,
+    "message_count": 0,
+    "running": false,
+    "authority_epoch": 3,
+    "replay_epoch": "ep-sess-side-1",
+    "last_sequence": 0,
+    "subscription_id": "sub-sess-side-1",
+    "revision": 0,
+    "execution_generation": 0,
+    "pending": [],
+    "prompts": [],
+    "open_requests": [],
+    "info": {
+     "title": ""
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "session.mutate",
+    "params": {
+     "session_id": "sess-side-1",
+     "operation": "rename",
+     "payload": {
+      "title": "Trip planning"
+     },
+     "expected_revision": 0
+    }
+   },
+   "result": {
+    "session_id": "sess-side-1",
+    "operation": "rename",
+    "revision": 1,
+    "title": "Trip planning"
+   }
+  },
+  {
+   "expect": {
+    "method": "session.mutate",
+    "params": {
+     "session_id": "sess-side-1",
+     "operation": "archive",
+     "payload": {
+      "archived": true
+     },
+     "expected_revision": 1
+    }
+   },
+   "result": {
+    "session_id": "sess-side-1",
+    "operation": "archive",
+    "revision": 2
+   }
+  },
+  {
+   "expect": {
+    "method": "session.resume",
+    "params": {
+     "profile": "coder",
+     "session_id": "sess-new"
+    }
+   },
+   "result": {
+    "session_id": "sess-new",
+    "stored_session_id": "sess-new",
+    "messages": [],
+    "messages_omitted": true,
+    "message_count": 0,
+    "running": false,
+    "authority_epoch": 3,
+    "replay_epoch": "ep-sess-new",
+    "last_sequence": 0,
+    "subscription_id": "sub-sess-new",
+    "revision": 3,
+    "execution_generation": 0,
+    "pending": [],
+    "prompts": [],
+    "open_requests": [],
+    "info": {
+     "title": ""
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "session.mutate",
+    "params": {
+     "session_id": "sess-new",
+     "operation": "delete",
+     "expected_revision": 3,
+     "expected_generation": 0
+    }
+   },
+   "result": {
+    "session_id": "sess-new",
+    "operation": "delete",
+    "revision": 4
+   }
+  },
+  {
+   "expect": {
+    "method": "session.mutate",
+    "params": {
+     "session_id": "sess-new",
+     "operation": "archive",
+     "payload": {
+      "archived": true
+     },
+     "expected_revision": 3
+    }
+   },
+   "result": {
+    "ok": true,
+    "revision": 4
+   }
+  },
+  {
+   "expect": {
+    "method": "session.resume",
+    "params": {
+     "profile": "coder",
+     "session_id": "sess-new"
+    }
+   },
+   "result": {
+    "session_id": "sess-new",
+    "stored_session_id": "sess-new",
+    "messages": [],
+    "messages_omitted": true,
+    "message_count": 0,
+    "running": false,
+    "authority_epoch": 3,
+    "replay_epoch": "ep-sess-new",
+    "last_sequence": 0,
+    "subscription_id": "sub-sess-new",
+    "revision": 4,
+    "execution_generation": 0,
+    "pending": [],
+    "prompts": [],
+    "open_requests": [],
+    "info": {
+     "title": ""
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "session.mutate",
+    "params": {
+     "session_id": "sess-new",
+     "operation": "archive",
+     "payload": {
+      "archived": false
+     },
+     "expected_revision": 4
+    }
+   },
+   "result": {
+    "ok": true,
+    "revision": 5
+   }
+  }
+ ],
+ "http": [
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/sessions",
+    "query": {
+     "profile": "coder",
+     "archived": "exclude"
+    }
+   },
+   "repeat": true,
+   "reply": {
+    "status": 200,
+    "body": {
+     "sessions": [
+      {
+       "id": "sess-coder-chat",
+       "title": "Bot Chat",
+       "source": "desktop",
+       "started_at": 1793974200.0,
+       "last_active": 1793974300.0,
+       "message_count": 4,
+       "archived": false,
+       "hidden": 1,
+       "auto_archived": 0,
+       "preview": "About Bot Chat",
+       "profile": "coder"
+      },
+      {
+       "id": "sess-old",
+       "title": "Lisbon trip",
+       "source": "desktop",
+       "started_at": 1793899900.0,
+       "last_active": 1793900000.0,
+       "message_count": 4,
+       "archived": false,
+       "hidden": 0,
+       "auto_archived": 0,
+       "preview": "About Lisbon trip",
+       "profile": "coder"
+      },
+      {
+       "id": "sess-new",
+       "title": "E-bike shortlist",
+       "source": "desktop",
+       "started_at": 1793969900.0,
+       "last_active": 1793970000.0,
+       "message_count": 4,
+       "archived": false,
+       "hidden": 0,
+       "auto_archived": 0,
+       "preview": "About E-bike shortlist",
+       "profile": "coder"
+      },
+      {
+       "id": "sess-auto",
+       "title": "Unused idea",
+       "source": "desktop",
+       "started_at": 1792999900.0,
+       "last_active": 1793000000.0,
+       "message_count": 4,
+       "archived": true,
+       "hidden": 0,
+       "auto_archived": 1,
+       "preview": "About Unused idea",
+       "profile": "coder"
+      },
+      {
+       "id": "sess-cron",
+       "title": "Routine run",
+       "source": "cron",
+       "started_at": 1793973900.0,
+       "last_active": 1793974000.0,
+       "message_count": 4,
+       "archived": false,
+       "hidden": 0,
+       "auto_archived": 0,
+       "preview": "About Routine run",
+       "profile": "coder"
+      }
+     ],
+     "total": 5,
+     "limit": 50,
+     "offset": 0
+    }
+   }
+  }
+ ]
+}

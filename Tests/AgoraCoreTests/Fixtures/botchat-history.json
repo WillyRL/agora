@@ -1,0 +1,32 @@
+{
+ "base": "local-roster",
+ "description": "Hermes (default) already has a Bot Chat with history: user turns, a tool call with its result, a Routine result and a message from another Bot. Rows are real REST shapes (trimmed).",
+ "exchanges": [
+  {"expect": {"method": "session.list", "params": {"profile": "default", "title": "Bot Chat", "include_hidden": true}},
+   "result": {"scope": "stored", "sessions": [{"id": "20260902_225145_f38c4b", "session_id": "20260902_225145_f38c4b", "resolved_id": "20260902_225145_f38c4b",
+              "title": "Bot Chat", "root_title": "Bot Chat", "message_count": 6, "running": false, "source": "tui", "started_at": 1788364305.23}]}},
+  {"expect": {"method": "session.resume", "params": {"profile": "default", "session_id": "20260902_225145_f38c4b", "omit_messages": true}},
+   "result": {"session_id": "20260902_225145_f38c4b", "stored_session_id": "20260902_225145_f38c4b", "messages": [], "messages_omitted": true,
+              "message_count": 6, "running": false, "authority_epoch": 3, "replay_epoch": "ep-default", "last_sequence": 0,
+              "subscription_id": "sub2", "revision": 0, "execution_generation": 0, "pending": [], "prompts": [], "open_requests": [],
+              "info": {"title": "Bot Chat", "profile_name": "default"}}}
+ ],
+ "http": [
+  {"expect": {"method": "GET", "path": "/api/sessions/20260902_225145_f38c4b/messages", "query": {"offset": "0", "order": "latest", "profile": "default"}},
+   "reply": {"status": 200, "body": {"session_id": "20260902_225145_f38c4b", "profile": "default", "pagination": {"limit": 4, "offset": 0, "order": "latest", "returned": 4},
+    "messages": [
+     {"id": 65669, "role": "user", "content": "how much is my mac mini storage left", "timestamp": 1793908083.59, "display_kind": null, "display_metadata": null},
+     {"id": 65670, "role": "assistant", "content": "", "timestamp": 1793908086.91, "finish_reason": "tool_calls",
+      "tool_calls": [{"id": "toolu_01Um", "call_id": "toolu_01Um", "type": "function", "function": {"name": "terminal", "arguments": "{\"command\": \"df -h /System/Volumes/Data | tail -1\"}"}}]},
+     {"id": 65671, "role": "tool", "content": "{\"output\": \"/dev/disk3s1   228Gi   169Gi    33Gi    84%\", \"exit_code\": 0, \"error\": null}", "tool_call_id": "toolu_01Um", "tool_name": "terminal", "timestamp": 1793908087.16},
+     {"id": 65672, "role": "assistant", "content": "The Mac mini has **33 GB free** out of 228 GB.", "timestamp": 1793908089.19, "finish_reason": "stop"}
+    ]}}},
+  {"expect": {"method": "GET", "path": "/api/sessions/20260902_225145_f38c4b/messages", "query": {"offset": "4", "order": "latest"}},
+   "reply": {"status": 200, "body": {"session_id": "20260902_225145_f38c4b", "profile": "default", "pagination": {"limit": 4, "offset": 4, "order": "latest", "returned": 2},
+    "messages": [
+     {"id": 59015, "role": "user", "content": "Message from 🤖 orchestrator (@orchestrator): Context check: do you remember the investment dashboard?", "timestamp": 1788978171.51},
+     {"id": 65610, "role": "user", "content": "[IMPORTANT: Background process proc_83a2 completed normally (exit code 0).\nCommand: df -k /", "timestamp": 1793866895.69,
+      "display_kind": "process_complete", "display_metadata": {"display_text": "Background Process Finished: df -k /"}}
+    ]}}}
+ ]
+}

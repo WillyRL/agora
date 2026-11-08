@@ -1,0 +1,43 @@
+{
+ "description": "Remote login whose refresh token has expired: refresh answers 401 session_expired, so Agora asks to sign in again.",
+ "control": [],
+ "http": [
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/status"
+   },
+   "repeat": true,
+   "reply": {
+    "status": 200,
+    "body": {
+     "version": "0.23.0",
+     "auth_required": true,
+     "auth_providers": [
+      "basic",
+      "session-token"
+     ],
+     "auth_flows": [
+      "cookie",
+      "native_pkce"
+     ],
+     "gateway_running": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/auth/native/refresh"
+   },
+   "reply": {
+    "status": 401,
+    "body": {
+     "error": "session_expired",
+     "detail": "Refresh token expired or invalid; start a new sign-in."
+    }
+   }
+  }
+ ],
+ "connections": []
+}

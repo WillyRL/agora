@@ -1,0 +1,135 @@
+{
+ "base": "local-roster",
+ "description": "Agora watches every Bot Chat. A Routine result arrives in coder's, another Bot's message in finance-assistant's; an approval arrives while Agora is in the background.",
+ "profiles": {
+  "coder": {
+   "canonical_session": {
+    "id": "sess-coder-chat",
+    "resolved_id": "sess-coder-chat",
+    "title": "Bot Chat",
+    "preview": "Earlier reply",
+    "last_active": 1893974300.0
+   }
+  }
+ },
+ "exchanges": [
+  {
+   "expect": {
+    "method": "session.list",
+    "params": {
+     "profile": "coder",
+     "title": "Bot Chat"
+    }
+   },
+   "result": {
+    "sessions": [
+     {
+      "session_id": "sess-coder-chat",
+      "resolved_id": "sess-coder-chat",
+      "title": "Bot Chat"
+     }
+    ]
+   }
+  },
+  {
+   "expect": {
+    "method": "session.resume",
+    "params": {
+     "profile": "coder",
+     "session_id": "sess-coder-chat",
+     "omit_messages": true
+    }
+   },
+   "result": {
+    "session_id": "sess-coder-chat",
+    "stored_session_id": "sess-coder-chat",
+    "messages": [],
+    "messages_omitted": true,
+    "message_count": 5,
+    "running": false,
+    "authority_epoch": 3,
+    "replay_epoch": "ep-sess-coder-chat",
+    "last_sequence": 0,
+    "subscription_id": "sub-sess-coder-chat",
+    "revision": 0,
+    "execution_generation": 1,
+    "pending": [],
+    "prompts": [],
+    "open_requests": []
+   }
+  },
+  {
+   "expect": {
+    "method": "session.list",
+    "params": {
+     "profile": "finance-assistant",
+     "title": "Bot Chat"
+    }
+   },
+   "result": {
+    "sessions": [
+     {
+      "session_id": "sess-fin-chat",
+      "resolved_id": "sess-fin-chat",
+      "title": "Bot Chat"
+     }
+    ]
+   }
+  },
+  {
+   "expect": {
+    "method": "session.resume",
+    "params": {
+     "profile": "finance-assistant",
+     "session_id": "sess-fin-chat"
+    }
+   },
+   "result": {
+    "session_id": "sess-fin-chat",
+    "stored_session_id": "sess-fin-chat",
+    "messages": [],
+    "messages_omitted": true,
+    "message_count": 3,
+    "running": false,
+    "authority_epoch": 3,
+    "replay_epoch": "ep-sess-fin-chat",
+    "last_sequence": 0,
+    "subscription_id": "sub-sess-fin-chat",
+    "revision": 0,
+    "execution_generation": 1,
+    "pending": [],
+    "prompts": [],
+    "open_requests": []
+   }
+  },
+  {
+   "expect": {
+    "method": "approval.respond",
+    "params": {
+     "prompt_id": "ap_9",
+     "choice": "session",
+     "session_id": "sess-coder-chat"
+    }
+   },
+   "result": {
+    "status": "resolved",
+    "prompt_id": "ap_9"
+   }
+  }
+ ],
+ "http": [
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/sessions/sess-coder-chat/messages"
+   },
+   "repeat": true,
+   "reply": {
+    "status": 200,
+    "body": {
+     "messages": []
+    }
+   }
+  }
+ ]
+}

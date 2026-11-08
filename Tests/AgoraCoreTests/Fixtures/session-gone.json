@@ -1,0 +1,154 @@
+{
+ "base": "local-roster",
+ "description": "coder's Bot Chat sat idle and Hermes unloaded it (reaped the live session). The next prompt.submit gets 4001 'session not found'; Agora resumes the saved id (getting a new live id) and sends again. Error shape follows tui_gateway/server.py _sess_nowait.",
+ "exchanges": [
+  {
+   "expect": {
+    "method": "session.list",
+    "params": {
+     "profile": "coder",
+     "title": "Bot Chat"
+    }
+   },
+   "result": {
+    "scope": "stored",
+    "sessions": [
+     {
+      "session_id": "saved-coder-chat",
+      "id": "saved-coder-chat",
+      "resolved_id": "saved-coder-chat",
+      "title": "Bot Chat",
+      "message_count": 0,
+      "running": false
+     }
+    ]
+   }
+  },
+  {
+   "expect": {
+    "method": "session.resume",
+    "params": {
+     "profile": "coder",
+     "session_id": "saved-coder-chat"
+    }
+   },
+   "result": {
+    "session_id": "live-1",
+    "session_key": "saved-coder-chat",
+    "messages": [],
+    "messages_omitted": true,
+    "message_count": 0,
+    "running": false,
+    "replay_epoch": "ep-1",
+    "last_sequence": 0,
+    "revision": 0,
+    "execution_generation": 0,
+    "prompts": [],
+    "info": {
+     "title": "Bot Chat"
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "prompt.submit",
+    "params": {
+     "profile": "coder",
+     "session_id": "live-1"
+    }
+   },
+   "error": {
+    "code": 4001,
+    "message": "session not found"
+   }
+  },
+  {
+   "expect": {
+    "method": "session.resume",
+    "params": {
+     "profile": "coder",
+     "session_id": "saved-coder-chat"
+    }
+   },
+   "result": {
+    "session_id": "live-2",
+    "session_key": "saved-coder-chat",
+    "messages": [],
+    "messages_omitted": true,
+    "message_count": 2,
+    "running": false,
+    "replay_epoch": "ep-2",
+    "last_sequence": 0,
+    "revision": 0,
+    "execution_generation": 0,
+    "prompts": [],
+    "info": {
+     "title": "Bot Chat"
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "prompt.submit",
+    "params": {
+     "profile": "coder",
+     "session_id": "live-2",
+     "text": "Draw me the latest SILVER chart",
+     "submission_id": "*"
+    }
+   },
+   "result": {
+    "status": "queued",
+    "sequence": 1
+   }
+  }
+ ],
+ "http": [
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/sessions/saved-coder-chat/messages",
+    "query": {
+     "offset": "0",
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "session_id": "saved-coder-chat",
+     "messages": [
+      {
+       "id": 1,
+       "role": "user",
+       "content": "Is silver stretched?",
+       "timestamp": 1793908083.59
+      },
+      {
+       "id": 2,
+       "role": "assistant",
+       "content": "Silver into the reopen: stretched.",
+       "timestamp": 1793908086.91,
+       "finish_reason": "stop"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/fs/download",
+    "query": {
+     "path": "/Users/me/charts/silver.html",
+     "session_id": "saved-coder-chat",
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": "<!doctype html><html><head></head><body>chart</body></html>"
+   }
+  }
+ ]
+}

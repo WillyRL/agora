@@ -1,0 +1,59 @@
+{
+ "base": "coder-chat",
+ "description": "session.steer isn't supported by this Hermes (-32601): a follow-up sent while the Bot works goes out as a normal message.",
+ "exchanges": [
+  {
+   "expect": {
+    "method": "prompt.submit",
+    "params": {
+     "text": "Write a poem"
+    }
+   },
+   "result": {
+    "admission_id": "a1",
+    "status": "queued"
+   },
+   "then": [
+    {
+     "jsonrpc": "2.0",
+     "method": "event",
+     "params": {
+      "type": "session.info",
+      "session_id": "sess-coder-chat",
+      "seq": 1,
+      "execution_generation": 2,
+      "payload": {
+       "running": true,
+       "execution_generation": 2,
+       "revision": 5
+      }
+     }
+    }
+   ]
+  },
+  {
+   "expect": {
+    "method": "session.steer"
+   },
+   "error": {
+    "code": -32601,
+    "message": "Method not found",
+    "data": {
+     "reason": "unknown_method"
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "prompt.submit",
+    "params": {
+     "text": "Shorter please"
+    }
+   },
+   "result": {
+    "admission_id": "a2",
+    "status": "queued"
+   }
+  }
+ ]
+}

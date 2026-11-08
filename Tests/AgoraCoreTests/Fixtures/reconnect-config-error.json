@@ -1,0 +1,14 @@
+{
+ "base": "local-roster",
+ "description": "The redial is refused with 4403 (Host/Origin check or config). Agora stops retrying and explains.",
+ "connections": [
+  {
+   "refuse": 4403,
+   "reason": "host_mismatch"
+  },
+  {
+   "refuse": 4403,
+   "reason": "host_mismatch"
+  }
+ ]
+}

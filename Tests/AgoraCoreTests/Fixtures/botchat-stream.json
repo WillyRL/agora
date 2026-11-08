@@ -1,0 +1,22 @@
+{
+ "base": "local-roster",
+ "description": "Send a message in coder's Bot Chat; the reply streams in (message.start, deltas) and completes. Event shapes follow tui_gateway/contracts/events.py.",
+ "exchanges": [
+  {"expect": {"method": "session.list", "params": {"profile": "coder", "title": "Bot Chat"}},
+   "result": {"scope": "stored", "sessions": [{"session_id": "sess-coder-chat", "id": "sess-coder-chat", "resolved_id": "sess-coder-chat", "title": "Bot Chat", "message_count": 0, "running": false}]}},
+  {"expect": {"method": "session.resume", "params": {"profile": "coder", "session_id": "sess-coder-chat"}},
+   "result": {"session_id": "sess-coder-chat", "stored_session_id": "sess-coder-chat", "messages": [], "messages_omitted": true, "message_count": 0,
+              "running": false, "authority_epoch": 3, "replay_epoch": "ep-coder", "last_sequence": 0, "subscription_id": "sub3",
+              "revision": 0, "execution_generation": 0, "pending": [], "prompts": [], "open_requests": [], "info": {"title": "Bot Chat"}}},
+  {"expect": {"method": "prompt.submit", "params": {"profile": "coder", "session_id": "sess-coder-chat", "text": "What's on my calendar?", "submission_id": "*"}},
+   "result": {"admission_id": "adm-1", "ref": {"profile_id": "/Users/me/.hermes/profiles/coder", "session_id": "sess-coder-chat"}, "sequence": 1,
+              "status": "queued", "outcome": null, "authority_epoch": 3, "execution_generation": null},
+   "then": [
+    {"jsonrpc": "2.0", "method": "event", "params": {"type": "session.info", "session_id": "sess-coder-chat", "seq": 1, "replay_epoch": "ep-coder",
+     "payload": {"running": true, "execution_generation": 1, "revision": 1, "pending": [], "authority_epoch": 3, "stored_session_id": "sess-coder-chat", "desktop_protocol": "hermes-gateway-v1"}}},
+    {"jsonrpc": "2.0", "method": "event", "params": {"type": "message.start", "session_id": "sess-coder-chat", "seq": 2, "execution_generation": 1, "payload": {"turn_id": "t1"}}},
+    {"jsonrpc": "2.0", "method": "event", "params": {"type": "message.delta", "session_id": "sess-coder-chat", "seq": 3, "execution_generation": 1, "payload": {"text": "You have ", "turn_id": "t1", "segment": 0, "offset": 0}}},
+    {"jsonrpc": "2.0", "method": "event", "params": {"type": "message.delta", "session_id": "sess-coder-chat", "seq": 4, "execution_generation": 1, "payload": {"text": "two meet", "turn_id": "t1", "segment": 0, "offset": 9}}}
+   ]}
+ ]
+}

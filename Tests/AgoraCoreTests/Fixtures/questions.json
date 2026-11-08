@@ -1,0 +1,19 @@
+{
+ "base": "coder-chat",
+ "description": "The Bot asks a clarifying question (clarify.request event), needs a secret and a sudo password (server requests), and sends one Agora doesn't support (vault.unlock_prompt → -32601). Shapes: tui_gateway/contracts/server_requests.py.",
+ "exchanges": [
+  {"expect": {"method": "prompt.submit", "params": {"text": "Set up the weather integration"}},
+   "result": {"admission_id": "adm-6", "status": "queued", "authority_epoch": 3},
+   "then": [
+    {"jsonrpc": "2.0", "method": "event", "params": {"type": "session.info", "session_id": "sess-coder-chat", "seq": 1, "payload": {"running": true, "execution_generation": 2, "revision": 5}}},
+    {"jsonrpc": "2.0", "method": "event", "params": {"type": "clarify.request", "session_id": "sess-coder-chat", "seq": 2, "execution_generation": 2,
+     "payload": {"kind": "clarify", "prompt_id": "cl_1", "execution_generation": 2, "question": "Which city should I use?", "choices": ["Jakarta", "Bandung"], "multi_select": false}}},
+    {"jsonrpc": "2.0", "id": "srq-2", "method": "secret", "params": {"session_id": "sess-coder-chat", "env_var": "OPENWEATHER_KEY", "prompt": "Paste your OpenWeather API key"}},
+    {"jsonrpc": "2.0", "id": "srq-3", "method": "vault.unlock_prompt", "params": {"session_id": "sess-coder-chat"}},
+    {"jsonrpc": "2.0", "id": "srq-4", "method": "sudo", "params": {"session_id": "sess-coder-chat", "command": "brew services restart redis"}}
+   ]},
+  {"expect": {"method": "clarify.respond", "params": {"session_id": "sess-coder-chat", "prompt_id": "cl_1", "answer": "Bandung", "execution_generation": 2}},
+   "result": {"status": "resolved", "prompt_id": "cl_1"}},
+  {"expect": {"response_to": "srq-2", "result": {"value": "sk-test-123"}}, "then": []}
+ ]
+}

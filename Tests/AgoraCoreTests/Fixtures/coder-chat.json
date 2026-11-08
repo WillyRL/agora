@@ -1,0 +1,12 @@
+{
+ "base": "local-roster",
+ "description": "coder's existing (empty) Bot Chat, opened. Base for chat scenarios.",
+ "exchanges": [
+  {"expect": {"method": "session.list", "params": {"profile": "coder", "title": "Bot Chat"}},
+   "result": {"scope": "stored", "sessions": [{"session_id": "sess-coder-chat", "id": "sess-coder-chat", "resolved_id": "sess-coder-chat", "title": "Bot Chat", "message_count": 0, "running": false}]}},
+  {"expect": {"method": "session.resume", "params": {"profile": "coder", "session_id": "sess-coder-chat"}},
+   "result": {"session_id": "sess-coder-chat", "stored_session_id": "sess-coder-chat", "messages": [], "messages_omitted": true, "message_count": 0,
+              "running": false, "authority_epoch": 3, "replay_epoch": "ep-coder", "last_sequence": 0, "subscription_id": "sub3",
+              "revision": 4, "execution_generation": 1, "pending": [], "prompts": [], "open_requests": [], "info": {"title": "Bot Chat"}}}
+ ]
+}

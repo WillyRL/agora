@@ -1,0 +1,25 @@
+{
+ "base": "coder-chat",
+ "description": "A turn with tool activity: web_search with progress, then an image the Bot generates, then the reply.",
+ "exchanges": [
+  {"expect": {"method": "prompt.submit", "params": {"text": "Find the weather and draw it"}},
+   "result": {"admission_id": "adm-2", "status": "queued", "sequence": 2, "authority_epoch": 3},
+   "then": [
+    {"jsonrpc": "2.0", "method": "event", "params": {"type": "session.info", "session_id": "sess-coder-chat", "seq": 1, "payload": {"running": true, "execution_generation": 2, "revision": 5}}},
+    {"jsonrpc": "2.0", "method": "event", "params": {"type": "message.start", "session_id": "sess-coder-chat", "seq": 2, "execution_generation": 2, "payload": {"turn_id": "t2"}}},
+    {"jsonrpc": "2.0", "method": "event", "params": {"type": "tool.generating", "session_id": "sess-coder-chat", "seq": 3, "execution_generation": 2, "payload": {"name": "web_search"}}},
+    {"jsonrpc": "2.0", "method": "event", "params": {"type": "tool.start", "session_id": "sess-coder-chat", "seq": 4, "execution_generation": 2,
+     "payload": {"tool_id": "call_ws", "name": "web_search", "context": "weather Jakarta today", "args": {"query": "weather Jakarta today"}}}},
+    {"jsonrpc": "2.0", "method": "event", "params": {"type": "tool.progress", "session_id": "sess-coder-chat", "seq": 5, "execution_generation": 2,
+     "payload": {"tool_id": "call_ws", "name": "web_search", "progress": 1, "total": 2, "percent": 50, "message": "Reading 2 results"}}}
+   ]},
+  {"expect": {"method": "prompt.submit", "params": {"text": "Draw a cat", "attachments": [{"path": "/Users/me/.hermes/profiles/coder/cache/images/upload_ab12.png", "mime": "image/png"}]}},
+   "result": {"admission_id": "adm-3", "status": "queued", "sequence": 3, "authority_epoch": 3}},
+  {"expect": {"method": "image.attach_bytes", "params": {"session_id": "sess-coder-chat", "profile": "coder", "content_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", "filename": "cat.png"}},
+   "result": {"attached": true, "path": "/Users/me/.hermes/profiles/coder/cache/images/upload_ab12.png", "mime": "image/png", "name": "upload_ab12.png", "count": 1, "bytes": 68}}
+ ],
+ "http": [
+  {"expect": {"method": "GET", "path": "/api/fs/read-data-url", "query": {"path": "/Users/me/.hermes/profiles/coder/cache/images/gen_1.png", "profile": "coder", "session_id": "sess-coder-chat"}},
+   "reply": {"status": 200, "body": {"dataUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="}}}
+ ]
+}

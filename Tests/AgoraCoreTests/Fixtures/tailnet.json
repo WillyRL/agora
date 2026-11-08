@@ -1,0 +1,33 @@
+{
+  "description": "A tailnet as `tailscale status --json` reports it (trimmed). Two machines run Hermes: the Mac mini behind Tailscale Serve (HTTPS) and on :9119, the homelab on :9119 only. An old Mac runs Hermes 0.22. The NAS serves something that isn't Hermes. Offline devices, phones and shared-in nodes are never probed.",
+  "tailscale": {
+    "BackendState": "Running",
+    "MagicDNSSuffix": "tail1234.ts.net",
+    "CurrentTailnet": { "Name": "someone@example.com", "MagicDNSSuffix": "tail1234.ts.net", "MagicDNSEnabled": true },
+    "Self": { "HostName": "Laptop", "DNSName": "laptop.tail1234.ts.net.", "OS": "macOS", "Online": true, "TailscaleIPs": ["100.64.0.1", "fd7a:115c:a1e0::1"] },
+    "Peer": {
+      "nodekey:a": { "HostName": "Studio Mac mini", "DNSName": "studio-mac-mini.tail1234.ts.net.", "OS": "macOS", "Online": true, "TailscaleIPs": ["100.64.0.2", "fd7a:115c:a1e0::2"] },
+      "nodekey:b": { "HostName": "homelab", "DNSName": "homelab.tail1234.ts.net.", "OS": "linux", "Online": true, "TailscaleIPs": ["100.64.0.3"] },
+      "nodekey:c": { "HostName": "nas", "DNSName": "nas.tail1234.ts.net.", "OS": "linux", "Online": true, "TailscaleIPs": ["100.64.0.4"] },
+      "nodekey:d": { "HostName": "Old iMac", "DNSName": "old-imac.tail1234.ts.net.", "OS": "macOS", "Online": true, "TailscaleIPs": ["100.64.0.5"] },
+      "nodekey:e": { "HostName": "Travel MacBook", "DNSName": "travel-macbook.tail1234.ts.net.", "OS": "macOS", "Online": false, "TailscaleIPs": ["100.64.0.6"] },
+      "nodekey:f": { "HostName": "localhost", "DNSName": "iphone.tail1234.ts.net.", "OS": "iOS", "Online": true, "TailscaleIPs": ["100.64.0.7"] },
+      "nodekey:g": { "HostName": "device-of-shared-to-user", "DNSName": "", "OS": "", "Online": true, "ShareeNode": true, "TailscaleIPs": ["100.64.0.8"] },
+      "nodekey:h": { "HostName": "funnel-ingress-node", "DNSName": "", "OS": "", "Online": true, "TailscaleIPs": ["fd7a:115c:a1e0::9"] }
+    }
+  },
+  "http": [
+    { "expect": { "method": "GET", "host": "studio-mac-mini.tail1234.ts.net", "port": null, "path": "/api/status" }, "repeat": true,
+      "reply": { "status": 200, "body": { "version": "0.23.0", "auth_required": true, "auth_providers": ["basic"], "auth_flows": ["cookie", "native_pkce"] } } },
+    { "expect": { "method": "GET", "host": "studio-mac-mini.tail1234.ts.net", "port": 9119, "path": "/api/status" }, "repeat": true,
+      "reply": { "status": 200, "body": { "version": "0.23.0", "auth_required": true, "auth_providers": ["basic"], "auth_flows": ["cookie", "native_pkce"] } } },
+    { "expect": { "method": "GET", "host": "homelab.tail1234.ts.net", "port": 9119, "path": "/api/status" }, "repeat": true,
+      "reply": { "status": 200, "body": { "version": "0.23.1", "auth_required": true, "auth_providers": ["session-token"], "auth_flows": ["cookie"] } } },
+    { "expect": { "method": "GET", "host": "old-imac.tail1234.ts.net", "port": 9119, "path": "/api/status" }, "repeat": true,
+      "reply": { "status": 200, "body": { "version": "0.22.5", "auth_required": true, "auth_providers": ["basic"], "auth_flows": ["cookie", "native_pkce"] } } },
+    { "expect": { "method": "GET", "host": "nas.tail1234.ts.net", "path": "/api/status" }, "repeat": true,
+      "reply": { "status": 200, "body": { "ok": true } } },
+    { "expect": { "method": "GET", "path": "/api/status" }, "repeat": true,
+      "reply": { "status": 404, "body": { "detail": "Not Found" } } }
+  ]
+}

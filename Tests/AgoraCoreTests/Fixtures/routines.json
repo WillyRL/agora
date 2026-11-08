@@ -1,0 +1,349 @@
+{
+ "base": "coder-chat",
+ "description": "coder's Routines over the cron REST: list, pause, resume, run now, delete; and the list refreshes after a turn that used the cronjob tool. The list also holds a job tagged for another Bot, which is left out.",
+ "http": [
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/cron/jobs",
+    "query": {
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": [
+     {
+      "id": "a1",
+      "name": "[bot:coder] Morning brief",
+      "prompt": "...",
+      "schedule": {
+       "kind": "cron",
+       "display": "every weekday at 07:00"
+      },
+      "schedule_display": "every weekday at 07:00",
+      "enabled": true,
+      "state": "scheduled",
+      "next_run_at": "2026-11-07T07:00:00+07:00",
+      "last_run_at": "2026-11-06T07:00:01.5+07:00",
+      "last_status": "ok",
+      "last_error": null,
+      "latest_execution": {
+       "status": "completed"
+      },
+      "live_execution": null,
+      "profile": "coder"
+     },
+     {
+      "id": "b2",
+      "name": "Inbox sweep",
+      "prompt": "...",
+      "schedule": {
+       "kind": "cron",
+       "display": "every 3h"
+      },
+      "schedule_display": "every 3h",
+      "enabled": true,
+      "state": "scheduled",
+      "next_run_at": "2026-11-07T07:00:00+07:00",
+      "last_run_at": "2026-11-06T07:00:01.5+07:00",
+      "last_status": "error",
+      "last_error": "IMAP timeout",
+      "latest_execution": {
+       "status": "completed"
+      },
+      "live_execution": null,
+      "profile": "coder"
+     },
+     {
+      "id": "z9",
+      "name": "[bot:finance-assistant] Budget check",
+      "prompt": "...",
+      "schedule": {
+       "kind": "cron",
+       "display": "every weekday at 07:00"
+      },
+      "schedule_display": "every weekday at 07:00",
+      "enabled": true,
+      "state": "scheduled",
+      "next_run_at": "2026-11-07T07:00:00+07:00",
+      "last_run_at": "2026-11-06T07:00:01.5+07:00",
+      "last_status": "ok",
+      "last_error": null,
+      "latest_execution": {
+       "status": "completed"
+      },
+      "live_execution": null,
+      "profile": "coder"
+     }
+    ]
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/cron/jobs/a1/pause",
+    "query": {
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "id": "a1",
+     "name": "[bot:coder] Morning brief",
+     "prompt": "...",
+     "schedule": {
+      "kind": "cron",
+      "display": "every weekday at 07:00"
+     },
+     "schedule_display": "every weekday at 07:00",
+     "enabled": false,
+     "state": "paused",
+     "next_run_at": "2026-11-07T07:00:00+07:00",
+     "last_run_at": "2026-11-06T07:00:01.5+07:00",
+     "last_status": "ok",
+     "last_error": null,
+     "latest_execution": {
+      "status": "completed"
+     },
+     "live_execution": null,
+     "profile": "coder"
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/cron/jobs/a1/resume",
+    "query": {
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "id": "a1",
+     "name": "[bot:coder] Morning brief",
+     "prompt": "...",
+     "schedule": {
+      "kind": "cron",
+      "display": "every weekday at 07:00"
+     },
+     "schedule_display": "every weekday at 07:00",
+     "enabled": true,
+     "state": "scheduled",
+     "next_run_at": "2026-11-07T07:00:00+07:00",
+     "last_run_at": "2026-11-06T07:00:01.5+07:00",
+     "last_status": "ok",
+     "last_error": null,
+     "latest_execution": {
+      "status": "completed"
+     },
+     "live_execution": null,
+     "profile": "coder"
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/cron/jobs/b2/trigger",
+    "query": {
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "id": "b2",
+     "name": "Inbox sweep",
+     "prompt": "...",
+     "schedule": {
+      "kind": "cron",
+      "display": "every 3h"
+     },
+     "schedule_display": "every 3h",
+     "enabled": true,
+     "state": "scheduled",
+     "next_run_at": "2026-11-07T07:00:00+07:00",
+     "last_run_at": "2026-11-06T07:00:01.5+07:00",
+     "last_status": "ok",
+     "last_error": null,
+     "latest_execution": {
+      "status": "completed"
+     },
+     "live_execution": null,
+     "profile": "coder"
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "DELETE",
+    "path": "/api/cron/jobs/b2",
+    "query": {
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/cron/jobs",
+    "query": {
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": [
+     {
+      "id": "a1",
+      "name": "[bot:coder] Morning brief",
+      "prompt": "...",
+      "schedule": {
+       "kind": "cron",
+       "display": "every weekday at 07:00"
+      },
+      "schedule_display": "every weekday at 07:00",
+      "enabled": true,
+      "state": "scheduled",
+      "next_run_at": "2026-11-07T07:00:00+07:00",
+      "last_run_at": "2026-11-06T07:00:01.5+07:00",
+      "last_status": "ok",
+      "last_error": null,
+      "latest_execution": {
+       "status": "completed"
+      },
+      "live_execution": null,
+      "profile": "coder"
+     },
+     {
+      "id": "b2",
+      "name": "Inbox sweep",
+      "prompt": "...",
+      "schedule": {
+       "kind": "cron",
+       "display": "every 3h"
+      },
+      "schedule_display": "every 3h",
+      "enabled": true,
+      "state": "scheduled",
+      "next_run_at": "2026-11-07T07:00:00+07:00",
+      "last_run_at": "2026-11-06T07:00:01.5+07:00",
+      "last_status": "error",
+      "last_error": "IMAP timeout",
+      "latest_execution": {
+       "status": "completed"
+      },
+      "live_execution": null,
+      "profile": "coder"
+     },
+     {
+      "id": "c3",
+      "name": "[bot:coder] Afternoon walk nudge",
+      "prompt": "...",
+      "schedule": {
+       "kind": "cron",
+       "display": "weekdays at 15:00"
+      },
+      "schedule_display": "weekdays at 15:00",
+      "enabled": true,
+      "state": "scheduled",
+      "next_run_at": "2026-11-07T07:00:00+07:00",
+      "last_run_at": null,
+      "last_status": null,
+      "last_error": null,
+      "latest_execution": {
+       "status": "completed"
+      },
+      "live_execution": null,
+      "profile": "coder"
+     }
+    ]
+   }
+  }
+ ],
+ "exchanges": [
+  {
+   "expect": {
+    "method": "prompt.submit",
+    "params": {
+     "text": "Nudge me to walk at 3pm on weekdays"
+    }
+   },
+   "result": {
+    "admission_id": "r1",
+    "status": "queued"
+   },
+   "then": [
+    {
+     "jsonrpc": "2.0",
+     "method": "event",
+     "params": {
+      "type": "session.info",
+      "session_id": "sess-coder-chat",
+      "seq": 1,
+      "execution_generation": 2,
+      "payload": {
+       "running": true,
+       "execution_generation": 2,
+       "revision": 5
+      }
+     }
+    },
+    {
+     "jsonrpc": "2.0",
+     "method": "event",
+     "params": {
+      "type": "tool.start",
+      "session_id": "sess-coder-chat",
+      "seq": 2,
+      "execution_generation": 2,
+      "payload": {
+       "tool_id": "call_cron",
+       "name": "cronjob",
+       "context": "add Afternoon walk nudge"
+      }
+     }
+    },
+    {
+     "jsonrpc": "2.0",
+     "method": "event",
+     "params": {
+      "type": "tool.complete",
+      "session_id": "sess-coder-chat",
+      "seq": 3,
+      "execution_generation": 2,
+      "payload": {
+       "tool_id": "call_cron",
+       "name": "cronjob",
+       "summary": "created c3"
+      }
+     }
+    },
+    {
+     "jsonrpc": "2.0",
+     "method": "event",
+     "params": {
+      "type": "message.complete",
+      "session_id": "sess-coder-chat",
+      "seq": 4,
+      "execution_generation": 2,
+      "payload": {
+       "text": "Done. New Routine: Afternoon walk nudge, weekdays at 15:00.",
+       "status": "complete"
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

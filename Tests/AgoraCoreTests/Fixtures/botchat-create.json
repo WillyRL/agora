@@ -1,0 +1,13 @@
+{
+ "base": "local-roster",
+ "description": "coder has no Bot Chat yet: lookup is empty, so Agora creates one. Shapes follow tui_gateway/contracts/canonical_sessions.py (hand-written; re-record with agora-record).",
+ "exchanges": [
+  {"expect": {"method": "session.list", "params": {"profile": "coder", "title": "Bot Chat", "include_hidden": true}},
+   "result": {"scope": "stored", "sessions": []}},
+  {"expect": {"method": "session.create", "params": {"profile": "coder", "title": "Bot Chat", "hidden": true, "source": "gui", "request_id": "*"}},
+   "result": {"session_id": "sess-coder-chat", "stored_session_id": "sess-coder-chat", "messages": [], "messages_omitted": false, "message_count": 0,
+              "running": false, "authority_epoch": 3, "replay_epoch": "ep-coder", "last_sequence": 0, "subscription_id": "sub1",
+              "revision": 0, "execution_generation": 0, "pending": [], "prompts": [], "open_requests": [],
+              "info": {"title": "Bot Chat", "profile_name": "coder", "source": "gui", "started_at": 1793974000.0}}}
+ ]
+}

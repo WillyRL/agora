@@ -1,0 +1,9 @@
+{
+ "base": "local-roster",
+ "description": "After a drop, the redial hangs (Hermes unreachable).",
+ "connections": [
+  {
+   "stall": true
+  }
+ ]
+}

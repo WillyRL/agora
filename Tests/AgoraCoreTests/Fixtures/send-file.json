@@ -1,0 +1,19 @@
+{
+ "base": "local-roster",
+ "description": "Send a CSV and an image to coder's Bot Chat. The CSV goes through file.attach (stored in the session workspace, @file: ref at the top of the message, as apps/desktop use-prompt-actions does); the image through image.attach_bytes. Shapes follow tui_gateway/contracts/prompt_voice.py.",
+ "exchanges": [
+  {"expect": {"method": "session.list", "params": {"profile": "coder", "title": "Bot Chat"}},
+   "result": {"scope": "stored", "sessions": [{"session_id": "sess-coder-chat", "id": "sess-coder-chat", "resolved_id": "sess-coder-chat", "title": "Bot Chat", "message_count": 0}]}},
+  {"expect": {"method": "session.resume", "params": {"profile": "coder", "session_id": "sess-coder-chat"}},
+   "result": {"session_id": "sess-coder-chat", "session_key": "sess-coder-chat", "messages": [], "message_count": 0, "running": false,
+              "replay_epoch": "ep-1", "last_sequence": 0, "revision": 0, "execution_generation": 0, "prompts": [], "info": {"title": "Bot Chat"}}},
+  {"expect": {"method": "file.attach", "params": {"session_id": "sess-coder-chat", "profile": "coder", "name": "my trades.csv", "data_url": "data:text/csv;base64,ZGF0ZSxwcmljZQoyMDI2LTExLTA2LDUxLjk0Cg=="}},
+   "result": {"attached": true, "name": "my_trades.csv", "path": "/Users/me/.hermes/profiles/coder/workspace/attachments/my_trades.csv",
+              "ref_path": "attachments/my_trades.csv", "ref_text": "@file:attachments/my_trades.csv", "uploaded": true}},
+  {"expect": {"method": "image.attach_bytes", "params": {"session_id": "sess-coder-chat", "filename": "chart.png"}},
+   "result": {"attached": true, "path": "/Users/me/.hermes/profiles/coder/images/upload_1.png", "mime": "image/png"}},
+  {"expect": {"method": "prompt.submit", "params": {"session_id": "sess-coder-chat", "text": "@file:attachments/my_trades.csv\n\nWhat's my average entry?",
+              "attachments": [{"path": "/Users/me/.hermes/profiles/coder/images/upload_1.png", "mime": "image/png"}]}},
+   "result": {"status": "queued", "sequence": 1}}
+ ]
+}

@@ -1,0 +1,227 @@
+{
+ "base": "local-roster",
+ "description": "A Bot's own skills over the dashboard REST (hermes_cli/web_routers/skills.py: GET /api/skills, PUT /api/skills/toggle, POST /api/skills, GET /api/skills/content) and hub search and uninstall over REST (/api/skills/hub/search, /api/skills/hub/uninstall), install over skills.manage (tui_gateway/methods_tools.py). Every call carries the Bot's profile.",
+ "exchanges": [
+  {
+   "expect": {
+    "method": "skills.manage",
+    "params": {
+     "action": "install",
+     "query": "official/finance/pptx-author",
+     "profile": "coder"
+    }
+   },
+   "result": {
+    "installed": true,
+    "name": "official/finance/pptx-author"
+   }
+  },
+  {
+   "expect": {
+    "method": "skills.manage",
+    "params": {
+     "action": "install",
+     "query": "skills-sh/someone/sketchy",
+     "profile": "coder"
+    }
+   },
+   "error": {
+    "code": 5031,
+    "message": "Blocked: scan verdict DANGEROUS (curl | sh in install step)",
+    "data": {
+     "installed": false,
+     "name": "sketchy"
+    }
+   }
+  }
+ ],
+ "http": [
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/skills/hub/search",
+    "query": {
+     "profile": "coder",
+     "q": "powerpoint"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "results": [
+      {
+       "name": "pptx-author",
+       "description": "Build PowerPoint decks headless with python-pptx.",
+       "source": "official",
+       "identifier": "official/finance/pptx-author",
+       "trust_level": "builtin",
+       "repo": null,
+       "tags": []
+      },
+      {
+       "name": "powerpoint",
+       "description": "Indexed by skills.sh",
+       "source": "skills-sh",
+       "identifier": "skills-sh/igorwarzocha/opencode-workflows/powerpoint",
+       "trust_level": "community",
+       "repo": null,
+       "tags": []
+      }
+     ],
+     "source_counts": {},
+     "timed_out": [],
+     "installed": {
+      "skills-sh/igorwarzocha/opencode-workflows/powerpoint": {
+       "name": "powerpoint"
+      }
+     }
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/skills",
+    "query": {
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": [
+     {
+      "name": "plan",
+      "description": "Write a plan first",
+      "category": "software-development",
+      "enabled": true,
+      "provenance": "agent",
+      "usage": 3,
+      "locked": false
+     },
+     {
+      "name": "market-data",
+      "description": "Pull OHLC data",
+      "category": "trading",
+      "enabled": false,
+      "provenance": "hub",
+      "usage": 0,
+      "locked": false
+     },
+     {
+      "name": "arxiv",
+      "description": "Search papers",
+      "category": "research",
+      "enabled": true,
+      "provenance": "bundled",
+      "usage": 0,
+      "locked": false
+     }
+    ]
+   }
+  },
+  {
+   "expect": {
+    "method": "PUT",
+    "path": "/api/skills/toggle",
+    "query": {
+     "profile": "coder"
+    },
+    "body": {
+     "name": "market-data",
+     "enabled": true,
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": true,
+     "name": "market-data",
+     "enabled": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/skills",
+    "query": {
+     "profile": "coder"
+    },
+    "body": {
+     "name": "silver-weekly",
+     "category": "trading",
+     "profile": "coder",
+     "content": "---\nname: silver-weekly\ndescription: \"Weekly silver chart, \\\"before\\\" the reopen\"\n---\n\nPull SI=F daily bars.\n"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "success": true,
+     "message": "Skill 'silver-weekly' created."
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/skills/content",
+    "query": {
+     "profile": "coder",
+     "name": "plan"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "name": "plan",
+     "content": "---\nname: plan\n---\nPlan first.",
+     "path": "/x/SKILL.md"
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/skills/hub/uninstall",
+    "query": {
+     "profile": "coder"
+    },
+    "body": {
+     "name": "market-data",
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": true,
+     "pid": 123,
+     "name": "uninstall-market-data"
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/skills",
+    "query": {
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": [
+     {
+      "name": "plan",
+      "description": "Write a plan first",
+      "category": "software-development",
+      "enabled": true,
+      "provenance": "agent"
+     }
+    ]
+   }
+  }
+ ]
+}

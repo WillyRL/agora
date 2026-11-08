@@ -1,0 +1,468 @@
+{
+ "base": "local-roster",
+ "description": "MCP servers: the main profile's library over REST (list, toggle, test, add, sign in, remove) and a Bot's own picks via profiles.configure.",
+ "exchanges": [
+  {
+   "expect": {
+    "method": "profiles.configure",
+    "params": {
+     "name": "coder",
+     "enabled_mcp_servers": [
+      "linear"
+     ]
+    }
+   },
+   "result": {
+    "ok": true,
+    "applied": {
+     "mcp_servers": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "profiles.configure",
+    "params": {
+     "name": "coder",
+     "enabled_mcp_servers": [
+      "acme easypanel",
+      "garmin"
+     ]
+    }
+   },
+   "result": {
+    "ok": true,
+    "applied": {
+     "mcp_servers": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "profiles.configure",
+    "params": {
+     "name": "coder",
+     "enabled_mcp_servers": [
+      "acme easypanel"
+     ]
+    }
+   },
+   "result": {
+    "ok": true,
+    "applied": {
+     "mcp_servers": true
+    }
+   }
+  }
+ ],
+ "http": [
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/mcp/servers",
+    "query": {
+     "profile": "default"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "servers": [
+      {
+       "name": "garmin",
+       "transport": "stdio",
+       "url": null,
+       "command": "/Users/me/.hermes/garmin/run.sh",
+       "args": [],
+       "env": {
+        "GARMIN_TOKEN": "gar...***"
+       },
+       "auth": null,
+       "enabled": true,
+       "tools": null,
+       "source": "config",
+       "plugin": null
+      },
+      {
+       "name": "linear",
+       "transport": "http",
+       "url": "https://mcp.linear.app/mcp?apiKey=lin-secret",
+       "command": null,
+       "args": [],
+       "env": {},
+       "auth": "oauth",
+       "enabled": false,
+       "tools": null,
+       "source": "config",
+       "plugin": null
+      },
+      {
+       "name": "kanban",
+       "transport": "stdio",
+       "url": null,
+       "command": "hermes-kanban",
+       "args": [],
+       "env": {},
+       "auth": null,
+       "enabled": true,
+       "tools": [
+        "list_cards"
+       ],
+       "source": "plugin",
+       "plugin": "kanban"
+      },
+      {
+       "name": "acme easypanel",
+       "transport": "http",
+       "url": "https://u7.example.host/api/mcp",
+       "command": null,
+       "args": [],
+       "env": {},
+       "auth": "header",
+       "enabled": true,
+       "tools": null,
+       "source": "config",
+       "plugin": null
+      }
+     ]
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/mcp/servers",
+    "query": {
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "servers": [
+      {
+       "name": "garmin",
+       "transport": "stdio",
+       "command": "/Users/me/.hermes/garmin/run.sh",
+       "auth": null,
+       "enabled": false,
+       "source": "config",
+       "plugin": null
+      }
+     ]
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "PUT",
+    "path": "/api/mcp/servers/linear/enabled",
+    "query": {
+     "profile": "default"
+    },
+    "body": {
+     "enabled": true
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": true,
+     "name": "linear",
+     "enabled": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/mcp/servers/garmin/test",
+    "query": {
+     "profile": "default"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": true,
+     "tools": [
+      {
+       "name": "get_activities",
+       "description": "Recent workouts"
+      },
+      {
+       "name": "get_sleep",
+       "description": "Sleep data"
+      }
+     ],
+     "prompts": 0,
+     "resources": 0
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/mcp/servers/tavily/test",
+    "query": {
+     "profile": "default"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": false,
+     "error": "401 Unauthorized",
+     "tools": []
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/mcp/servers",
+    "query": {
+     "profile": "default"
+    },
+    "body": {
+     "name": "tavily",
+     "url": "https://mcp.tavily.com/mcp",
+     "auth": "header",
+     "bearer_token": "tvly-secret"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/mcp/servers",
+    "query": {
+     "profile": "default"
+    },
+    "body": {
+     "name": "garmin"
+    }
+   },
+   "reply": {
+    "status": 409,
+    "body": {
+     "detail": "Server 'garmin' already exists"
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "DELETE",
+    "path": "/api/mcp/servers/tavily",
+    "query": {
+     "profile": "default"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/mcp/servers/linear/auth",
+    "query": {
+     "profile": "default"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "flow_id": "f1",
+     "server_name": "linear",
+     "status": "authorization_required",
+     "authorization_url": "https://linear.app/oauth/authorize?state=x",
+     "error": null
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/mcp/oauth/flows/f1"
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "flow_id": "f1",
+     "status": "authorization_required",
+     "authorization_url": "https://linear.app/oauth/authorize?state=x",
+     "error": null
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/mcp/oauth/flows/f1"
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "flow_id": "f1",
+     "status": "approved",
+     "authorization_url": null,
+     "error": null,
+     "tools": [
+      "list_issues"
+     ]
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/mcp/servers/acme easypanel/test",
+    "query": {
+     "profile": "default"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": true,
+     "tools": [
+      {
+       "name": "list_projects",
+       "description": "Projects"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "DELETE",
+    "path": "/api/mcp/servers/linear",
+    "query": {
+     "profile": "default"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/mcp/servers",
+    "query": {
+     "profile": "default"
+    },
+    "body": {
+     "name": "linear",
+     "url": "https://mcp.linear.app/sse",
+     "auth": "oauth"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "PUT",
+    "path": "/api/mcp/servers/linear/enabled",
+    "query": {
+     "profile": "default"
+    },
+    "body": {
+     "enabled": false
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/mcp/servers",
+    "query": {
+     "profile": "coder"
+    },
+    "body": {
+     "name": "acme easypanel",
+     "url": "https://u7.example.host/api/mcp",
+     "auth": "header",
+     "bearer_token": "ep-token"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/tools/toolsets",
+    "query": {
+     "profile": "devops"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": [
+     {
+      "name": "browser",
+      "label": "Browser",
+      "description": "Drive a web browser",
+      "enabled": false,
+      "configured": true,
+      "tools": [
+       "browser_open"
+      ]
+     },
+     {
+      "name": "terminal",
+      "label": "Terminal",
+      "description": "Run shell commands",
+      "enabled": true,
+      "configured": true,
+      "tools": [
+       "terminal",
+       "process"
+      ]
+     },
+     {
+      "name": "web",
+      "label": "Web search",
+      "description": "Search and read the web",
+      "enabled": true,
+      "configured": false,
+      "tools": [
+       "web_search",
+       "web_extract"
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

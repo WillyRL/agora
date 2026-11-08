@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><style>body{margin:0;-webkit-font-smoothing:antialiased}a{color:#7c3aed;text-decoration:none}a:hover{color:#5b21b6;text-decoration:underline}input,textarea,button{font-family:inherit}textarea:focus,input:focus{outline:none}</style></helmet>
+<div style="min-height:100vh;background:#d9d6df;display:flex;flex-direction:column;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Helvetica,sans-serif;color:#1d1b20;font-size:14px">
+  <div style="height:26px;flex:none;display:flex;align-items:center;gap:20px;padding:0 18px;background:rgba(246,245,248,.72);backdrop-filter:blur(20px);font-size:13px;border-bottom:1px solid rgba(0,0,0,.06)">
+    <span style="font-weight:700">Agora</span><span>File</span><span>Edit</span><span>View</span><span>Bot</span><span>Window</span><span>Help</span>
+    <span style="flex:1"></span><span style="color:#4a4650">Local · Hermes connected</span><span>Fri 6 Nov 14:49</span>
+  </div>
+  <div style="flex:1;position:relative;display:flex;align-items:center;justify-content:center;padding:28px 24px 96px">
+
+    <sc-if value="{{ isOnboarding }}" hint-placeholder-val="{{ false }}">
+      <div style="width:min(640px,100%);height:560px;background:#fcfbfd;border-radius:12px;box-shadow:0 30px 80px rgba(30,20,50,.28),0 0 0 1px rgba(0,0,0,.08);display:flex;flex-direction:column;overflow:hidden">
+        <div style="height:44px;display:flex;align-items:center;gap:8px;padding:0 16px;flex:none">
+          <span style="width:12px;height:12px;border-radius:50%;background:#ff5f57"></span><span style="width:12px;height:12px;border-radius:50%;background:#febc2e"></span><span style="width:12px;height:12px;border-radius:50%;background:#28c840"></span>
+          <span style="flex:1"></span>
+          <div style="display:flex;gap:6px"><sc-for list="{{ obDots }}" as="d" hint-placeholder-count="3"><span style="width:18px;height:4px;border-radius:2px;background:{{ d.bg }}"></span></sc-for></div>
+        </div>
+        <div style="flex:1;padding:24px 56px 40px;display:flex;flex-direction:column">
+          <sc-if value="{{ ob0 }}" hint-placeholder-val="{{ true }}">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px">
+              <div style="width:84px;height:84px;border-radius:20px;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:600;box-shadow:0 10px 30px rgba(124,58,237,.35)">A</div>
+              <div style="font-size:30px;font-weight:700;letter-spacing:-.02em">Welcome to Agora</div>
+              <div style="font-size:16px;line-height:1.55;color:#6e6a75;max-width:400px;text-wrap:pretty">A quiet window onto your Bots. Their thinking, tools and memory stay in Hermes. Agora only shows you the conversation.</div>
+            </div>
+            <button onClick="{{ obNext }}" style="align-self:center;height:40px;padding:0 28px;border:0;border-radius:10px;background:#7c3aed;color:#fff;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#6d28d9">Get started</button>
+          </sc-if>
+          <sc-if value="{{ ob1 }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:24px;font-weight:700;letter-spacing:-.01em;margin-top:8px">Where does Hermes run?</div>
+            <div style="font-size:15px;color:#6e6a75;margin:8px 0 28px;line-height:1.5">You can switch this later in Settings.</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div onClick="{{ pickLocal }}" style="padding:18px 20px;border-radius:12px;border:{{ localBorder }};background:{{ localBg }};cursor:pointer;display:flex;gap:16px;align-items:flex-start">
+                <div style="width:20px;height:20px;border-radius:50%;border:{{ localRadio }};flex:none;margin-top:1px;box-sizing:border-box"></div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="font-size:15px;font-weight:600">On this Mac</div>
+                  <div style="font-size:13.5px;color:#6e6a75;line-height:1.45">Found Hermes at <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px">~/.hermes/gateway.sock</span></div>
+                  <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#15803d"><span style="width:7px;height:7px;border-radius:50%;background:#22c55e"></span>Running · 4 profiles</div>
+                </div>
+              </div>
+              <div onClick="{{ pickRemote }}" style="padding:18px 20px;border-radius:12px;border:{{ remoteBorder }};background:{{ remoteBg }};cursor:pointer;display:flex;gap:16px;align-items:flex-start">
+                <div style="width:20px;height:20px;border-radius:50%;border:{{ remoteRadio }};flex:none;margin-top:1px;box-sizing:border-box"></div>
+                <div style="display:flex;flex-direction:column;gap:6px;flex:1">
+                  <div style="font-size:15px;font-weight:600">On another machine</div>
+                  <div style="font-size:13.5px;color:#6e6a75;line-height:1.45">Nothing Hermes-related needed on this Mac.</div>
+                  <sc-if value="{{ isRemote }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;gap:8px;margin-top:6px">
+                      <input placeholder="https://hermes.home.lan:8642" style="flex:1;height:34px;padding:0 12px;border-radius:8px;border:1px solid rgba(0,0,0,.14);font-size:13.5px;background:#fff"></input>
+                      <button style="height:34px;padding:0 14px;border-radius:8px;border:1px solid rgba(0,0,0,.14);background:#fff;font-size:13px;cursor:pointer">Sign in with browser</button>
+                    </div>
+                    <div style="font-size:12.5px;color:#7c3aed;margin-top:2px">Use an access token instead</div>
+                  </sc-if>
+                </div>
+              </div>
+            </div>
+            <div style="flex:1"></div>
+            <div style="display:flex;justify-content:space-between"><button onClick="{{ obBack }}" style="height:38px;padding:0 18px;border:0;background:transparent;color:#6e6a75;font-size:14px;cursor:pointer">Back</button><button onClick="{{ obNext }}" style="height:38px;padding:0 24px;border:0;border-radius:10px;background:#7c3aed;color:#fff;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#6d28d9">Connect</button></div>
+          </sc-if>
+          <sc-if value="{{ ob2 }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:24px;font-weight:700;letter-spacing:-.01em;margin-top:8px">Your Bots</div>
+            <div style="font-size:15px;color:#6e6a75;margin:8px 0 24px;line-height:1.5">These are already set up in Hermes. Pick the ones to keep in your sidebar.</div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <sc-for list="{{ obBots }}" as="b" hint-placeholder-count="4">
+                <div onClick="{{ b.toggle }}" style="display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:10px;cursor:pointer" style-hover="background:#f3f1f6">
+                  <div style="width:38px;height:38px;border-radius:50%;background:{{ b.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:16px;flex:none">{{ b.initial }}</div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">{{ b.name }}</span><span style="font-size:13px;color:#6e6a75">{{ b.purpose }}</span></div>
+                  <div style="width:20px;height:20px;border-radius:6px;background:{{ b.checkBg }};border:{{ b.checkBorder }};box-sizing:border-box;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center">{{ b.check }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="flex:1"></div>
+            <div style="display:flex;justify-content:space-between"><button onClick="{{ obBack }}" style="height:38px;padding:0 18px;border:0;background:transparent;color:#6e6a75;font-size:14px;cursor:pointer">Back</button><button onClick="{{ obDone }}" style="height:38px;padding:0 24px;border:0;border-radius:10px;background:#7c3aed;color:#fff;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#6d28d9">Open Agora</button></div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isApp }}" hint-placeholder-val="{{ true }}">
+      <div style="width:min(1280px,100%);height:800px;display:flex;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 30px 80px rgba(30,20,50,.28),0 0 0 1px rgba(0,0,0,.1)">
+        <div style="width:264px;flex:none;background:rgba(244,242,247,.94);border-right:1px solid rgba(0,0,0,.07);display:flex;flex-direction:column">
+          <div style="height:52px;display:flex;align-items:center;gap:8px;padding:0 18px;flex:none">
+            <span style="width:12px;height:12px;border-radius:50%;background:#ff5f57"></span><span style="width:12px;height:12px;border-radius:50%;background:#febc2e"></span><span style="width:12px;height:12px;border-radius:50%;background:#28c840"></span>
+          </div>
+          <div style="padding:4px 12px;display:flex;flex-direction:column;gap:2px">
+            <div onClick="{{ goHome }}" style="display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:9px;cursor:pointer;background:{{ homeBg }}" style-hover="background:rgba(0,0,0,.05)">
+              <div style="width:32px;height:32px;border-radius:8px;background:#fff;border:1px solid rgba(0,0,0,.1);display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;overflow:hidden"><span style="font-size:7px;font-weight:700;color:#e5484d;letter-spacing:.04em;line-height:1">FRI</span><span style="font-size:14px;font-weight:600;line-height:1.1">6</span></div>
+              <span style="font-size:14.5px;font-weight:600;flex:1">Today</span>
+              <sc-if value="{{ hasPending }}" hint-placeholder-val="{{ true }}"><span style="min-width:20px;height:20px;padding:0 6px;box-sizing:border-box;border-radius:10px;background:#7c3aed;color:#fff;font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center">{{ pendingCount }}</span></sc-if>
+            </div>
+          </div>
+          <div style="padding:18px 22px 6px;font-size:11.5px;font-weight:600;color:#8c8893;letter-spacing:.04em">BOTS</div>
+          <div style="flex:1;overflow:auto;padding:0 12px;display:flex;flex-direction:column;gap:2px">
+            <sc-for list="{{ sideBots }}" as="b" hint-placeholder-count="4">
+              <div onClick="{{ b.open }}" style="display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:9px;cursor:pointer;background:{{ b.bg }}" style-hover="background:rgba(0,0,0,.05)">
+                <div style="position:relative;flex:none"><div style="width:36px;height:36px;border-radius:50%;background:{{ b.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px">{{ b.initial }}</div>
+                  <sc-if value="{{ b.hasPending }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;right:-2px;bottom:-2px;width:12px;height:12px;border-radius:50%;background:#f59e0b;border:2px solid #f4f2f7"></span></sc-if>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                  <div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:14.5px;font-weight:600;flex:1">{{ b.name }}</span><span style="font-size:11.5px;color:#9a96a1">{{ b.time }}</span></div>
+                  <sc-if value="{{ showSnippets }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;align-items:center;gap:6px"><span style="font-size:12.5px;color:#7a7680;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">{{ b.snippet }}</span>
+                      <sc-if value="{{ b.hasUnread }}" hint-placeholder-val="{{ false }}"><span style="width:8px;height:8px;border-radius:50%;background:#7c3aed;flex:none"></span></sc-if></div>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="padding:12px;border-top:1px solid rgba(0,0,0,.06);display:flex;flex-direction:column;gap:2px">
+            <div onClick="{{ goDir }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13.5px;background:{{ dirBg }}" style-hover="background:rgba(0,0,0,.05)"><span style="width:20px;text-align:center;color:#6e6a75">◫</span>All Bots</div>
+            <div onClick="{{ openQA }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13.5px" style-hover="background:rgba(0,0,0,.05)"><span style="width:20px;text-align:center;color:#6e6a75">⌥</span><span style="flex:1">Quick Ask</span><span style="font-size:11.5px;color:#9a96a1;padding:2px 6px;border-radius:5px;border:1px solid rgba(0,0,0,.1)">⌥ Space</span></div>
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 10px 2px;font-size:12px;color:#7a7680"><span style="width:7px;height:7px;border-radius:50%;background:#22c55e"></span>{{ connLabel }}</div>
+          </div>
+        </div>
+
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;background:#fff">
+
+          <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+            <div style="flex:1;overflow:auto;padding:56px 64px 48px">
+              <div style="max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:40px">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:13px;font-weight:600;color:#7c3aed;letter-spacing:.03em">FRIDAY, 6 NOVEMBER</div>
+                  <div style="font-size:34px;font-weight:700;letter-spacing:-.025em">Good afternoon, Alex.</div>
+                  <div style="font-size:16px;color:#6e6a75;line-height:1.55;max-width:600px;text-wrap:pretty">Two things are waiting for your OK, and the afternoon is held for the Q4 proposal. Rain after four.</div>
+                </div>
+                <sc-if value="{{ hasPending }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;flex-direction:column;gap:12px">
+                    <div style="font-size:13px;font-weight:600;color:#6e6a75">Waiting for you</div>
+                    <sc-for list="{{ pendingList }}" as="p" hint-placeholder-count="2">
+                      <div style="display:flex;align-items:center;gap:16px;padding:16px 18px;border-radius:12px;background:#faf8fd;border:1px solid #ebe5f7">
+                        <div style="width:34px;height:34px;border-radius:50%;background:{{ p.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;flex:none">{{ p.initial }}</div>
+                        <div style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="font-size:14.5px;font-weight:600">{{ p.title }}</span><span style="font-size:13px;color:#6e6a75">{{ p.bot }} wants to use <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px">{{ p.tool }}</span></span></div>
+                        <button onClick="{{ p.view }}" style="height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(0,0,0,.12);background:#fff;font-size:13px;cursor:pointer" style-hover="background:#f5f3f8">Review</button>
+                        <button onClick="{{ p.allow }}" style="height:32px;padding:0 14px;border-radius:8px;border:0;background:#7c3aed;color:#fff;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#6d28d9">Allow</button>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <div style="display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:40px">
+                  <div style="display:flex;flex-direction:column;gap:14px">
+                    <div style="display:flex;align-items:center;gap:8px"><span style="width:20px;height:20px;border-radius:50%;background:oklch(0.70 0.14 65);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">D</span><span style="font-size:13px;font-weight:600;color:#6e6a75">Your day · from Daybreak</span></div>
+                    <div style="display:flex;flex-direction:column">
+                      <sc-for list="{{ agenda }}" as="a" hint-placeholder-count="5">
+                        <div style="display:flex;gap:18px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.06)">
+                          <span style="width:46px;font-size:13.5px;color:#8c8893;font-variant-numeric:tabular-nums;flex:none;padding-top:1px">{{ a.time }}</span>
+                          <span style="width:3px;border-radius:2px;background:{{ a.bar }};flex:none"></span>
+                          <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:14.5px;font-weight:500;color:{{ a.fg }};text-decoration:{{ a.deco }}">{{ a.title }}</span><span style="font-size:12.5px;color:#8c8893">{{ a.note }}</span></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:36px">
+                    <div style="display:flex;flex-direction:column;gap:14px">
+                      <div style="font-size:13px;font-weight:600;color:#6e6a75">From your Bots</div>
+                      <sc-for list="{{ digest }}" as="d" hint-placeholder-count="3">
+                        <div onClick="{{ d.open }}" style="display:flex;gap:12px;cursor:pointer;padding:10px;margin:-10px;border-radius:10px" style-hover="background:#f7f5fa">
+                          <div style="width:28px;height:28px;border-radius:50%;background:{{ d.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;flex:none">{{ d.initial }}</div>
+                          <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:14px;font-weight:600">{{ d.name }}</span><span style="font-size:13.5px;color:#55515b;line-height:1.45;text-wrap:pretty">{{ d.text }}</span></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:14px">
+                      <div style="display:flex;align-items:center;gap:8px"><span style="width:20px;height:20px;border-radius:50%;background:oklch(0.64 0.15 20);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">P</span><span style="font-size:13px;font-weight:600;color:#6e6a75">Habits · from Pulse</span></div>
+                      <sc-for list="{{ habits }}" as="h" hint-placeholder-count="3">
+                        <div style="display:flex;flex-direction:column;gap:6px">
+                          <div style="display:flex;justify-content:space-between;font-size:13.5px"><span>{{ h.name }}</span><span style="color:#8c8893;font-variant-numeric:tabular-nums">{{ h.value }}</span></div>
+                          <div style="height:6px;border-radius:3px;background:#f0edf3;overflow:hidden"><div style="height:100%;width:{{ h.pct }};border-radius:3px;background:oklch(0.64 0.15 20)"></div></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isChat }}" hint-placeholder-val="{{ false }}">
+            <div style="height:64px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px 0 28px;border-bottom:1px solid rgba(0,0,0,.07)">
+              <div style="width:34px;height:34px;border-radius:50%;background:{{ bot.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;flex:none">{{ bot.initial }}</div>
+              <div style="display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-size:15px;font-weight:600">{{ bot.name }}</span><span style="font-size:12.5px;color:#8c8893;white-space:nowrap">{{ bot.purpose }}</span></div>
+              <div style="display:flex;gap:4px;margin-left:18px;padding:3px;border-radius:9px;background:#f3f1f6;min-width:0;overflow:auto">
+                <sc-for list="{{ threadTabs }}" as="t" hint-placeholder-count="2">
+                  <div onClick="{{ t.open }}" style="padding:5px 12px;border-radius:7px;font-size:13px;cursor:pointer;white-space:nowrap;background:{{ t.bg }};box-shadow:{{ t.shadow }};font-weight:{{ t.weight }};color:{{ t.fg }}">{{ t.title }}</div>
+                </sc-for>
+                <div onClick="{{ newSide }}" title="New Side Chat" style="padding:5px 10px;border-radius:7px;font-size:14px;cursor:pointer;color:#6e6a75" style-hover="background:rgba(0,0,0,.05)">+</div>
+              </div>
+              <span style="flex:1"></span>
+              <div onClick="{{ toggleInspector }}" style="height:30px;padding:0 12px;border-radius:8px;display:flex;align-items:center;font-size:13px;cursor:pointer;color:{{ inspFg }};background:{{ inspBg }}" style-hover="background:#ede9f3">About {{ bot.name }}</div>
+            </div>
+            <div style="flex:1;min-height:0;display:flex">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                <div ref="{{ scrollRef }}" style="flex:1;overflow:auto;padding:36px 40px 20px">
+                  <div style="max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:26px">
+                    <sc-if value="{{ isSideChat }}" hint-placeholder-val="{{ false }}">
+                      <div style="align-self:center;font-size:12.5px;color:#8c8893;padding:6px 14px;border-radius:14px;background:#f5f3f8">Side Chat · {{ bot.name }} keeps its persona, skills and memory here</div>
+                    </sc-if>
+                    <sc-for list="{{ messages }}" as="m" hint-placeholder-count="4">
+                      <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}">
+                        <div style="align-self:flex-end;max-width:78%;padding:12px 16px;border-radius:18px 18px 6px 18px;background:#f1ecfc;font-size:15px;line-height:1.5;white-space:pre-wrap;text-wrap:pretty">{{ m.text }}</div>
+                      </sc-if>
+                      <sc-if value="{{ m.isBotish }}" hint-placeholder-val="{{ true }}">
+                        <div style="display:flex;gap:14px">
+                          <div style="width:30px;height:30px;border-radius:50%;background:{{ m.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12.5px;flex:none">{{ m.initial }}</div>
+                          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                            <div style="display:flex;align-items:baseline;gap:8px;font-size:13px"><span style="font-weight:600">{{ m.name }}</span>
+                              <sc-if value="{{ m.via }}" hint-placeholder-val="{{ false }}"><span style="font-size:11.5px;color:#7c3aed;padding:1px 7px;border-radius:5px;background:#f3effd">joined via @{{ m.name }}</span></sc-if>
+                              <span style="color:#9a96a1;font-size:12px">{{ m.time }}</span></div>
+                            <sc-if value="{{ m.isBot }}" hint-placeholder-val="{{ true }}">
+                              <div style="font-size:15px;line-height:1.6;white-space:pre-wrap;text-wrap:pretty">{{ m.text }}</div>
+                            </sc-if>
+                            <sc-if value="{{ m.isRoutine }}" hint-placeholder-val="{{ false }}">
+                              <div style="border-radius:12px;border:1px solid rgba(0,0,0,.08);padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+                                <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#8c8893"><span style="font-weight:600;letter-spacing:.04em">ROUTINE</span><span>·</span><span>{{ m.title }}</span><span>·</span><span>{{ m.schedule }}</span></div>
+                                <sc-for list="{{ m.items }}" as="it" hint-placeholder-count="3"><div style="display:flex;gap:10px;font-size:14.5px;line-height:1.5"><span style="color:{{ m.color }}">•</span><span>{{ it }}</span></div></sc-for>
+                              </div>
+                            </sc-if>
+                            <sc-if value="{{ m.isSources }}" hint-placeholder-val="{{ false }}">
+                              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                                <sc-for list="{{ m.items }}" as="s" hint-placeholder-count="3"><div style="display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:10px;background:#f7f5fa;max-width:210px"><span style="font-size:13px;font-weight:500;line-height:1.35">{{ s.title }}</span><span style="font-size:11.5px;color:#8c8893">{{ s.domain }}</span></div></sc-for>
+                              </div>
+                            </sc-if>
+                            <sc-if value="{{ m.isApproval }}" hint-placeholder-val="{{ false }}">
+                              <div style="border-radius:14px;border:1px solid {{ m.border }};background:{{ m.cardBg }};padding:18px 20px;display:flex;flex-direction:column;gap:14px">
+                                <div style="display:flex;align-items:center;gap:10px"><span style="font-size:14.5px;font-weight:600;flex:1">{{ m.title }}</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#6e6a75;padding:3px 8px;border-radius:6px;background:rgba(0,0,0,.05)">{{ m.tool }}</span></div>
+                                <div style="display:flex;flex-direction:column;gap:8px">
+                                  <sc-for list="{{ m.items }}" as="it" hint-placeholder-count="2"><div style="font-size:13.5px;line-height:1.45;color:#3f3b45;padding-left:12px;border-left:2px solid rgba(0,0,0,.1)">{{ it }}</div></sc-for>
+                                </div>
+                                <sc-if value="{{ m.pending }}" hint-placeholder-val="{{ true }}">
+                                  <div style="display:flex;gap:8px;align-items:center">
+                                    <button onClick="{{ m.allow }}" style="height:32px;padding:0 16px;border-radius:8px;border:0;background:#7c3aed;color:#fff;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#6d28d9">Allow once</button>
+                                    <button onClick="{{ m.always }}" style="height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(0,0,0,.12);background:#fff;font-size:13px;cursor:pointer" style-hover="background:#f5f3f8">Always allow</button>
+                                    <span style="flex:1"></span>
+                                    <button onClick="{{ m.deny }}" style="height:32px;padding:0 12px;border-radius:8px;border:0;background:transparent;color:#b42318;font-size:13px;cursor:pointer" style-hover="background:#fdf0ef">Deny</button>
+                                  </div>
+                                </sc-if>
+                                <sc-if value="{{ m.resolved }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:{{ m.statusFg }};font-weight:500">{{ m.statusText }}</div></sc-if>
+                              </div>
+                            </sc-if>
+                          </div>
+                        </div>
+                      </sc-if>
+                    </sc-for>
+                    <sc-if value="{{ isTyping }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;gap:14px;align-items:center"><div style="width:30px;height:30px;border-radius:50%;background:{{ typingColor }};opacity:.5"></div><span style="font-size:14px;color:#8c8893">{{ typingName }} is thinking…</span></div>
+                    </sc-if>
+                  </div>
+                </div>
+                <div style="padding:0 40px 24px;flex:none">
+                  <div style="max-width:680px;margin:0 auto;position:relative">
+                    <sc-if value="{{ showMentions }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:absolute;bottom:calc(100% + 8px);left:0;width:280px;background:#fff;border-radius:12px;box-shadow:0 12px 36px rgba(30,20,50,.16),0 0 0 1px rgba(0,0,0,.07);padding:6px;display:flex;flex-direction:column;gap:2px">
+                        <div style="font-size:11.5px;color:#8c8893;padding:6px 10px 4px">Bring another Bot into this chat</div>
+                        <sc-for list="{{ mentionList }}" as="b" hint-placeholder-count="3">
+                          <div onClick="{{ b.pick }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer" style-hover="background:#f3effd">
+                            <div style="width:24px;height:24px;border-radius:50%;background:{{ b.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:11px">{{ b.initial }}</div>
+                            <span style="font-size:14px;font-weight:500">{{ b.name }}</span><span style="font-size:12px;color:#8c8893">{{ b.purpose }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                    <div style="display:flex;align-items:flex-end;gap:10px;padding:10px 10px 10px 18px;border-radius:16px;border:1px solid rgba(0,0,0,.12);background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+                      <textarea ref="{{ composerRef }}" rows="1" value="{{ draft }}" onChange="{{ onDraft }}" onKeyDown="{{ onKey }}" placeholder="{{ placeholder }}" style="flex:1;border:0;resize:none;font-size:15px;line-height:22px;padding:5px 0;background:transparent;color:#1d1b20;max-height:120px"></textarea>
+                      <button onClick="{{ send }}" style="width:32px;height:32px;border-radius:50%;border:0;background:{{ sendBg }};color:#fff;font-size:16px;cursor:pointer;flex:none">↑</button>
+                    </div>
+                    <div style="display:flex;gap:16px;font-size:12px;color:#9a96a1;padding:8px 4px 0"><span>{{ bot.model }}</span><span>Type @ to bring in another Bot</span></div>
+                  </div>
+                </div>
+              </div>
+              <sc-if value="{{ showInspector }}" hint-placeholder-val="{{ false }}">
+                <div style="width:300px;flex:none;border-left:1px solid rgba(0,0,0,.07);overflow:auto;padding:32px 26px;display:flex;flex-direction:column;gap:26px;background:#fcfbfd">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+                    <div style="width:72px;height:72px;border-radius:50%;background:{{ bot.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:28px">{{ bot.initial }}</div>
+                    <div style="font-size:18px;font-weight:700">{{ bot.name }}</div>
+                    <div style="font-size:13.5px;color:#6e6a75;line-height:1.5">{{ bot.persona }}</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:11.5px;font-weight:600;color:#8c8893;letter-spacing:.04em">ROUTINES</div>
+                    <sc-for list="{{ bot.routines }}" as="r" hint-placeholder-count="2"><div style="display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:10px;background:#f3f1f6"><span style="font-size:13.5px;font-weight:500">{{ r.t }}</span><span style="font-size:12px;color:#8c8893">{{ r.when }}</span></div></sc-for>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:11.5px;font-weight:600;color:#8c8893;letter-spacing:.04em">TOOLS</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ bot.tools }}" as="t" hint-placeholder-count="3"><span style="font-size:12.5px;padding:4px 10px;border-radius:12px;border:1px solid rgba(0,0,0,.1)">{{ t }}</span></sc-for></div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:6px;font-size:13.5px">
+                    <div style="display:flex;justify-content:space-between"><span style="color:#6e6a75">Model</span><span>{{ bot.model }}</span></div>
+                    <div style="display:flex;justify-content:space-between"><span style="color:#6e6a75">Memory</span><span>{{ bot.memLabel }}</span></div>
+                  </div>
+                  <button onClick="{{ editBot }}" style="height:34px;border-radius:9px;border:1px solid rgba(0,0,0,.12);background:#fff;font-size:13.5px;cursor:pointer" style-hover="background:#f5f3f8">Configure {{ bot.name }}…</button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isDir }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;overflow:auto;padding:56px 64px">
+              <div style="max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:36px">
+                <div style="display:flex;align-items:flex-end;gap:16px">
+                  <div style="flex:1;display:flex;flex-direction:column;gap:6px"><div style="font-size:30px;font-weight:700;letter-spacing:-.02em">All Bots</div><div style="font-size:15px;color:#6e6a75">Each Bot has its own purpose, memory and Bot Chat.</div></div>
+                  <button onClick="{{ newBot }}" style="height:36px;padding:0 18px;border-radius:10px;border:0;background:#7c3aed;color:#fff;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#6d28d9">New Bot</button>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+                  <sc-for list="{{ dirBots }}" as="b" hint-placeholder-count="4">
+                    <div style="border-radius:14px;border:1px solid rgba(0,0,0,.08);padding:22px;display:flex;flex-direction:column;gap:14px" style-hover="box-shadow:0 6px 20px rgba(30,20,50,.08)">
+                      <div style="display:flex;align-items:center;gap:12px"><div style="width:44px;height:44px;border-radius:50%;background:{{ b.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px">{{ b.initial }}</div>
+                        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:600">{{ b.name }}</span><span style="font-size:13px;color:#6e6a75">{{ b.purpose }}</span></div></div>
+                      <div style="font-size:13.5px;color:#55515b;line-height:1.5;text-wrap:pretty;flex:1">{{ b.persona }}</div>
+                      <div style="font-size:12.5px;color:#8c8893">{{ b.meta }}</div>
+                      <div style="display:flex;gap:8px"><button onClick="{{ b.open }}" style="flex:1;height:32px;border-radius:8px;border:0;background:#f3effd;color:#5b21b6;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#ebe3fc">Open Bot Chat</button><button onClick="{{ b.edit }}" style="height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(0,0,0,.12);background:#fff;font-size:13px;cursor:pointer" style-hover="background:#f5f3f8">Configure</button></div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:14px">
+                  <div style="font-size:13px;font-weight:600;color:#6e6a75">Start from a template</div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+                    <sc-for list="{{ templates }}" as="t" hint-placeholder-count="4">
+                      <div onClick="{{ t.use }}" style="padding:16px;border-radius:12px;border:1px dashed rgba(0,0,0,.16);cursor:pointer;display:flex;flex-direction:column;gap:4px" style-hover="background:#faf8fd;border-color:#c4b5fd"><span style="font-size:14px;font-weight:600">{{ t.name }}</span><span style="font-size:12.5px;color:#8c8893">{{ t.purpose }}</span></div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ false }}">
+            <div style="height:64px;flex:none;display:flex;align-items:center;gap:12px;padding:0 28px;border-bottom:1px solid rgba(0,0,0,.07)">
+              <span style="font-size:15px;font-weight:600;flex:1">{{ editTitle }}</span>
+              <button onClick="{{ cancelEdit }}" style="height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(0,0,0,.12);background:#fff;font-size:13px;cursor:pointer">Cancel</button>
+              <button onClick="{{ saveEdit }}" style="height:32px;padding:0 18px;border-radius:8px;border:0;background:#7c3aed;color:#fff;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#6d28d9">Save</button>
+            </div>
+            <div style="flex:1;overflow:auto;padding:40px 64px 56px">
+              <div style="max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:32px">
+                <div style="display:flex;align-items:center;gap:22px">
+                  <div style="width:76px;height:76px;border-radius:50%;background:{{ ed.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:30px;flex:none">{{ ed.initial }}</div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+                    <input value="{{ ed.name }}" onChange="{{ onEdName }}" placeholder="Bot name" style="font-size:22px;font-weight:700;border:0;border-bottom:1px solid rgba(0,0,0,.1);padding:4px 0;background:transparent;color:#1d1b20"></input>
+                    <div style="display:flex;gap:8px"><sc-for list="{{ swatches }}" as="s" hint-placeholder-count="6"><div onClick="{{ s.pick }}" style="width:22px;height:22px;border-radius:50%;background:{{ s.c }};cursor:pointer;box-shadow:{{ s.ring }}"></div></sc-for></div>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px"><label style="font-size:13px;font-weight:600;color:#55515b">Purpose</label>
+                  <input value="{{ ed.purpose }}" onChange="{{ onEdPurpose }}" placeholder="What is this Bot for?" style="height:40px;padding:0 14px;border-radius:10px;border:1px solid rgba(0,0,0,.12);font-size:14.5px;background:#fff"></input></div>
+                <div style="display:flex;flex-direction:column;gap:8px"><label style="font-size:13px;font-weight:600;color:#55515b">Persona</label>
+                  <textarea value="{{ ed.persona }}" onChange="{{ onEdPersona }}" rows="3" placeholder="How should it talk and think?" style="padding:12px 14px;border-radius:10px;border:1px solid rgba(0,0,0,.12);font-size:14.5px;line-height:1.5;resize:vertical;background:#fff"></textarea></div>
+                <div style="display:flex;flex-direction:column;gap:10px"><label style="font-size:13px;font-weight:600;color:#55515b">Model</label>
+                  <div style="display:flex;gap:4px;padding:3px;border-radius:10px;background:#f3f1f6;align-self:flex-start;flex-wrap:wrap"><sc-for list="{{ modelOpts }}" as="o" hint-placeholder-count="3"><div onClick="{{ o.pick }}" style="padding:7px 14px;border-radius:8px;font-size:13px;cursor:pointer;background:{{ o.bg }};box-shadow:{{ o.shadow }};font-weight:{{ o.weight }}">{{ o.name }}</div></sc-for></div></div>
+                <div style="display:flex;flex-direction:column;gap:10px"><label style="font-size:13px;font-weight:600;color:#55515b">Tools</label>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ toolOpts }}" as="t" hint-placeholder-count="6"><div onClick="{{ t.toggle }}" style="padding:7px 14px;border-radius:16px;font-size:13px;cursor:pointer;border:1px solid {{ t.border }};background:{{ t.bg }};color:{{ t.fg }}">{{ t.name }}</div></sc-for></div>
+                  <div style="font-size:12.5px;color:#8c8893">Anything that sends, deletes or spends asks for your approval first.</div></div>
+                <div style="display:flex;flex-direction:column;gap:10px"><label style="font-size:13px;font-weight:600;color:#55515b">Routines</label>
+                  <sc-for list="{{ ed.routines }}" as="r" hint-placeholder-count="1"><div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;border:1px solid rgba(0,0,0,.08)"><span style="flex:1;font-size:14px;font-weight:500">{{ r.t }}</span><span style="font-size:13px;color:#8c8893">{{ r.when }}</span></div></sc-for>
+                  <div onClick="{{ addRoutine }}" style="padding:12px 14px;border-radius:10px;border:1px dashed rgba(0,0,0,.16);font-size:13.5px;color:#7c3aed;cursor:pointer" style-hover="background:#faf8fd">+ Add Routine</div></div>
+                <div onClick="{{ toggleMem }}" style="display:flex;align-items:center;gap:14px;cursor:pointer">
+                  <div style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="font-size:14px;font-weight:600">Memory</span><span style="font-size:13px;color:#6e6a75">Remembers things you tell it across chats. Stored in Hermes.</span></div>
+                  <div style="width:38px;height:22px;border-radius:11px;background:{{ memTrack }};position:relative;flex:none"><div style="position:absolute;top:2px;left:{{ memKnob }};width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div></div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ qaOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeQA }}" style="position:absolute;inset:0;background:rgba(25,18,40,.22)"></div>
+      <div style="position:absolute;top:110px;left:50%;transform:translateX(-50%);width:min(660px,calc(100% - 48px));background:rgba(252,251,254,.96);backdrop-filter:blur(30px);border-radius:16px;box-shadow:0 30px 90px rgba(25,18,40,.35),0 0 0 1px rgba(0,0,0,.1);overflow:hidden">
+        <div style="display:flex;align-items:center;gap:14px;padding:18px 20px">
+          <div style="width:34px;height:34px;border-radius:50%;background:{{ qaBot.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;flex:none">{{ qaBot.initial }}</div>
+          <input ref="{{ qaRef }}" value="{{ qaText }}" onChange="{{ onQaText }}" onKeyDown="{{ onQaKey }}" placeholder="{{ qaPlaceholder }}" style="flex:1;border:0;background:transparent;font-size:20px;color:#1d1b20"></input>
+          <span style="font-size:12px;color:#9a96a1;padding:3px 8px;border-radius:6px;border:1px solid rgba(0,0,0,.1)">⏎</span>
+        </div>
+        <sc-if value="{{ qaHasAnswer }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:2px 20px 20px 68px;font-size:15px;line-height:1.6;white-space:pre-wrap;color:#2b2830">{{ qaAnswer }}</div>
+        </sc-if>
+        <div style="display:flex;align-items:center;gap:6px;padding:10px 14px;border-top:1px solid rgba(0,0,0,.07);background:rgba(0,0,0,.02)">
+          <sc-for list="{{ qaBots }}" as="b" hint-placeholder-count="4">
+            <div onClick="{{ b.pick }}" style="display:flex;align-items:center;gap:7px;padding:5px 10px 5px 5px;border-radius:14px;cursor:pointer;background:{{ b.bg }}" style-hover="background:rgba(0,0,0,.05)"><span style="width:20px;height:20px;border-radius:50%;background:{{ b.color }};color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ b.initial }}</span><span style="font-size:12.5px;font-weight:500">{{ b.name }}</span></div>
+          </sc-for>
+          <span style="flex:1"></span>
+          <sc-if value="{{ qaHasAnswer }}" hint-placeholder-val="{{ false }}"><span onClick="{{ qaOpenChat }}" style="font-size:12.5px;color:#7c3aed;cursor:pointer">Continue in Bot Chat</span></sc-if>
+          <span style="font-size:12px;color:#9a96a1">esc</span>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+    <div style="position:fixed;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:4px;padding:5px;border-radius:14px;background:rgba(29,27,32,.86);backdrop-filter:blur(16px);box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:calc(100% - 32px);overflow:auto">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="7">
+        <div onClick="{{ n.go }}" style="padding:7px 13px;border-radius:9px;font-size:12.5px;cursor:pointer;white-space:nowrap;color:{{ n.fg }};background:{{ n.bg }}" style-hover="color:#fff">{{ n.label }}</div>
+      </sc-for>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Today&quot;,&quot;Onboarding&quot;,&quot;Bot Chat&quot;,&quot;Approvals&quot;,&quot;Side Chat&quot;,&quot;All Bots&quot;,&quot;Configure&quot;,&quot;Quick Ask&quot;],&quot;default&quot;:&quot;Today&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showPrototypeNav&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;showPreviews&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sidebar&quot;}}">
+const HUE = h => `oklch(0.66 0.14 ${h})`;
+const BOTS = [
+  {id:'daybreak',name:'Daybreak',purpose:'Daily briefing & planner',color:HUE(65),model:'Hermes 4 70B',tools:['Calendar','Reminders','Weather'],persona:'Calm and brief. Plans your day in priorities, not lists.',memory:true,routines:[{t:'Morning brief',when:'Weekdays · 7:00'},{t:'Evening wrap-up',when:'Daily · 21:00'}]},
+  {id:'courier',name:'Courier',purpose:'Inbox & email triage',color:HUE(250),model:'Hermes 4 70B',tools:['Mail','Contacts','Files'],persona:'Reads everything so you only read what matters. Never sends without asking.',memory:true,routines:[{t:'Inbox sweep',when:'Every 3 hours'}]},
+  {id:'scout',name:'Scout',purpose:'Research',color:HUE(160),model:'Hermes 4 405B',tools:['Web search','Browser','Files'],persona:'Curious and skeptical. Gives the short answer first, then the sources.',memory:true,routines:[{t:'Weekly reading digest',when:'Sundays · 9:00'}]},
+  {id:'pulse',name:'Pulse',purpose:'Health & habits',color:HUE(20),model:'Local · Hermes 3 8B',tools:['Health','Reminders'],persona:'Encouraging, never preachy. Notices trends before you do.',memory:true,routines:[{t:'Morning check-in',when:'Daily · 7:30'},{t:'Afternoon walk nudge',when:'Weekdays · 15:00'}]},
+];
+const TOOLS = ['Calendar','Reminders','Mail','Contacts','Web search','Browser','Files','Health','Weather','Terminal'];
+const MODELS = ['Hermes 4 70B','Hermes 4 405B','Local · Hermes 3 8B'];
+const SWATCHES = [65,20,330,295,250,200,160].map(HUE);
+const TEMPLATES = [
+  {name:'Travel',purpose:'Trips, bookings & itineraries',tools:['Calendar','Web search','Mail'],persona:'Organised and a little adventurous.'},
+  {name:'Ledger',purpose:'Finance & receipts',tools:['Mail','Files'],persona:'Precise. Flags anything unusual.'},
+  {name:'Quill',purpose:'Writing & editing',tools:['Files'],persona:'Honest editor. Keeps your voice.'},
+  {name:'Wrench',purpose:'Light code help',tools:['Terminal','Files','Web search'],persona:'Explains before it changes anything.'},
+];
+const THREADS = () => ({
+  daybreak:{tabs:[{id:'main',title:'Bot Chat'},{id:'lisbon',title:'Lisbon trip'}],main:[
+    {kind:'routine',title:'Morning brief',schedule:'07:00',time:'07:00',items:['3 meetings. First is Standup at 9:30','Dentist at 11:00, leave by 10:40','Top priority: Q4 proposal draft for Dana','Light rain after 16:00']},
+    {kind:'user',text:'Can you move my 2pm with Dana to Monday and block 90 minutes this afternoon for the proposal?',time:'13:58'},
+    {kind:'bot',text:'Dana is free Monday at 10:30. I’ll move the 1:1 there and hold 14:00–15:30 today for the proposal.',time:'13:58'},
+    {kind:'approval',id:'a1',title:'Update 2 calendar events',tool:'calendar.update_event',status:'pending',time:'13:58',items:['Move “Dana / Alex 1:1” to Mon 9 Nov, 10:30–11:00','Create “Focus: Q4 proposal”, today 14:00–15:30']},
+  ],lisbon:[
+    {kind:'user',text:'Rough 3-day plan for Lisbon in December. Slow mornings, lots of walking.',time:'Tue'},
+    {kind:'bot',text:'Day 1: Alfama and the castle, late lunch, sunset at a miradouro.\nDay 2: Belém by tram, pastries, the riverside walk back.\nDay 3: LX Factory, then a slow dinner in Príncipe Real.\n\nWant me to bring in @Scout for restaurant picks?',time:'Tue'},
+  ]},
+  courier:{tabs:[{id:'main',title:'Bot Chat'}],main:[
+    {kind:'routine',title:'Inbox sweep',schedule:'13:00',time:'13:00',items:['38 new since this morning','3 need a reply from you','6 newsletters archived, 2 receipts filed']},
+    {kind:'bot',text:'The three that need you:\n1. Dana Ortiz: Q4 proposal timeline, wants a draft by Monday\n2. Lumen Dental: confirm today’s 11:00\n3. Hannah (landlord): boiler service window',time:'13:01'},
+    {kind:'user',text:'Confirm with Lumen, and tell Hannah Tuesday morning works.',time:'13:40'},
+    {kind:'bot',text:'Drafted both. They’re short and friendly.',time:'13:40'},
+    {kind:'approval',id:'a2',title:'Send 2 emails',tool:'mail.send',status:'pending',time:'13:40',items:['To appointments@example.com: “Confirming 11:00 today, thank you!”','To Hannah K.: “Tuesday morning works, any time after 8.”']},
+  ]},
+  scout:{tabs:[{id:'main',title:'Bot Chat'},{id:'ebikes',title:'E-bike shortlist'}],main:[
+    {kind:'user',text:'Is it worth switching my savings to a high-yield account right now?',time:'Wed'},
+    {kind:'bot',text:'Probably, if it’s money you won’t touch for a few months. The gap between typical savings and high-yield rates is still meaningful. Check for withdrawal limits and whether the rate is promotional.',time:'Wed'},
+  ],ebikes:[
+    {kind:'user',text:'Compare commuter e-bikes under $2,000. I ride 12 km each way with some hills.',time:'10:12'},
+    {kind:'bot',text:'Short answer: for your hills, a mid-drive motor matters more than a bigger battery. Three types fit your budget:\n• Mid-drive city bike (~$1,900). Best on climbs, heavier\n• Hub-drive with torque sensor (~$1,500). Smooth, simpler to service\n• Lightweight hub (~$1,200). Fine if the hills are short',time:'10:13'},
+    {kind:'sources',time:'10:13',items:[{title:'Long-term commuter e-bike test',domain:'bikeradar.com'},{title:'Mid-drive vs hub motors explained',domain:'electrek.co'},{title:'Owner reliability survey 2026',domain:'reddit.com/r/ebikes'}]},
+    {kind:'user',text:'@Daybreak find time for a test ride this weekend',time:'10:20'},
+    {kind:'bot',from:'daybreak',via:true,text:'Saturday 10:00–12:00 is open. I’ve pencilled in “E-bike test ride”. You can change it in my Bot Chat.',time:'10:20'},
+  ]},
+  pulse:{tabs:[{id:'main',title:'Bot Chat'}],main:[
+    {kind:'routine',title:'Morning check-in',schedule:'07:30',time:'07:30',items:['Slept 7h 12m, 25 min above your average','Resting heart rate 58','Today: 8,000 steps · 2 L water']},
+    {kind:'bot',text:'You’ve hit your water goal 4 days running. Your steps usually dip after lunch. Want a nudge at 15:00 to go for a walk?',time:'07:31'},
+    {kind:'user',text:'Yes, weekdays only.',time:'08:02'},
+    {kind:'bot',text:'Done. New Routine: Afternoon walk nudge, weekdays at 15:00.',time:'08:02'},
+  ]},
+});
+const CANNED = {
+  daybreak:'Noted. I’ll fold that into tomorrow’s brief and keep this afternoon’s focus block protected.',
+  courier:'Nothing new on that since Tuesday. I’ll flag it the moment something arrives.',
+  scout:'Looking into it. First pass: three solid sources agree on the basics. I’ll send a short write-up with citations within the hour.',
+  pulse:'Logged. That’s in line with your weekly trend. I’ll mention it in tonight’s check-in.',
+};
+const MENTION = {
+  daybreak:'Added it to your calendar as tentative. I’ll confirm in tomorrow’s brief.',
+  courier:'Found 2 related emails. Summary: nothing needs a reply yet.',
+  scout:'Quick take with sources coming up. I’ll post it here so you have it in context.',
+  pulse:'Noted for your habits. No conflicts with your goals this week.',
+};
+const QA = {
+  daybreak:'Next up: Focus: Q4 proposal at 14:00. After that you’re free until 16:30. Take a jacket, rain after 4.',
+  courier:'2 emails are waiting on your approval. Nothing urgent has come in since 13:00.',
+  scout:'Short answer: yes. I can add a sourced write-up to my Bot Chat if you want more detail.',
+  pulse:'4,210 steps so far, about half your goal. A 20-minute walk would get you most of the way.',
+};
+const NAV = ['Onboarding','Today','Bot Chat','Approvals','Side Chat','All Bots','Configure','Quick Ask'];
+const now = () => { const d = new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
+let uid = 100;
+
+class Component extends DCLogic {
+  state = { mode:'app', view:'home', botId:'daybreak', threadId:'main', bots:BOTS.map(b=>({...b,routines:[...b.routines],tools:[...b.tools]})), threads:THREADS(),
+    unread:{courier:true,pulse:true}, draft:'', typing:null, inspector:false, qa:{open:false,bot:'daybreak',text:'',answer:''},
+    ob:0, conn:'local', obPick:{daybreak:true,courier:true,scout:true,pulse:true}, ed:null, editingId:null, nav:'Today' };
+  scrollRef = React.createRef(); composerRef = React.createRef(); qaRef = React.createRef();
+
+  componentDidMount(){
+    this.key = e => {
+      if (e.altKey && e.code === 'Space') { e.preventDefault(); this.setQA({open:!this.state.qa.open}); }
+      else if (e.key === 'Escape' && this.state.qa.open) this.setQA({open:false});
+    };
+    window.addEventListener('keydown', this.key);
+    const s = this.props.startScreen; if (s && s !== 'Today') this.go(s);
+  }
+  componentWillUnmount(){ window.removeEventListener('keydown', this.key); }
+  componentDidUpdate(pp, ps){
+    const el = this.scrollRef.current;
+    if (el && (ps.threads !== this.state.threads || ps.typing !== this.state.typing || ps.threadId !== this.state.threadId || ps.botId !== this.state.botId || ps.view !== this.state.view)) el.scrollTop = el.scrollHeight;
+    if (this.state.qa.open && !ps.qa.open) setTimeout(()=>this.qaRef.current && this.qaRef.current.focus(), 30);
+  }
+  setQA(p){ this.setState(s=>({qa:{...s.qa,...p}})); }
+  bot(id){ return this.state.bots.find(b=>b.id===id); }
+  openChat(botId, threadId='main', nav='Bot Chat'){
+    this.setState(s=>({mode:'app',view:'chat',botId,threadId,unread:{...s.unread,[botId]:false},nav,draft:''}));
+    setTimeout(()=>this.composerRef.current && this.composerRef.current.focus(),50);
+  }
+  push(botId, threadId, msgs){
+    this.setState(s=>{ const t = s.threads[botId]; return {threads:{...s.threads,[botId]:{...t,[threadId]:[...t[threadId],...msgs]}}}; });
+  }
+  resolve(botId, threadId, id, status){
+    this.setState(s=>{ const t = s.threads[botId]; return {threads:{...s.threads,[botId]:{...t,[threadId]:t[threadId].map(m=>m.id===id?{...m,status}:m)}}}; });
+    if (status !== 'denied') setTimeout(()=>this.push(botId, threadId, [{kind:'bot',text: botId==='courier'?'Sent. I’ll let you know when they reply.':'Done. Your calendar is updated.',time:now()}]), 600);
+  }
+  send = () => {
+    const text = this.state.draft.trim(); if (!text) return;
+    const {botId, threadId} = this.state;
+    this.push(botId, threadId, [{kind:'user',text,time:now()}]);
+    this.setState({draft:'', typing:botId});
+    const mentioned = this.state.bots.filter(b=>b.id!==botId && text.toLowerCase().includes('@'+b.name.toLowerCase()));
+    setTimeout(()=>{
+      const out = [];
+      if (mentioned.length && text.trim().startsWith('@')) {} else if (/\b(send|reply|move|book|schedule|cancel|email)\b/i.test(text) && (botId==='daybreak'||botId==='courier')) {
+        out.push({kind:'bot',text:'Here’s what I’d do. It needs your OK first.',time:now()});
+        out.push({kind:'approval',id:'a'+(uid++),title: botId==='courier'?'Send 1 email':'Update calendar',tool: botId==='courier'?'mail.send':'calendar.update_event',status:'pending',time:now(),items:[text]});
+      } else out.push({kind:'bot',text:CANNED[botId] || 'On it.',time:now()});
+      mentioned.forEach(b=>out.push({kind:'bot',from:b.id,via:true,text:MENTION[b.id]||'On it.',time:now()}));
+      this.push(botId, threadId, out); this.setState({typing:null});
+    }, 1100);
+  };
+  go(label){
+    const base = {nav:label, qa:{...this.state.qa,open:false}};
+    if (label==='Onboarding') return this.setState({...base, mode:'onboarding', ob:0});
+    if (label==='Today') return this.setState({...base, mode:'app', view:'home'});
+    if (label==='Bot Chat') { this.setState(base); return this.openChat('daybreak','main',label); }
+    if (label==='Approvals') { this.setState(base); return this.openChat('courier','main',label); }
+    if (label==='Side Chat') { this.setState(base); return this.openChat('scout','ebikes',label); }
+    if (label==='All Bots') return this.setState({...base, mode:'app', view:'dir'});
+    if (label==='Configure') return this.startEdit('scout', label);
+    if (label==='Quick Ask') return this.setState({...base, mode:'app', view:'home', qa:{open:true,bot:'daybreak',text:'',answer:''}});
+  }
+  startEdit(id, nav='Configure', tpl){
+    const b = id ? this.bot(id) : null;
+    const ed = b ? {...b, tools:[...b.tools], routines:[...b.routines]} : {id:null,name:tpl?tpl.name:'',purpose:tpl?tpl.purpose:'',persona:tpl?tpl.persona:'',color:SWATCHES[3],model:MODELS[0],tools:tpl?[...tpl.tools]:[],routines:[],memory:true};
+    this.setState({mode:'app', view:'edit', ed, editingId:id, nav, qa:{...this.state.qa,open:false}});
+  }
+  setEd(p){ this.setState(s=>({ed:{...s.ed,...p}})); }
+  saveEdit = () => {
+    const ed = {...this.state.ed, name:this.state.ed.name.trim()||'Untitled Bot'};
+    if (this.state.editingId) { this.setState(s=>({bots:s.bots.map(b=>b.id===ed.id?ed:b)})); this.openChat(ed.id); }
+    else {
+      const id = 'bot'+(uid++); const nb = {...ed, id};
+      this.setState(s=>({bots:[...s.bots,nb], threads:{...s.threads,[id]:{tabs:[{id:'main',title:'Bot Chat'}],main:[{kind:'bot',text:`Hi, I’m ${nb.name}. ${nb.purpose ? 'I’m here for '+nb.purpose.toLowerCase()+'.' : ''} What should I know about you to get started?`,time:now()}]}}}));
+      setTimeout(()=>this.openChat(id),0);
+    }
+  };
+
+  renderVals(){
+    const s = this.state, P = this.props;
+    const pending = [];
+    s.bots.forEach(b=>{ const t = s.threads[b.id]; if (!t) return; t.tabs.forEach(tab=>(t[tab.id]||[]).forEach(m=>{ if (m.kind==='approval'&&m.status==='pending') pending.push({b,tab:tab.id,m}); })); });
+    const av = b => ({...b, initial:(b.name||'?')[0].toUpperCase()});
+    const cur = av(this.bot(s.botId) || s.bots[0]);
+    cur.memLabel = cur.memory ? 'On · 128 notes' : 'Off';
+    const thread = (s.threads[cur.id]||{})[s.threadId] || [];
+    const snippet = m => !m ? '' : m.kind==='approval' ? (m.status==='pending'?'Waiting for your approval':'Approved') : m.kind==='routine' ? 'Routine: '+m.title : m.kind==='sources' ? 'Shared sources' : (m.kind==='user'?'You: ':'')+m.text;
+    const sel = (on) => on ? {bg:'#fff',shadow:'0 1px 2px rgba(0,0,0,.1)',weight:'600',fg:'#1d1b20'} : {bg:'transparent',shadow:'none',weight:'400',fg:'#55515b'};
+    const isChat = s.view==='chat', ed = s.ed;
+    const mentionMatch = isChat && /(^|\s)@(\w*)$/.exec(s.draft);
+    const qaBot = av(this.bot(s.qa.bot));
+
+    const messages = thread.map(m=>{
+      const fb = av(this.bot(m.from||cur.id) || cur);
+      const st = m.status;
+      return {...m, isUser:m.kind==='user', isBotish:m.kind!=='user', isBot:m.kind==='bot', isRoutine:m.kind==='routine', isSources:m.kind==='sources', isApproval:m.kind==='approval',
+        name:fb.name, initial:fb.initial, color:fb.color, via:!!m.via,
+        pending:st==='pending', resolved:st&&st!=='pending',
+        border: st==='pending'?'#ddd0fa':'rgba(0,0,0,.08)', cardBg: st==='pending'?'#faf7ff':'#fcfbfd',
+        statusText: st==='allowed'?'✓ Allowed once':st==='always'?'✓ Always allowed for '+m.tool:'Denied. Nothing was changed.', statusFg: st==='denied'?'#b42318':'#15803d',
+        allow:()=>this.resolve(cur.id,s.threadId,m.id,'allowed'), always:()=>this.resolve(cur.id,s.threadId,m.id,'always'), deny:()=>this.resolve(cur.id,s.threadId,m.id,'denied')};
+    });
+
+    return {
+      isOnboarding: s.mode==='onboarding', isApp: s.mode==='app',
+      ob0:s.ob===0, ob1:s.ob===1, ob2:s.ob===2,
+      obDots:[0,1,2].map(i=>({bg:i<=s.ob?'#7c3aed':'rgba(0,0,0,.1)'})),
+      obNext:()=>this.setState({ob:s.ob+1}), obBack:()=>this.setState({ob:Math.max(0,s.ob-1)}),
+      obDone:()=>this.setState({mode:'app',view:'home',nav:'Today'}),
+      isRemote:s.conn==='remote',
+      pickLocal:()=>this.setState({conn:'local'}), pickRemote:()=>this.setState({conn:'remote'}),
+      localBorder:s.conn==='local'?'2px solid #7c3aed':'1px solid rgba(0,0,0,.12)', localBg:s.conn==='local'?'#faf7ff':'#fff', localRadio:s.conn==='local'?'6px solid #7c3aed':'1.5px solid rgba(0,0,0,.25)',
+      remoteBorder:s.conn==='remote'?'2px solid #7c3aed':'1px solid rgba(0,0,0,.12)', remoteBg:s.conn==='remote'?'#faf7ff':'#fff', remoteRadio:s.conn==='remote'?'6px solid #7c3aed':'1.5px solid rgba(0,0,0,.25)',
+      obBots: BOTS.map(b=>{ const on=!!s.obPick[b.id]; return {...av(b), checkBg:on?'#7c3aed':'#fff', checkBorder:on?'0':'1.5px solid rgba(0,0,0,.2)', check:on?'✓':'', toggle:()=>this.setState(x=>({obPick:{...x.obPick,[b.id]:!on}}))}; }),
+      connLabel: s.conn==='local' ? 'Local · Hermes on this Mac' : 'Remote · hermes.home.lan',
+
+      showSnippets: P.showPreviews ?? true,
+      homeBg: s.view==='home' ? 'rgba(124,58,237,.1)' : 'transparent',
+      dirBg: s.view==='dir' ? 'rgba(124,58,237,.1)' : 'transparent',
+      goHome:()=>this.setState({view:'home',nav:'Today'}), goDir:()=>this.setState({view:'dir',nav:'All Bots'}),
+      openQA:()=>this.setQA({open:true}),
+      hasPending: pending.length>0, pendingCount: pending.length,
+      sideBots: s.bots.filter(b=>s.obPick[b.id]!==false).map(b=>{ const t=s.threads[b.id]; const main=t?t.main:[]; const last=main[main.length-1];
+        return {...av(b), bg: isChat&&s.botId===b.id?'rgba(124,58,237,.1)':'transparent', snippet:snippet(last), time:last?last.time:'', hasUnread:!!s.unread[b.id], hasPending:pending.some(p=>p.b.id===b.id), open:()=>this.openChat(b.id)}; }),
+
+      isHome: s.view==='home', isChat, isDir: s.view==='dir', isEdit: s.view==='edit' && !!ed,
+      pendingList: pending.map(p=>({...av(p.b), bot:p.b.name, title:p.m.title, tool:p.m.tool, view:()=>this.openChat(p.b.id,p.tab,'Approvals'), allow:()=>this.resolve(p.b.id,p.tab,p.m.id,'allowed')})),
+      agenda: [
+        {time:'09:30',title:'Standup',note:'Done',bar:'#d6d2dc',fg:'#8c8893',deco:'none'},
+        {time:'11:00',title:'Dentist · Lumen Dental',note:'Done',bar:'#d6d2dc',fg:'#8c8893',deco:'none'},
+        {time:'14:00',title:'Dana / Alex 1:1',note:'Moving to Monday 10:30 if you approve',bar:'#d6d2dc',fg:'#8c8893',deco:'line-through'},
+        {time:'14:00',title:'Focus: Q4 proposal',note:'Held by Daybreak · 90 min',bar:HUE(65),fg:'#1d1b20',deco:'none'},
+        {time:'16:30',title:'Pick up dry cleaning',note:'Reminder · it’ll be raining',bar:HUE(250),fg:'#1d1b20',deco:'none'},
+        {time:'19:30',title:'Dinner with Sam',note:'Tasca do Bairro',bar:HUE(160),fg:'#1d1b20',deco:'none'},
+      ],
+      digest: [
+        {...av(BOTS[1]), text:'3 emails need a reply. 2 drafts are waiting for your OK.', open:()=>this.openChat('courier')},
+        {...av(BOTS[2]), text:'E-bike shortlist is ready, 3 options with sources.', open:()=>this.openChat('scout','ebikes','Side Chat')},
+        {...av(BOTS[3]), text:'Afternoon walk nudge is set for 15:00 on weekdays.', open:()=>this.openChat('pulse')},
+      ],
+      habits: [{name:'Steps',value:'4,210 / 8,000',pct:'53%'},{name:'Water',value:'1.4 / 2 L',pct:'70%'},{name:'Sleep',value:'7h 12m',pct:'90%'}],
+
+      bot: cur, messages, isSideChat: s.threadId!=='main',
+      threadTabs: ((s.threads[cur.id]||{}).tabs||[]).map(t=>({...t,...sel(t.id===s.threadId), open:()=>this.setState({threadId:t.id})})),
+      newSide:()=>{ const id='side'+(uid++); this.setState(x=>{ const t=x.threads[cur.id]; return {threadId:id, threads:{...x.threads,[cur.id]:{...t,tabs:[...t.tabs,{id,title:'New Side Chat'}],[id]:[]}}}; }); },
+      toggleInspector:()=>this.setState({inspector:!s.inspector}),
+      showInspector: s.inspector, inspBg: s.inspector?'#ede9f3':'transparent', inspFg: s.inspector?'#1d1b20':'#55515b',
+      editBot:()=>this.startEdit(cur.id),
+      scrollRef:this.scrollRef, composerRef:this.composerRef,
+      draft:s.draft, onDraft:e=>this.setState({draft:e.target.value}),
+      onKey:e=>{ if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); this.send(); } },
+      send:this.send, sendBg: s.draft.trim()?'#7c3aed':'#d6d2dc',
+      placeholder:`Message ${cur.name}`,
+      isTyping: !!s.typing, typingName: s.typing?this.bot(s.typing).name:'', typingColor: s.typing?this.bot(s.typing).color:'#ccc',
+      showMentions: !!mentionMatch,
+      mentionList: s.bots.filter(b=>b.id!==cur.id && (!mentionMatch || b.name.toLowerCase().startsWith((mentionMatch[2]||'').toLowerCase()))).map(b=>({...av(b), pick:()=>{ this.setState({draft:s.draft.replace(/@(\w*)$/,'@'+b.name+' ')}); this.composerRef.current && this.composerRef.current.focus(); }})),
+
+      dirBots: s.bots.map(b=>({...av(b), meta:`${b.model} · ${b.routines.length} Routine${b.routines.length===1?'':'s'} · ${b.tools.length} tools`, open:()=>this.openChat(b.id), edit:()=>this.startEdit(b.id)})),
+      newBot:()=>this.startEdit(null,'All Bots'),
+      templates: TEMPLATES.map(t=>({...t, use:()=>this.startEdit(null,'All Bots',t)})),
+
+      ed: ed ? {...ed, initial:(ed.name||'?')[0].toUpperCase()} : {routines:[]},
+      editTitle: s.editingId ? 'Configure '+(ed&&ed.name) : 'New Bot',
+      onEdName:e=>this.setEd({name:e.target.value}), onEdPurpose:e=>this.setEd({purpose:e.target.value}), onEdPersona:e=>this.setEd({persona:e.target.value}),
+      swatches: SWATCHES.map(c=>({c, ring: ed&&ed.color===c?'0 0 0 2px #fff,0 0 0 4px '+c:'none', pick:()=>this.setEd({color:c})})),
+      modelOpts: MODELS.map(m=>({name:m,...sel(ed&&ed.model===m), pick:()=>this.setEd({model:m})})),
+      toolOpts: TOOLS.map(t=>{ const on = ed && ed.tools.includes(t); return {name:t, bg:on?'#f3effd':'#fff', border:on?'#c4b5fd':'rgba(0,0,0,.12)', fg:on?'#5b21b6':'#55515b', toggle:()=>this.setEd({tools: on?ed.tools.filter(x=>x!==t):[...ed.tools,t]})}; }),
+      addRoutine:()=>this.setEd({routines:[...ed.routines,{t:'Weekly review',when:'Fridays · 17:00'}]}),
+      memTrack: ed&&ed.memory?'#7c3aed':'#d6d2dc', memKnob: ed&&ed.memory?'18px':'2px',
+      toggleMem:()=>this.setEd({memory:!ed.memory}),
+      cancelEdit:()=>s.editingId?this.openChat(s.editingId):this.setState({view:'dir',nav:'All Bots'}),
+      saveEdit:this.saveEdit,
+
+      qaOpen: s.mode==='app' && s.qa.open, closeQA:()=>this.setQA({open:false}),
+      qaBot, qaRef:this.qaRef, qaText:s.qa.text, qaPlaceholder:`Ask ${qaBot.name}…`,
+      onQaText:e=>this.setQA({text:e.target.value}),
+      onQaKey:e=>{ if (e.key==='Enter' && s.qa.text.trim()) { if (e.metaKey && s.qa.answer) return this.qaToChat(); this.setQA({answer:'…'}); setTimeout(()=>this.setQA({answer:QA[s.qa.bot]||'On it.'}),700); } },
+      qaHasAnswer: !!s.qa.answer, qaAnswer:s.qa.answer,
+      qaBots: s.bots.slice(0,4).map(b=>({...av(b), bg:s.qa.bot===b.id?'rgba(124,58,237,.12)':'transparent', pick:()=>{ this.setQA({bot:b.id,answer:''}); this.qaRef.current&&this.qaRef.current.focus(); }})),
+      qaOpenChat:()=>this.qaToChat(),
+
+      showNav: P.showPrototypeNav ?? true,
+      navItems: NAV.map(n=>({label:n, fg:s.nav===n?'#fff':'rgba(255,255,255,.62)', bg:s.nav===n?'rgba(255,255,255,.16)':'transparent', go:()=>this.go(n)})),
+    };
+  }
+  qaToChat(){
+    const {bot,text,answer} = this.state.qa;
+    this.push(bot,'main',[{kind:'user',text,time:now()},{kind:'bot',text:answer,time:now()}]);
+    this.setQA({open:false,text:'',answer:''}); this.openChat(bot);
+  }
+}
+</script>
+</body>
+</html>
