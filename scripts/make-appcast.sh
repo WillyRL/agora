@@ -1,8 +1,9 @@
 #!/bin/zsh
 # Writes an update feed (Sparkle appcast) with one signed item for <archive>.
-# Usage: scripts/make-appcast.sh <version> <build-number> <archive.zip> <download-url> <notes.html> <out.xml> [also-include.xml]
-#   also-include.xml   another feed whose items are copied in (the nightly feed carries the latest stable item,
-#                      so nightly users still get a newer stable release)
+# Usage: scripts/make-appcast.sh <version> <build-number> <archive.zip> <download-url> <notes.html> <out.xml> [current.xml]
+#   current.xml        the feed as published now: its items on other channels are kept, so the stable feed
+#                      carries the latest stable release and the latest beta side by side
+#   SPARKLE_CHANNEL    "beta" marks the new item as a beta (only betas install those); empty for stable
 #   SPARKLE_BIN        folder with Sparkle's sign_update (from the Sparkle release of the same version)
 #   SPARKLE_KEY_FILE   the private EdDSA key; without it, sign_update uses the key in this Mac's Keychain
 set -euo pipefail
@@ -15,9 +16,21 @@ SIGNATURE="$("$SPARKLE_BIN/sign_update" "${KEY_ARGS[@]}" "$ARCHIVE")"   # sparkl
 case "$SIGNATURE" in *edSignature=*length=*) ;; *) echo "sign_update gave no signature" >&2; exit 1 ;; esac
 DATE="$(LC_ALL=C date -u '+%a, %d %b %Y %H:%M:%S +0000')"
 MIN_OS="$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' scripts/Info.plist)"
+CHANNEL="${SPARKLE_CHANNEL:-}"
+CHANNEL_TAG=""
+[ -n "$CHANNEL" ] && CHANNEL_TAG="<sparkle:channel>$CHANNEL</sparkle:channel>"
 EXTRA=""
 if [ -n "$INCLUDE" ] && [ -s "$INCLUDE" ]; then
-  EXTRA="$(python3 -c 'import re,sys; print("\n".join(m.group(0) for m in re.finditer(r"<item>.*?</item>", open(sys.argv[1]).read(), re.S)))' "$INCLUDE")"
+  # Keep the items on other channels; this one replaces the previous item on its own channel.
+  EXTRA="$(python3 - "$INCLUDE" "$CHANNEL" <<'PY'
+import re, sys
+feed, channel = open(sys.argv[1]).read(), sys.argv[2]
+for item in re.findall(r"<item>.*?</item>", feed, re.S):
+    m = re.search(r"<sparkle:channel>(.*?)</sparkle:channel>", item)
+    if (m.group(1) if m else "") != channel:
+        print(item)
+PY
+)"
 fi
 cat > "$OUT" <<XML
 <?xml version="1.0" encoding="utf-8"?>
@@ -31,6 +44,7 @@ cat > "$OUT" <<XML
       <sparkle:version>$BUILD</sparkle:version>
       <sparkle:shortVersionString>$VERSION</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>$MIN_OS</sparkle:minimumSystemVersion>
+      $CHANNEL_TAG
       <description><![CDATA[$(cat "$NOTES")]]></description>
       <enclosure url="$URL" type="application/octet-stream" $SIGNATURE/>
     </item>

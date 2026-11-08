@@ -173,6 +173,10 @@ jobs:
             gh release create nightly "${FILES[@]}" --title "Agora Nightly ($V)" --notes-file "$RUNNER_TEMP/notes.md" --prerelease --latest=false --verify-tag
           fi
 
+      - name: Tell installed copies
+        if: steps.check.outputs.skip != 'true' && env.SPARKLE_PRIVATE_KEY != ''
+        run: scripts/publish-feed.sh dist/appcast-nightly.xml   # the updates branch Agora Nightly checks
+
       - name: Clean up the keychain
         if: always() && env.MACOS_CERTIFICATE != ''
         run: security delete-keychain "$RUNNER_TEMP/release.keychain-db" || true

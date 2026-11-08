@@ -8,7 +8,7 @@ Agora comes in three separate apps, so they install side by side with their own 
 | Made by | pushing a `v*` tag (`release.yml`) | every night at 19:00 UTC when `main` changed, or **Actions → Nightly → Run workflow** (`nightly.yml`) | `scripts/build-app.sh` on your Mac |
 | Version | from the tag: `0.2.0` | the next patch + date: `0.2.1-nightly.20261109` | Info.plist's |
 | On GitHub | a release, marked latest (a tag with a dash, `v0.2.0-beta.1`, is a pre-release) | one rolling pre-release tagged `nightly`, replaced each night | — |
-| Updates from | `releases/latest/download/appcast.xml` | `releases/download/nightly/appcast-nightly.xml` | doesn't update |
+| Updates from | `appcast.xml` on the `updates` branch | `appcast-nightly.xml` on the `updates` branch | doesn't update |
 | Icon | plain | dark NIGHTLY band | orange DEV band |
 
 `scripts/build-app.sh [dev|stable|nightly]` sets the bundle ID, name and icon; `scripts/package-release.sh` (with `AGORA_FLAVOR=stable|nightly`) adds the update feed and packages it.
@@ -24,6 +24,8 @@ The workflow tests, builds a universal app (Apple Silicon + Intel) with the vers
 Build numbers (`CFBundleVersion`) are UTC timestamps (`YYYYMMDDHHMM`), so every build is newer than the one before it.
 
 Locally, `scripts/package-release.sh <version>` does the same packaging into `dist/`, and `scripts/make-appcast.sh` writes a feed.
+
+**Update feeds** live on the `updates` branch and are read from `https://raw.githubusercontent.com/WillyRL/agora/updates/<file>`: always the newest, pre-releases included, and independent of GitHub's release downloads. The workflows write them (`scripts/publish-feed.sh`) once a release is public; each release also has its feed attached. `appcast.xml` holds the latest stable release and the latest beta: a beta item is marked `<sparkle:channel>beta</sparkle:channel>`, which only betas (versions with a dash) install. So a beta moves on to newer betas and then to the release, and a stable copy only ever sees stable releases.
 
 **Fixing a released version** while `main` has moved on: branch from the tag (`git switch -c release/0.2 v0.2.0`), fix it there, tag `v0.2.1` on that branch, and bring the fix to `main` too.
 

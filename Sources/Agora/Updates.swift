@@ -21,8 +21,10 @@ final class AppUpdater {
             && (info["SUPublicEDKey"] as? String)?.isEmpty == false
         let quiet = env["AGORA_DEMO"] != nil || env["AGORA_SNAPSHOT"] != nil
         controller = configured && !quiet
-            ? SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil) : nil
+            ? SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: channels, userDriverDelegate: nil) : nil
     }
+
+    private let channels = BetaChannel()
 
     func checkForUpdates() {
         controller?.checkForUpdates(nil)
@@ -35,4 +37,13 @@ final class AppUpdater {
     }
 
     var lastChecked: Date? { controller?.updater.lastUpdateCheckDate }
+}
+
+/// A beta (a version with a dash, like 0.2.0-beta.1) also takes newer betas; a stable release only stable
+/// ones. The feed marks beta items with `<sparkle:channel>beta</sparkle:channel>`.
+final class BetaChannel: NSObject, SPUUpdaterDelegate {
+    func allowedChannels(for updater: SPUUpdater) -> Set<String> {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+        return version.contains("-") ? ["beta"] : []
+    }
 }

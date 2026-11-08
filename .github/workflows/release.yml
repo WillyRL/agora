@@ -13,7 +13,8 @@ name: Release
 #   APPLE_APP_PASSWORD           an app-specific password from account.apple.com
 # Without them the release is signed ad hoc and the notes explain how to open it.
 #
-# In-app updates: each release also gets appcast.xml, the feed Agora checks, with the .zip signed by
+# In-app updates: each release also writes appcast.xml (attached, and on the `updates` branch, which Agora
+# reads), with the .zip signed by
 #   SPARKLE_PRIVATE_KEY          the EdDSA key from Sparkle's generate_keys (its public half is in package-release.sh)
 
 on:
@@ -154,10 +155,13 @@ jobs:
           umask 077; printf '%s' "$SPARKLE_PRIVATE_KEY" > "$RUNNER_TEMP/sparkle.key"
           gh release view "$TAG" --json body -q .body > "$RUNNER_TEMP/notes-final.md"
           gh api markdown -f text="$(cat "$RUNNER_TEMP/notes-final.md")" -f mode=gfm -f context="$GITHUB_REPOSITORY" > "$RUNNER_TEMP/notes.html"
-          SPARKLE_BIN="$SPARKLE_BIN" SPARKLE_KEY_FILE="$RUNNER_TEMP/sparkle.key" scripts/make-appcast.sh \
+          # Start from the feed installed copies read now, so it keeps the latest stable and the latest beta.
+          git fetch -q origin updates 2>/dev/null && git show FETCH_HEAD:appcast.xml > "$RUNNER_TEMP/current.xml" 2>/dev/null || : > "$RUNNER_TEMP/current.xml"
+          CHANNEL=""; [ "${{ steps.version.outputs.prerelease }}" = "true" ] && CHANNEL=beta
+          SPARKLE_CHANNEL="$CHANNEL" SPARKLE_BIN="$SPARKLE_BIN" SPARKLE_KEY_FILE="$RUNNER_TEMP/sparkle.key" scripts/make-appcast.sh \
             "$V" "${{ steps.version.outputs.build }}" "dist/Agora-$V.zip" \
             "https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/Agora-$V.zip" \
-            "$RUNNER_TEMP/notes.html" dist/appcast.xml
+            "$RUNNER_TEMP/notes.html" dist/appcast.xml "$RUNNER_TEMP/current.xml"
           rm -f "$RUNNER_TEMP/sparkle.key"
           gh release upload "$TAG" dist/appcast.xml --clobber
 
@@ -166,6 +170,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release edit "${{ steps.version.outputs.tag }}" --draft=false
+
+      - name: Tell installed copies
+        if: steps.version.outputs.draft != 'true' && env.SPARKLE_PRIVATE_KEY != ''
+        run: scripts/publish-feed.sh dist/appcast.xml   # the updates branch Agora checks
 
       - name: Clean up the keychain
         if: always() && env.MACOS_CERTIFICATE != ''

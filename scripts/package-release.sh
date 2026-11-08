@@ -20,8 +20,8 @@ rm -rf "$DIST" && mkdir -p "$DIST"
 
 FLAVOR="${AGORA_FLAVOR:-stable}"
 case "$FLAVOR" in
-  stable)  APP_NAME="Agora";         FEED="https://github.com/WillyRL/agora/releases/latest/download/appcast.xml" ;;
-  nightly) APP_NAME="Agora Nightly"; FEED="https://github.com/WillyRL/agora/releases/download/nightly/appcast-nightly.xml" ;;
+  stable)  APP_NAME="Agora";         FEED="https://raw.githubusercontent.com/WillyRL/agora/updates/appcast.xml" ;;
+  nightly) APP_NAME="Agora Nightly"; FEED="https://raw.githubusercontent.com/WillyRL/agora/updates/appcast-nightly.xml" ;;
   *) echo "AGORA_FLAVOR must be stable or nightly" >&2; exit 2 ;;
 esac
 
