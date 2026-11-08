@@ -10,6 +10,8 @@ Light and clean from day one, and it doesn't make you run Hermes on the same Mac
   <img src="docs/screenshots/chat-dark.png" width="49%" alt="The same chat in dark mode">
 </p>
 
+I have been using the Hermes for quite a while, the one thing that I don't like about them is their **Hermes Desktop** It's too bloated, I'm using hermes mainly for my assistant, doing repetitive works, not for coding, I'll straight up using the official harness like claude code, therefore I don't need my hermes desktop to have terminal, file explorer, and other features. I only need to chat with my hermes agents and done something for me on background while I'm doing other stuffs, so I made Agora, and I'm quite happy with the result, and I believed someone must have the same problem with me, hope you like it.  
+
 Agora is a small SwiftUI app for talking to the Bots you run in Hermes. Hermes does the thinking, tools, memory and schedules; Agora is the window onto it. Run Hermes on a Mac mini, a home server or a VPS, and use Agora from your laptop. Or run both on one Mac.
 
 ## What it does
