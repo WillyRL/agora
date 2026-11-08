@@ -39,6 +39,7 @@ public final class InMemoryKeyValueStore: KeyValueStore {
 /// Remote logins in the macOS Keychain, keyed by the Connection's base URL.
 public final class KeychainCredentialStore: CredentialStore {
     let service: String
+    // A fixed name, not the bundle ID: it predates `io.github.willyrl.agora`, and keeping it keeps saved logins.
     public init(service: String = "app.agora.remote-login") { self.service = service }
 
     public func load(for key: String) -> RemoteCredential? {

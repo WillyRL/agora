@@ -4,7 +4,7 @@
 <dict>
 	<key>CFBundleName</key><string>Agora</string>
 	<key>CFBundleDisplayName</key><string>Agora</string>
-	<key>CFBundleIdentifier</key><string>app.agora.Agora</string>
+	<key>CFBundleIdentifier</key><string>io.github.willyrl.agora</string>
 	<key>CFBundleExecutable</key><string>Agora</string>
 	<key>CFBundlePackageType</key><string>APPL</string>
 	<key>CFBundleShortVersionString</key><string>0.1.0</string>
