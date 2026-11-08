@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Agora</title>
+    <link>https://github.com/WillyRL/agora</link>
+    <item>
+      <title>Agora 0.1.0-beta.2</title>
+      <pubDate>Sun, 08 Nov 2026 10:22:20 +0000</pubDate>
+      <sparkle:version>202611081018</sparkle:version>
+      <sparkle:shortVersionString>0.1.0-beta.2</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <sparkle:channel>beta</sparkle:channel>
+      <description><![CDATA[<h2 dir="auto">Install</h2>
+<ol dir="auto">
+<li>Download <strong>Agora-0.1.0-beta.2.dmg</strong> below, open it and drag <strong>Agora</strong> into <strong>Applications</strong>.</li>
+<li>Open Agora and choose where your Hermes runs: on this Mac, or on another machine.</li>
+</ol>
+<p dir="auto">Needs macOS 15 or later and Hermes v0.23 or later. Runs natively on Apple Silicon and Intel.</p>
+<h3 dir="auto">First launch</h3>
+<p dir="auto">This build isn't notarized by Apple yet, so macOS stops it the first time:</p>
+<ul dir="auto">
+<li>Open Agora once, then go to <strong>System Settings → Privacy &amp; Security</strong>, scroll down and click <strong>Open Anyway</strong>.</li>
+<li>Or in Terminal: <code class="notranslate">xattr -dr com.apple.quarantine /Applications/Agora.app</code></li>
+</ul>
+<p dir="auto">Check the download: <code class="notranslate">shasum -a 256 -c SHA256SUMS</code>.</p>
+<p dir="auto"><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/WillyRL/agora/compare/v0.1.0-beta.1...v0.1.0-beta.2"><tt>v0.1.0-beta.1...v0.1.0-beta.2</tt></a></p>]]></description>
+      <enclosure url="https://github.com/WillyRL/agora/releases/download/v0.1.0-beta.2/Agora-0.1.0-beta.2.zip" type="application/octet-stream" sparkle:edSignature="i61LJptvkqODksYrg/6F/Ud1lL9a0kCjBbb+OaVTEyhmhxYvzLyJ7/yQ/ZnB1zl3S0IB26uuZTM84SPbuDgpDg==" length="5009628"/>
+    </item>
+
+  </channel>
+</rss>
