@@ -252,6 +252,9 @@ struct BotEditorView: View {
     @State private var confirmDelete = false
     @State private var loaded = false
     @State private var mcp = BotMCPSelection()
+    @State private var draftingPersona = false
+    @State private var previousPersona: String?
+    @State private var personaError: String?
 
     static let swatches = ["#8b5cf6", "#3b82f6", "#14b8a6", "#22c55e", "#eab308", "#f97316", "#ef4444", "#ec4899", "#6b7280"]
 
@@ -300,11 +303,32 @@ struct BotEditorView: View {
                     Field("Persona") {
                         TextEditor(text: $draft.persona)
                             .font(.system(size: 13))
+                            .disabled(draftingPersona)
                             .frame(minHeight: 140, maxHeight: 300)  // long personas scroll inside, so the page stays short
                             .padding(6)
                             .background(RoundedRectangle(cornerRadius: 6).fill(Theme.cardBackground))
                             .overlay(RoundedRectangle(cornerRadius: 6).stroke(Theme.hairline))
-                        Text("How it should talk and think. Saved as the Bot's SOUL.md in Hermes.").font(.system(size: 11)).foregroundStyle(.tertiary)
+                        HStack(alignment: .firstTextBaseline, spacing: 8) {
+                            Text(personaError ?? "How it should talk and think. Saved as the Bot's SOUL.md in Hermes.")
+                                .font(.system(size: 11)).foregroundStyle(personaError == nil ? AnyShapeStyle(.tertiary) : AnyShapeStyle(.red))
+                            Spacer()
+                            if let previousPersona, !draftingPersona {
+                                Button("Undo") {
+                                    draft.persona = previousPersona
+                                    self.previousPersona = nil
+                                }
+                                .buttonStyle(.borderless)
+                            }
+                            Button(action: generatePersona) {
+                                HStack(spacing: 5) {
+                                    if draftingPersona { ProgressView().controlSize(.mini) } else { Image(systemName: "sparkles") }
+                                    Text(draftingPersona ? "Writing…" : draft.persona.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Draft with AI" : "Rewrite with AI")
+                                }
+                            }
+                            .controlSize(.small)
+                            .disabled(draftingPersona || draft.title.trimmingCharacters(in: .whitespaces).isEmpty)
+                            .help("Hermes writes a persona from the name and purpose, keeping anything already in the box")
+                        }
                     }
                     Field("Model") {
                         Picker("", selection: Binding(get: { "\(draft.provider):\(draft.model)" }, set: { v in
@@ -362,6 +386,22 @@ struct BotEditorView: View {
             Text("Its Hermes profile, memory, chats and Routines are removed. This can't be undone.")
         }
         .onAppear { core.setViewing(bot: nil, session: nil) }
+    }
+
+    func generatePersona() {
+        draftingPersona = true
+        personaError = nil
+        let before = draft.persona
+        Task {
+            defer { draftingPersona = false }
+            do {
+                let persona = try await core.draftPersona(name: draft.title, purpose: draft.description, current: before, bot: existing?.name)
+                previousPersona = before
+                draft.persona = persona
+            } catch {
+                personaError = "Couldn't write a persona: \(error.localizedDescription)"
+            }
+        }
     }
 
     func save() {

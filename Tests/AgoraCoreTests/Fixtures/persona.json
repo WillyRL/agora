@@ -1,0 +1,28 @@
+{
+ "base": "local-roster",
+ "description": "The Bot editor drafts a persona over llm.oneshot (tui_gateway/methods_session.py): stateless, scoped to the Bot's profile (the default Bot for a Bot not created yet).",
+ "exchanges": [
+  {
+   "expect": {
+    "method": "llm.oneshot",
+    "params": {
+     "profile": "coder"
+    }
+   },
+   "result": {
+    "text": "## Who you are\nYou are Coder.\n"
+   }
+  },
+  {
+   "expect": {
+    "method": "llm.oneshot",
+    "params": {
+     "profile": "default"
+    }
+   },
+   "result": {
+    "text": "  "
+   }
+  }
+ ]
+}

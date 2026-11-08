@@ -380,3 +380,34 @@ final class OpenedURL: @unchecked Sendable {
     var value: URL? { lock.withLock { url } }
     func set(_ u: URL) { lock.withLock { url = u } }
 }
+
+@MainActor
+struct PersonaTests {
+    @Test func aPersonaIsDraftedFromTheNameAndPurposeKeepingWhatsAlreadyThere() async throws {
+        let fake = try FakeHermes(named: "persona")
+        let core = TestCore.make(fake)
+        await core.start()
+
+        let persona = try await core.draftPersona(name: "Coder ", purpose: "Writes and reviews code", current: "Always run the tests.", bot: "coder")
+
+        #expect(persona == "## Who you are\nYou are Coder.")
+        let sent = try #require(fake.sent("llm.oneshot").first?["params"])
+        #expect(sent["input"].string == "Bot name: Coder\nPurpose: Writes and reviews code\n\nCurrent persona or notes (keep what they ask for):\nAlways run the tests.")
+        #expect(sent["instructions"].string?.contains("SOUL.md") == true)
+        #expect(sent["session_id"] == .null)  // stateless: no chat is touched
+        #expect(fake.unexpected.isEmpty)
+    }
+
+    @Test func aNewBotsPersonaIsWrittenUnderTheDefaultBotAndAnEmptyAnswerIsAnError() async throws {
+        let fake = try FakeHermes(named: "persona")
+        let core = TestCore.make(fake)
+        await core.start()
+        _ = try await core.draftPersona(name: "Coder", purpose: "", current: "", bot: "coder")  // uses the first reply
+
+        await #expect(throws: HermesError.self) {
+            try await core.draftPersona(name: "Video Editor", purpose: "Promo videos", current: "", bot: nil)
+        }
+        #expect(fake.sent("llm.oneshot").last?["params"]["profile"] == "default")
+        #expect(fake.sent("llm.oneshot").last?["params"]["input"].string?.contains("Current persona") == false)
+    }
+}

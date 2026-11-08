@@ -59,8 +59,31 @@ public final class DemoHermes: SocketFactory, HTTPClient, ControlSocket, Gateway
         case "session.create":
             return ["session_id": .string("demo-\(UUID().uuidString.prefix(8))"), "message_count": 0, "running": false, "info": ["title": ""]]
         case "prompt.submit": return ["status": "queued", "sequence": 1]
+        case "llm.oneshot":
+            let name = (p["input"].string ?? "").split(separator: "\n").first?.replacingOccurrences(of: "Bot name: ", with: "") ?? "this Bot"
+            return ["text": .string(Self.persona(for: String(name)))]
         default: return [:]
         }
+    }
+
+    static func persona(for name: String) -> String {
+        """
+        # \(name)
+
+        ## Who you are
+        You are \(name). You turn rough requests into finished work the user can use straight away.
+
+        ## How you work
+        - Ask one short question when the goal is unclear; otherwise start.
+        - Show a first version early, then refine it.
+        - Ask before anything that sends, publishes or spends.
+
+        ## How you talk
+        Short and plain. Lead with the result, then what changed.
+
+        ## What you avoid
+        Filler, long preambles, and guessing at facts you can check.
+        """
     }
 
     // MARK: REST

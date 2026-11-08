@@ -97,6 +97,42 @@ extension AgoraCore {
         return bot
     }
 
+    // MARK: Persona
+
+    /// Drafts a persona (SOUL.md) from the Bot's name and purpose. Text already in the persona is
+    /// treated as notes to keep and build on. Hermes writes it with its quick background model,
+    /// billed to `bot` (a new Bot doesn't exist yet, so it uses the default Bot).
+    public func draftPersona(name: String, purpose: String, current: String, bot: String?) async throws -> String {
+        let connection = try requireConnection()
+        var input = "Bot name: \(name.trimmingCharacters(in: .whitespacesAndNewlines))\nPurpose: \(purpose.trimmingCharacters(in: .whitespacesAndNewlines))"
+        let notes = current.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !notes.isEmpty { input += "\n\nCurrent persona or notes (keep what they ask for):\n\(notes)" }
+        let r = try await connection.call(
+            "llm.oneshot",
+            ["profile": .string(bot ?? "default"), "instructions": .string(Self.personaInstructions), "input": .string(input),
+             "max_tokens": 2000, "temperature": 0.7],
+            timeout: .seconds(90))
+        let text = (r["text"].string ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { throw HermesError.protocolViolation("Hermes returned an empty persona. Try again.") }
+        return text
+    }
+
+    static let personaInstructions = """
+        You write SOUL.md files for Hermes Bots. A SOUL.md is the persona a Bot reads at the start of every \
+        conversation: who it is and how it behaves. It is not a task list and not documentation.
+
+        Write the persona for the Bot described by the user. Use Markdown with a few short sections, addressed \
+        to the Bot as "you", 150 to 300 words in total:
+        - Who you are: one or two sentences on the role and what the Bot is for.
+        - How you work: the approach, what it checks before acting, when it asks the user first.
+        - How you talk: tone, length of replies, format.
+        - What you avoid.
+
+        Be specific to this Bot's purpose; skip generic virtues like "helpful" or "friendly". If current \
+        persona text or notes are given, keep every concrete instruction in them and build on them. Reply \
+        with the SOUL.md content only, no preamble and no code fence.
+        """
+
     // MARK: Edit
 
     /// Saves changes to a Bot. Its look is merged into the official app's metadata so keys Agora
