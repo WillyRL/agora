@@ -420,6 +420,7 @@ struct ConnectionsSettings: View {
 
 struct GeneralSettings: View {
     @Environment(AppModel.self) private var app
+    @Environment(AgoraCore.self) private var core
     @State private var hotkey = HotkeyChoice.saved
     @State private var openAtLogin = LoginItem.isEnabled
     @State private var error: String?
@@ -447,6 +448,15 @@ struct GeneralSettings: View {
                 }
             Text("Closing the window keeps Agora running in the Dock so notifications and Quick Ask keep working. ⌘Q quits.")
                 .font(.system(size: 11.5)).foregroundStyle(.secondary)
+            if core.installsAgoraSkill {
+                Toggle("Teach my Bots about Agora", isOn: Binding(get: { core.teachBots == true }, set: { core.setTeachBots($0) }))
+                Text(TeachBots.explanation + " Turning this off leaves what's already there; turn the skill off in Skills.")
+                    .font(.system(size: 11.5)).foregroundStyle(.secondary)
+                if core.teachBots == true && !core.allBots.isEmpty {
+                    Text(TeachBots.openChats).font(.system(size: 11.5)).foregroundStyle(.secondary)
+                    RefreshPromptsCommand()
+                }
+            }
             UpdateSettings(updater: app.updater)
             if let error { Text(error).foregroundStyle(.red) }
         }

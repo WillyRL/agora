@@ -1,0 +1,185 @@
+{
+ "base": "local-roster",
+ "description": "Agora writes its agora-chat skill into each Bot after loading the roster (hermes_cli/web_routers/skills.py). coder has an older copy Agora wrote (updated), devops the current one, reviewer a skill of its own by that name (both left alone), the rest none (created).",
+ "http": [
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/skills",
+    "query": {
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": [
+     {
+      "name": "agora-chat",
+      "description": "",
+      "category": "other",
+      "enabled": true,
+      "provenance": "agent"
+     }
+    ]
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/skills/content",
+    "query": {
+     "profile": "coder",
+     "name": "agora-chat"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "name": "agora-chat",
+     "content": "---\nname: agora-chat\ndescription: old\nauthor: Agora\n---\nOld.",
+     "path": "/x/SKILL.md"
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "PUT",
+    "path": "/api/skills/content",
+    "query": {
+     "profile": "coder"
+    },
+    "body": {
+     "name": "agora-chat",
+     "profile": "coder"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "success": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/skills",
+    "query": {
+     "profile": "devops"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": [
+     {
+      "name": "agora-chat",
+      "description": "",
+      "category": "other",
+      "enabled": true,
+      "provenance": "agent"
+     }
+    ]
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/skills/content",
+    "query": {
+     "profile": "devops",
+     "name": "agora-chat"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "name": "agora-chat",
+     "content": "---\nname: agora-chat\nversion: 1\nauthor: Agora\n---\nCurrent.",
+     "path": "/x/SKILL.md"
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/skills",
+    "query": {
+     "profile": "reviewer"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": [
+     {
+      "name": "agora-chat",
+      "description": "",
+      "category": "other",
+      "enabled": true,
+      "provenance": "agent"
+     }
+    ]
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/skills/content",
+    "query": {
+     "profile": "reviewer",
+     "name": "agora-chat"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "name": "agora-chat",
+     "content": "---\nname: agora-chat\ndescription: my notes on the Agora repo\n---\nMine.",
+     "path": "/x/SKILL.md"
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/skills"
+   },
+   "repeat": true,
+   "reply": {
+    "status": 200,
+    "body": []
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/skills",
+    "body": {
+     "name": "agora-chat"
+    }
+   },
+   "repeat": true,
+   "reply": {
+    "status": 200,
+    "body": {
+     "success": true,
+     "message": "Skill 'agora-chat' created."
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/config"
+   },
+   "repeat": true,
+   "reply": {
+    "status": 200,
+    "body": {
+     "platform_hints": {
+      "gui": "My own words."
+     }
+    }
+   }
+  }
+ ]
+}

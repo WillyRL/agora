@@ -4,6 +4,8 @@ import SwiftUI
 struct MainView: View {
     @Environment(AgoraCore.self) private var core
     @Environment(AppModel.self) private var app
+    /// The sheet's second step, after you said yes: how to update chats already under way.
+    @State private var teachFollowUp = false
 
     var body: some View {
         Group {
@@ -25,6 +27,9 @@ struct MainView: View {
         .overlay(alignment: .bottom) { NoticeBanner() }
         .sheet(isPresented: Binding(get: { if case .needsSignIn = core.status { true } else { false } }, set: { _ in })) {
             SignInAgainSheet()
+        }
+        .sheet(isPresented: Binding(get: { (core.shouldAskToTeachBots || teachFollowUp) && !app.showSetup }, set: { _ in })) {
+            TeachBotsSheet(taught: $teachFollowUp)
         }
     }
 }

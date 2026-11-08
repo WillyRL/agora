@@ -92,6 +92,8 @@ final class AppModel {
         }
         let registry = ConnectionRegistry(store: store)
         core = AgoraCore(registry: registry, environment: env)
+        // Teach every Bot what an Agora chat can show (not the demo's made-up Bots).
+        core.installsAgoraSkill = ProcessInfo.processInfo.environment["AGORA_DEMO"] == nil
         showSetup = registry.connections.isEmpty
         quickAsk = QuickAskController(app: self)
         hotkey = GlobalHotkey { [weak self] in self?.quickAsk.toggle() }

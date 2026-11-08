@@ -89,6 +89,10 @@ Settings → MCP Servers manages the servers in the main Hermes profile: switch 
 
 Each Bot has its own skills (its profile's `skills/` folder in Hermes). In **Configure <Bot> → Skills** you can turn a skill on or off for that Bot, view or edit its SKILL.md, write a new one (**New Skill…**), or search the skills hub and install one for that Bot only (**Get from Hub…**). Changes apply right away, and the Bot's open chats reload their skills.
 
+The first time you connect, Agora asks to **teach your Bots about Agora** (you can change your answer in Settings → General). If you say yes, it adds one skill to every Bot: **agora-chat**, which tells the Bot how to show files, images and live charts in an Agora chat. Without it, Bots assume a plain terminal and say they can't attach files. Turn it off in Skills if you don't want it; Agora won't turn it back on. If you edit it, your edits stay until a new Agora version updates it.
+
+It also adds one line to each Bot's system prompt saying it's in Agora and can attach files (`platform_hints.gui` in the Bot's `config.yaml`). Replace it with your own text and Agora leaves it alone. A chat already under way keeps the prompt it started with until you run `hermes -p <bot> sessions refresh-prompts` on the Hermes host. Agora shows the command for all your Bots, with a Copy button, after you say yes and in Settings → General.
+
 ## Contributing
 
 Issues and pull requests are welcome. Build with `swift build` and test with `swift test` (no Hermes needed); [CONTRIBUTING.md](CONTRIBUTING.md) has the details.

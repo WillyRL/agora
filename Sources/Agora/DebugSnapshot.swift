@@ -85,6 +85,16 @@ enum DebugSnapshot {
                 capture("mcp", in: window)
                 window.orderOut(nil)
                 continue
+            case "teach":
+                // The "Teach your Bots about Agora?" sheet, in a window of its own; `teach:done` shows its second step.
+                let window = NSWindow(contentRect: NSRect(x: 200, y: 200, width: 460, height: 300), styleMask: [.titled], backing: .buffered, defer: false)
+                window.contentView = NSHostingView(rootView: TeachBotsSheet(taught: .constant(arg == "done")).environment(model.core))
+                window.setContentSize(window.contentView?.fittingSize ?? window.frame.size)
+                window.makeKeyAndOrderFront(nil)
+                try? await Task.sleep(for: .seconds(1.5))
+                capture(step.replacingOccurrences(of: ":", with: "-"), in: window)
+                window.orderOut(nil)
+                continue
             default: break
             }
             try? await Task.sleep(for: .seconds(2.5))

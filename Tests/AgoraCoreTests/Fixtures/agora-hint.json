@@ -1,0 +1,136 @@
+{
+ "base": "local-roster",
+ "description": "Agora puts its line in each Bot's system prompt (platform_hints.gui, via PUT /api/config, which Hermes deep-merges: hermes_cli/web_routers/config_env.py). coder has an older line Agora wrote (replaced), devops the current one, reviewer its own words and finance-assistant its own dict (all left alone), the rest none (written).",
+ "http": [
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/config",
+    "query": {
+     "profile": "coder",
+     "include_defaults": "false"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "platform_hints": {
+      "gui": {
+       "replace": "Old.",
+       "agora_version": 0
+      }
+     }
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/config",
+    "query": {
+     "profile": "devops",
+     "include_defaults": "false"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "platform_hints": {
+      "gui": {
+       "replace": "Current.",
+       "agora_version": 1
+      }
+     }
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/config",
+    "query": {
+     "profile": "reviewer",
+     "include_defaults": "false"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "platform_hints": {
+      "gui": "I write my own."
+     }
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/config",
+    "query": {
+     "profile": "finance-assistant",
+     "include_defaults": "false"
+    }
+   },
+   "reply": {
+    "status": 200,
+    "body": {
+     "platform_hints": {
+      "gui": {
+       "append": "Mine too."
+      }
+     }
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/config"
+   },
+   "repeat": true,
+   "reply": {
+    "status": 200,
+    "body": {
+     "model": "x"
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "PUT",
+    "path": "/api/config"
+   },
+   "repeat": true,
+   "reply": {
+    "status": 200,
+    "body": {
+     "ok": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/skills"
+   },
+   "repeat": true,
+   "reply": {
+    "status": 200,
+    "body": []
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/skills"
+   },
+   "repeat": true,
+   "reply": {
+    "status": 200,
+    "body": {
+     "success": true
+    }
+   }
+  }
+ ]
+}

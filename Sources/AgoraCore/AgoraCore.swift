@@ -61,6 +61,11 @@ public final class AgoraCore {
     public internal(set) var features = Features()
     /// A problem worth telling the user about (failed action, unsupported feature …).
     public var notice: String?
+    /// Agora may teach Bots about itself here (see `teachBots`). The app turns it on; the demo and
+    /// tests that script every request leave it off.
+    public var installsAgoraSkill = false
+    /// Bots checked for the `agora-chat` skill on this Connection.
+    var agoraSkillChecked: Set<String> = []
     /// Hermes found on your tailnet (see `scanTailnet`).
     public internal(set) var tailnet = TailnetScan()
 
@@ -177,6 +182,7 @@ public final class AgoraCore {
     func resetConnectionState() {
         bots = []
         allBots = []
+        agoraSkillChecked = []
         conversations = [:]
         botChatIDs = [:]
         sideChats = [:]
@@ -250,6 +256,7 @@ public final class AgoraCore {
         }
         bots = allBots.filter { !$0.hidden }
         restoreUnread()
+        teachUncheckedBots()
     }
 
     public func bot(named name: String) -> Bot? {
