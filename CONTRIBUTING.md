@@ -14,6 +14,8 @@ scripts/build-app.sh && open "build/Agora Dev.app"
 
 `build-app.sh` makes **Agora Dev** by default: its own app (`io.github.willyrl.agora.dev`, an orange DEV band on the icon) with its own settings and saved logins, so it never touches the Agora you use every day. It doesn't update itself, and its Quick Ask hotkey starts off. `scripts/build-app.sh stable` builds the regular **Agora** instead.
 
+**First build fails downloading Sparkle** (`badResponseStatusCode(504)`)? GitHub's release downloads fail now and then; `scripts/fetch-packages.sh` retries and falls back to the GitHub API (needs `gh`). It's only needed once; after that Sparkle is cached.
+
 Tests drive Agora Core against a fake Hermes that replays protocol conversations from `Tests/AgoraCoreTests/Fixtures`, so they need no Hermes and no network.
 
 **Password prompt after every rebuild?** macOS ties saved logins to the app's signature, and ad-hoc signed builds look like a new app every time. Run `scripts/make-signing-cert.sh` once per Mac: it creates a local signing certificate that `build-app.sh` then uses. On the next build macOS asks twice (once for `codesign`, once for Agora); enter your login password and click **Always Allow**.
