@@ -13,4 +13,4 @@ awk -v v="$VERSION" '
     found { print }
 ' CHANGELOG.md \
     | sed -E "s#(\]\(|src=\")docs/#\1https://raw.githubusercontent.com/$REPO/$REF/docs/#g" \
-    | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}'
+    | sed -e '/./,$!d' -e :a -e '/^\n*$/{$d;N;ba' -e '}'
