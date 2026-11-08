@@ -14,7 +14,7 @@ scripts/build-app.sh && open "build/Agora Dev.app"
 
 `build-app.sh` makes **Agora Dev** by default: its own app (`io.github.willyrl.agora.dev`, an orange DEV band on the icon) with its own settings and saved logins, so it never touches the Agora you use every day. It doesn't update itself, and its Quick Ask hotkey starts off. `scripts/build-app.sh stable` builds the regular **Agora** instead.
 
-**First build fails downloading Sparkle** (`badResponseStatusCode(504)`)? GitHub's release downloads fail now and then; `scripts/fetch-packages.sh` retries and falls back to the GitHub API (needs `gh`). It's only needed once; after that Sparkle is cached.
+GitHub's release downloads fail now and then (`badResponseStatusCode(504)`). `build-app.sh` runs `scripts/fetch-packages.sh` first, which then fetches Sparkle through the GitHub API instead (checksum-checked); run it on its own before `swift build` if you build without the script.
 
 Tests drive Agora Core against a fake Hermes that replays protocol conversations from `Tests/AgoraCoreTests/Fixtures`, so they need no Hermes and no network.
 

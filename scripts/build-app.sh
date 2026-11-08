@@ -23,6 +23,7 @@ esac
 CONFIG="${AGORA_CONFIG:-release}"
 ARCHS=()
 [ "${AGORA_UNIVERSAL:-}" = "1" ] && ARCHS=(--arch arm64 --arch x86_64)
+scripts/fetch-packages.sh   # survives GitHub's flaky release downloads
 swift build -c "$CONFIG" --product Agora "${ARCHS[@]}"
 BINDIR="$(swift build -c "$CONFIG" "${ARCHS[@]}" --show-bin-path)"
 APP="build/$NAME.app"
