@@ -15,6 +15,8 @@ Agora comes in three separate apps, so they install side by side with their own 
 
 ## Make a stable release
 
+First add the version's section to `CHANGELOG.md` (`## 0.2.0 (date)`, moved from **Unreleased**), with screenshots of new features in `docs/screenshots/<version>/`. The release notes start with it (`scripts/changelog-notes.sh`), and so does the in-app update window.
+
 ```sh
 git tag v0.2.0 && git push origin v0.2.0
 ```

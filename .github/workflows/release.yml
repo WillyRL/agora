@@ -115,6 +115,16 @@ jobs:
         run: |
           V="${{ steps.version.outputs.version }}"
           {
+            # What's new, from this version's CHANGELOG.md section (also shown in the in-app update window).
+            CHANGES="$(scripts/changelog-notes.sh "$V" "${{ steps.version.outputs.tag }}" "$GITHUB_REPOSITORY")"
+            if [ -n "$CHANGES" ]; then
+              echo "## What's new"
+              echo
+              printf '%s\n' "$CHANGES" | sed 's/^###/####/'
+              echo
+            else
+              echo "::warning::CHANGELOG.md has no section for $V" >&2
+            fi
             echo "## Install"
             echo
             echo "1. Download **Agora-$V.dmg** below, open it and drag **Agora** into **Applications**."

@@ -372,6 +372,7 @@ struct BotEditorView: View {
             loaded = true
             if let existing { draft = await core.draft(for: existing) }
             models = await core.modelChoices(for: existing?.name ?? "default")
+            if DebugSnapshot.draftsPersona { generatePersona() }
         }
         .confirmationDialog("Delete \(existing?.title ?? "this Bot")?", isPresented: $confirmDelete) {
             Button("Delete Bot", role: .destructive) {

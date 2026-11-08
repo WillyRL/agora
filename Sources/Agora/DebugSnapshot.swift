@@ -8,6 +8,10 @@ import WebKit
 @MainActor
 enum DebugSnapshot {
     static var prefix: String? { ProcessInfo.processInfo.environment["AGORA_SNAPSHOT"] }
+    /// The `persona:<bot>` step: the Bot editor presses Draft with AI as it opens.
+    static var draftsPersona: Bool {
+        prefix != nil && (ProcessInfo.processInfo.environment["AGORA_SNAPSHOT_STEPS"] ?? "").contains("persona:")
+    }
 
     static func runScript(model: AppModel) async {
         let steps = (ProcessInfo.processInfo.environment["AGORA_SNAPSHOT_STEPS"] ?? "today").split(separator: ",").map(String.init)
@@ -21,6 +25,7 @@ enum DebugSnapshot {
             case "bot": model.destination = .bot(arg)
             case "allbots": model.destination = .allBots
             case "edit": model.destination = .editBot(arg)
+            case "persona": model.destination = .editBot(arg)
             case "new": model.destination = .newBot
             case "routines":
                 model.destination = .bot(arg)
