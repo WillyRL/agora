@@ -44,9 +44,9 @@ Agora is a small SwiftUI app for talking to the Bots you run in Hermes. Hermes d
 
 ## Download
 
-Get the latest **Agora-<version>.dmg** from [Releases](https://github.com/WillyRL/agora/releases), open it and drag Agora into Applications. It runs natively on Apple Silicon and Intel. If a release isn't notarized yet, its notes explain how to open it the first time.
+Agora is in **beta**: get the newest **Agora-<version>.dmg** from [Releases](https://github.com/WillyRL/agora/releases), open it and drag Agora into Applications. It runs natively on Apple Silicon and Intel. The builds aren't notarized by Apple yet, so the first time you open Agora, go to **System Settings → Privacy & Security** and click **Open Anyway**.
 
-Agora updates itself (**Agora → Check for Updates…**). Want the newest features early? **[Agora Nightly](https://github.com/WillyRL/agora/releases/tag/nightly)** is built every night from `main`. It's a separate app, so it installs next to Agora with its own settings, and updates itself to each new nightly.
+Agora updates itself (**Agora → Check for Updates…**), so a beta moves on to the full release when it's out. Want the newest changes every day? **[Agora Nightly](https://github.com/WillyRL/agora/releases/tag/nightly)** is built every night from `main`. It's a separate app, so it installs next to Agora with its own settings, and updates itself to each new nightly.
 
 ## Build it yourself
 
