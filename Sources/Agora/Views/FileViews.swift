@@ -46,6 +46,7 @@ struct FileCard: View {
     @State private var quickLook: URL?
     @State private var busy = false
     @State private var error: String?
+    @State private var reading = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -56,6 +57,9 @@ struct FileCard: View {
             }
             Spacer(minLength: 12)
             if busy { ProgressView().controlSize(.small) }
+            if file.kind == .text {
+                Button("View") { reading = true }
+            }
             Button("Open") { run { NSWorkspace.shared.open($0) } }
             Button {
                 run { quickLook = $0 }
@@ -88,6 +92,7 @@ struct FileCard: View {
             }
         }
         .quickLookPreview($quickLook)
+        .sheet(isPresented: $reading) { TextFileSheet(file: file, conversation: conversation) }
     }
 
     var icon: NSImage {
@@ -336,5 +341,79 @@ struct HTMLWebView: NSViewRepresentable {
 final class PassthroughWebView: WKWebView {
     override func scrollWheel(with event: NSEvent) {
         nextResponder?.scrollWheel(with: event)
+    }
+}
+
+// MARK: Text files
+
+/// Reads a text file the Bot handed over (a Markdown draft, a CSV, a log) without leaving the chat.
+/// Markdown is formatted; everything else shows as plain text, ready to select and copy.
+struct TextFileSheet: View {
+    @Environment(AgoraCore.self) private var core
+    @Environment(\.dismiss) private var dismiss
+    let file: FileAttachment
+    let conversation: Conversation
+    @State private var text: String?
+    @State private var error: String?
+    @State private var raw = false
+
+    var isMarkdown: Bool { ["md", "markdown"].contains(file.fileExtension) }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(file.name).font(.system(size: 14, weight: .semibold)).lineLimit(1).truncationMode(.middle)
+                Spacer()
+                if isMarkdown, text != nil {
+                    Picker("", selection: $raw) {
+                        Text("Formatted").tag(false)
+                        Text("Source").tag(true)
+                    }
+                    .pickerStyle(.segmented).labelsHidden().fixedSize()
+                }
+                Button("Copy") {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(text ?? "", forType: .string)
+                }
+                .disabled(text == nil)
+            }
+            Group {
+                if let text {
+                    ScrollView {
+                        Group {
+                            if isMarkdown && !raw {
+                                MarkdownView(text: text)
+                            } else {
+                                Text(text).font(.system(size: 12, design: .monospaced))
+                            }
+                        }
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(14)
+                    }
+                    .background(RoundedRectangle(cornerRadius: 8).fill(Theme.cardBackground))
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Theme.hairline))
+                } else if let error {
+                    Label(error, systemImage: "exclamationmark.triangle").foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
+            HStack {
+                Spacer()
+                Button("Done") { dismiss() }.keyboardShortcut(.defaultAction)
+            }
+        }
+        .padding(20)
+        .frame(width: 680, height: 600)
+        .task {
+            do {
+                let data = try await core.fileData(file.path, in: conversation)
+                text = String(decoding: data, as: UTF8.self)
+            } catch {
+                self.error = "Couldn't open \(file.name): \(error.localizedDescription)"
+            }
+        }
     }
 }

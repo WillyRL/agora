@@ -34,6 +34,7 @@ struct ChatView: View {
                         } actions: {
                             Button("Try Again") { loadAttempt += 1 }
                         }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
                         ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
@@ -64,8 +65,18 @@ struct ChatView: View {
             app.focusComposer()
         } catch {
             conversation = nil
-            loadError = error.localizedDescription
+            loadError = Self.explain(error)
         }
+    }
+}
+
+extension ChatView {
+    /// Hermes's reasons, in words.
+    static func explain(_ error: Error) -> String {
+        if let e = error as? HermesError, e.rpcReason == "runtime_coordination_required" {
+            return "This chat is open in another Hermes process right now, for example Agora on another Mac that connects through hermes serve. Close it there (or wait until its reply finishes), then try again."
+        }
+        return error.localizedDescription
     }
 }
 

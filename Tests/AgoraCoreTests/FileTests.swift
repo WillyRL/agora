@@ -30,6 +30,13 @@ struct FileTests {
         #expect(code.contains("MEDIA:/not/a/file.txt"))
     }
 
+    @Test func aBotThatWritesAttachInsteadOfMediaStillHandsOverItsFile() {
+        let parts = MessagePart.split("Draft below.\n\nATTACH:/Users/me/projects/agora-launch/reddit-hermesagent.md")
+        #expect(parts == [.text("Draft below."), .file(FileAttachment(path: "/Users/me/projects/agora-launch/reddit-hermesagent.md", inline: false))])
+        #expect(FileAttachment(path: "/x/post.md", inline: false).kind == .text)
+        #expect(FileAttachment(path: "/x/data.CSV", inline: false).kind == .text)
+    }
+
     @Test func filesAreSortedByWhatTheyAre() {
         #expect(FileAttachment(path: "/a/chart.PNG", inline: false).kind == .image)
         #expect(FileAttachment(path: "/a/page.html", inline: true).kind == .html)

@@ -1,11 +1,11 @@
 import CryptoKit
 import Foundation
 
-/// A file a Bot hands over in its reply. Bots write `MEDIA:/path/to/file` on its own line for any
+/// A file a Bot hands over in its reply. Bots write `MEDIA:/path/to/file` (some write `ATTACH:`) on its own line for any
 /// file, or `::preview{file="page.html"}` for an HTML page shown live in the chat (Hermes teaches
 /// both to Bots talking to a desktop app). The file stays on the Hermes host; Agora fetches it.
 public struct FileAttachment: Sendable, Hashable, Identifiable {
-    public enum Kind: Sendable { case image, html, other }
+    public enum Kind: Sendable { case image, html, text, other }
 
     public var path: String
     /// Shown live in the message (`::preview`), not as a card.
@@ -24,6 +24,7 @@ public struct FileAttachment: Sendable, Hashable, Identifiable {
         switch fileExtension {
         case "png", "jpg", "jpeg", "gif", "webp", "heic", "bmp", "tiff", "svg": return .image
         case "html", "htm": return .html
+        case "md", "markdown", "txt", "text", "csv", "tsv", "json", "log", "yaml", "yml", "xml", "toml": return .text
         default: return .other
         }
     }
@@ -34,9 +35,9 @@ public enum MessagePart: Sendable, Hashable {
     case text(String)
     case file(FileAttachment)
 
-    /// Splits out `MEDIA:` and `::preview{…}` lines (each alone on its line, outside code blocks).
+    /// Splits out `MEDIA:` / `ATTACH:` and `::preview{…}` lines (each alone on its line, outside code blocks).
     public static func split(_ text: String) -> [MessagePart] {
-        guard text.contains("MEDIA:") || text.contains("::preview") else { return [.text(text)] }
+        guard text.contains("MEDIA:") || text.contains("ATTACH:") || text.contains("::preview") else { return [.text(text)] }
         var parts: [MessagePart] = []
         var buffer: [Substring] = []
         var inCode = false
@@ -62,8 +63,9 @@ public enum MessagePart: Sendable, Hashable {
     static func attachment(in line: String) -> FileAttachment? {
         var line = line
         if line.hasPrefix("`"), line.hasSuffix("`"), line.count > 2 { line = String(line.dropFirst().dropLast()) }
-        if line.hasPrefix("MEDIA:") {
-            let path = clean(String(line.dropFirst(6)))
+        // Hermes's own apps use MEDIA:; Bots following other instructions (or their own skills) write ATTACH:.
+        if let prefix = ["MEDIA:", "ATTACH:"].first(where: { line.hasPrefix($0) }) {
+            let path = clean(String(line.dropFirst(prefix.count)))
             // Bots give absolute paths; anything else is prose that happens to start with "MEDIA:".
             return path.hasPrefix("/") || path.hasPrefix("~") ? FileAttachment(path: path, inline: false) : nil
         }
