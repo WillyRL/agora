@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Agora</title>
+    <link>https://github.com/WillyRL/agora</link>
+    <item>
+      <title>Agora 0.1.0-nightly.20261108</title>
+      <pubDate>Sun, 08 Nov 2026 10:20:57 +0000</pubDate>
+      <sparkle:version>202611081018</sparkle:version>
+      <sparkle:shortVersionString>0.1.0-nightly.20261108</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      
+      <description><![CDATA[<p dir="auto">Built every night from <code class="notranslate">main</code> (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/06043eccbbecba82fb790438d3788f4b6a9b7277/hovercard" href="https://github.com/WillyRL/agora/commit/06043eccbbecba82fb790438d3788f4b6a9b7277"><tt>06043ec</tt></a>). Newest features, rougher edges: for the tested version, use the <a href="https://github.com/WillyRL/agora/releases/latest">latest release</a>.</p>
+<p dir="auto"><strong>Agora Nightly</strong> is a separate app: it installs next to Agora with its own settings and logins, and updates itself to each new nightly.</p>
+<h2 dir="auto">Changes</h2>
+<ul dir="auto">
+<li>Update feeds on an 'updates' branch, with a beta channel (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/06043eccbbecba82fb790438d3788f4b6a9b7277/hovercard" href="https://github.com/WillyRL/agora/commit/06043eccbbecba82fb790438d3788f4b6a9b7277"><tt>06043ec</tt></a>)</li>
+<li>README: Agora is in beta; how to open the first time (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/55136309ed795cd73fae8bf2bb0c71738cbfee5d/hovercard" href="https://github.com/WillyRL/agora/commit/55136309ed795cd73fae8bf2bb0c71738cbfee5d"><tt>5513630</tt></a>)</li>
+</ul>
+<p dir="auto">This build isn't notarized: on first launch, open it once, then <strong>System Settings → Privacy &amp; Security → Open Anyway</strong> (or <code class="notranslate">xattr -dr com.apple.quarantine /Applications/Agora.app</code>).</p>]]></description>
+      <enclosure url="https://github.com/WillyRL/agora/releases/download/nightly/Agora-0.1.0-nightly.20261108.zip" type="application/octet-stream" sparkle:edSignature="HBCdl2lLtgtxXyGjMuP0tB4Ue1RTeO2ppM5WJ/qew4WbngC4hQhPfsqN07lZzsaoD/6tkXwB4FXOrBazx13TCQ==" length="5035424"/>
+    </item>
+
+  </channel>
+</rss>
