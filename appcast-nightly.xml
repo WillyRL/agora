@@ -5,23 +5,20 @@
     <link>https://github.com/WillyRL/agora</link>
     <item>
       <title>Agora 0.1.0-nightly.20261108</title>
-      <pubDate>Sun, 08 Nov 2026 15:55:09 +0000</pubDate>
-      <sparkle:version>202611081551</sparkle:version>
+      <pubDate>Sun, 08 Nov 2026 22:41:27 +0000</pubDate>
+      <sparkle:version>202611082239</sparkle:version>
       <sparkle:shortVersionString>0.1.0-nightly.20261108</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
       
-      <description><![CDATA[<p dir="auto">Built every night from <code class="notranslate">main</code> (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/0c9756d6d9d6471b258b484afd9de23f9b05c3d5/hovercard" href="https://github.com/WillyRL/agora/commit/0c9756d6d9d6471b258b484afd9de23f9b05c3d5"><tt>0c9756d</tt></a>). Newest features, rougher edges: for the tested version, use the <a href="https://github.com/WillyRL/agora/releases/latest">latest release</a>.</p>
+      <description><![CDATA[<p dir="auto">Built every night from <code class="notranslate">main</code> (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/756261e924c330fc2d2e04b4d7ccd65c7e90c73e/hovercard" href="https://github.com/WillyRL/agora/commit/756261e924c330fc2d2e04b4d7ccd65c7e90c73e"><tt>756261e</tt></a>). Newest features, rougher edges: for the tested version, use the <a href="https://github.com/WillyRL/agora/releases/latest">latest release</a>.</p>
 <p dir="auto"><strong>Agora Nightly</strong> is a separate app: it installs next to Agora with its own settings and logins, and updates itself to each new nightly.</p>
 <h2 dir="auto">Changes</h2>
 <ul dir="auto">
-<li>Show handoffs between Bots and kanban work as cards (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/0c9756d6d9d6471b258b484afd9de23f9b05c3d5/hovercard" href="https://github.com/WillyRL/agora/commit/0c9756d6d9d6471b258b484afd9de23f9b05c3d5"><tt>0c9756d</tt></a>)</li>
-<li>Teach Bots that they're in Agora (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/b55563f4307de3ab43a2e27971a55cd96fcceb98/hovercard" href="https://github.com/WillyRL/agora/commit/b55563f4307de3ab43a2e27971a55cd96fcceb98"><tt>b55563f</tt></a>)</li>
-<li>Draft a Bot's persona with AI (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/ea0c4d4d2021b49a8e9122b5d62bdac0ff2add40/hovercard" href="https://github.com/WillyRL/agora/commit/ea0c4d4d2021b49a8e9122b5d62bdac0ff2add40"><tt>ea0c4d4</tt></a>)</li>
-<li>Chats open at the newest message (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/f032c69ca6ecc424b7355e8a2e0536b831721779/hovercard" href="https://github.com/WillyRL/agora/commit/f032c69ca6ecc424b7355e8a2e0536b831721779"><tt>f032c69</tt></a>)</li>
-<li>Files: accept ATTACH: lines, and read text files in the app (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/f07011c021ad7f93b4e6c1cb3bf6d733221bbc24/hovercard" href="https://github.com/WillyRL/agora/commit/f07011c021ad7f93b4e6c1cb3bf6d733221bbc24"><tt>f07011c</tt></a>)</li>
+<li>changelog-notes.sh: no blank line at the start (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/756261e924c330fc2d2e04b4d7ccd65c7e90c73e/hovercard" href="https://github.com/WillyRL/agora/commit/756261e924c330fc2d2e04b4d7ccd65c7e90c73e"><tt>756261e</tt></a>)</li>
+<li>Changelog, with screenshots of each version's new features (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/43cedf66e8e91c6e39504e62590f661011359921/hovercard" href="https://github.com/WillyRL/agora/commit/43cedf66e8e91c6e39504e62590f661011359921"><tt>43cedf6</tt></a>)</li>
 </ul>
 <p dir="auto">This build isn't notarized: on first launch, open it once, then <strong>System Settings → Privacy &amp; Security → Open Anyway</strong> (or <code class="notranslate">xattr -dr com.apple.quarantine /Applications/Agora.app</code>).</p>]]></description>
-      <enclosure url="https://github.com/WillyRL/agora/releases/download/nightly/Agora-0.1.0-nightly.20261108.zip" type="application/octet-stream" sparkle:edSignature="iCjQAewrmaSIss6UB/ow+ShJrdkMNfKTRfUEpdkPyflkAOyQlehIsO9yiMKzhLgi7QQwNNpBZJAKtcmGPO1yCQ==" length="5362201"/>
+      <enclosure url="https://github.com/WillyRL/agora/releases/download/nightly/Agora-0.1.0-nightly.20261108.zip" type="application/octet-stream" sparkle:edSignature="sUJogdabE4qauROMiGkdr7GEN3PLV+9KaxNHqhwUn0Fx1ZqmVOLbUiIOPqRI3A62C4a1zDoMJ02v+f7KCQCmBg==" length="5367209"/>
     </item>
 
   </channel>
