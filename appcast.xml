@@ -4,44 +4,23 @@
     <title>Agora</title>
     <link>https://github.com/WillyRL/agora</link>
     <item>
-      <title>Agora 0.1.0-beta.3</title>
-      <pubDate>Sun, 08 Nov 2026 15:55:21 +0000</pubDate>
-      <sparkle:version>202611081551</sparkle:version>
-      <sparkle:shortVersionString>0.1.0-beta.3</sparkle:shortVersionString>
+      <title>Agora 0.1.0-beta.4</title>
+      <pubDate>Tue, 10 Nov 2026 07:03:59 +0000</pubDate>
+      <sparkle:version>202611100700</sparkle:version>
+      <sparkle:shortVersionString>0.1.0-beta.4</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
       <sparkle:channel>beta</sparkle:channel>
       <description><![CDATA[<h2 dir="auto">What's new</h2>
 <h4 dir="auto">New</h4>
-<p dir="auto"><strong>See work move between Bots.</strong> When a Bot hands work to another (Hermes's <code class="notranslate">message_agent</code>), its chat shows who it went to, the message, and whether it arrived. If it didn't, Hermes's reason is shown. The receiving Bot's chat shows it as a handoff from that Bot. Constraints and "Reply needed" get their own lines.</p>
-<p dir="auto"><strong>Kanban cards in the chat.</strong></p>
-<ul dir="auto">
-<li>When a task you started on a kanban board finishes, gets blocked or is ready for review, the update shows as a card: the task, its status, who did it and the result. Hermes's instructions to the Bot are hidden.</li>
-<li>A Bot's chat for a kanban task opens with a card for the task instead of the whole brief. The brief is one click away.</li>
-<li>Kanban steps read as sentences, like "Created card … for <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/markets/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/markets">@markets</a>".</li>
-</ul>
-<p dir="auto"><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WillyRL/agora/43cedf66e8e91c6e39504e62590f661011359921/docs/screenshots/0.1.0-beta.3/handoffs-and-kanban.png"><img src="https://raw.githubusercontent.com/WillyRL/agora/43cedf66e8e91c6e39504e62590f661011359921/docs/screenshots/0.1.0-beta.3/handoffs-and-kanban.png" alt="Handoffs between Bots and kanban cards" style="max-width: 100%;"></a></p>
-<p dir="auto"><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WillyRL/agora/43cedf66e8e91c6e39504e62590f661011359921/docs/screenshots/0.1.0-beta.3/kanban-task-brief.png"><img src="https://raw.githubusercontent.com/WillyRL/agora/43cedf66e8e91c6e39504e62590f661011359921/docs/screenshots/0.1.0-beta.3/kanban-task-brief.png" alt="A Bot's chat for a kanban task, opened with the task's card" style="max-width: 100%;"></a></p>
-<p dir="auto"><strong>Bots know they're in Agora.</strong> Bots used to say "this terminal can't show attachments", because Hermes describes only its own desktop app to them. The first time you connect, Agora asks to teach your Bots about Agora. If you say yes, it adds to each Bot:</p>
-<ul dir="auto">
-<li>an <strong>agora-chat</strong> skill: how to attach files and show charts;</li>
-<li>a short line in its system prompt (<code class="notranslate">platform_hints.gui</code> in the Bot's <code class="notranslate">config.yaml</code>).</li>
-</ul>
-<p dir="auto">Agora never overwrites text you wrote there. Chats that are already open keep their old instructions until you run <code class="notranslate">hermes sessions refresh-prompts</code> on your Hermes host. Agora shows the command for all your Bots, with a Copy button. You can change your answer in <strong>Settings → General</strong>.</p>
-<p dir="auto">
-<a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WillyRL/agora/43cedf66e8e91c6e39504e62590f661011359921/docs/screenshots/0.1.0-beta.3/teach-bots.png"><img src="https://raw.githubusercontent.com/WillyRL/agora/43cedf66e8e91c6e39504e62590f661011359921/docs/screenshots/0.1.0-beta.3/teach-bots.png" width="460" alt="Teach your Bots about Agora?" style="max-width: 100%;"></a>
-<a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WillyRL/agora/43cedf66e8e91c6e39504e62590f661011359921/docs/screenshots/0.1.0-beta.3/teach-bots-refresh.png"><img src="https://raw.githubusercontent.com/WillyRL/agora/43cedf66e8e91c6e39504e62590f661011359921/docs/screenshots/0.1.0-beta.3/teach-bots-refresh.png" width="460" alt="The command that updates open chats" style="max-width: 100%;"></a>
-</p>
-<p dir="auto"><strong>Draft a Bot's persona with AI.</strong> New Bot and Configure Bot have a <strong>Draft with AI</strong> button next to the persona. Hermes writes one from the Bot's name and purpose and keeps any notes you've typed. <strong>Undo</strong> puts your text back.</p>
-<p dir="auto"><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WillyRL/agora/43cedf66e8e91c6e39504e62590f661011359921/docs/screenshots/0.1.0-beta.3/persona-draft.png"><img src="https://raw.githubusercontent.com/WillyRL/agora/43cedf66e8e91c6e39504e62590f661011359921/docs/screenshots/0.1.0-beta.3/persona-draft.png" alt="A persona drafted with AI" style="max-width: 100%;"></a></p>
-<p dir="auto"><strong>Text files open in the app.</strong> Markdown, text, CSV, JSON, logs and YAML get a <strong>View</strong> button: a reader with Markdown formatted (or its source), which you can select and copy from. A Bot that writes <code class="notranslate">ATTACH:/path</code> now gets a file card, just like <code class="notranslate">MEDIA:/path</code>.</p>
+<p dir="auto"><strong>Hermes behind Cloudflare Access.</strong> A Hermes behind a Cloudflare Tunnel with an Access login used to fail with "answered HTTP 302". Agora now opens Cloudflare's login in your browser, as <code class="notranslate">cloudflared access login</code> does, or on Cloudflare's page inside Agora if you prefer. It keeps the login in the Keychain and asks again when it runs out.</p>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WillyRL/agora/v0.1.0-beta.4/docs/screenshots/0.1.0-beta.4/cloudflare-access.png"><img src="https://raw.githubusercontent.com/WillyRL/agora/v0.1.0-beta.4/docs/screenshots/0.1.0-beta.4/cloudflare-access.png" width="540" alt="Log in to Cloudflare Access in your browser" style="max-width: 100%;"></a></p>
 <h4 dir="auto">Fixed</h4>
 <ul dir="auto">
-<li>Opening a chat sometimes showed a blank page until you scrolled up. Chats now open at the newest message.</li>
-<li>When a chat is held by another Hermes process, Agora says so in words, and the error fills the window.</li>
+<li>Pasting an image into the message box did nothing when the clipboard held only the image, such as a screenshot. It now becomes an attachment.</li>
 </ul>
 <h2 dir="auto">Install</h2>
 <ol dir="auto">
-<li>Download <strong>Agora-0.1.0-beta.3.dmg</strong> below, open it and drag <strong>Agora</strong> into <strong>Applications</strong>.</li>
+<li>Download <strong>Agora-0.1.0-beta.4.dmg</strong> below, open it and drag <strong>Agora</strong> into <strong>Applications</strong>.</li>
 <li>Open Agora and choose where your Hermes runs: on this Mac, or on another machine.</li>
 </ol>
 <p dir="auto">Needs macOS 15 or later and Hermes v0.23 or later. Runs natively on Apple Silicon and Intel.</p>
@@ -52,8 +31,8 @@
 <li>Or in Terminal: <code class="notranslate">xattr -dr com.apple.quarantine /Applications/Agora.app</code></li>
 </ul>
 <p dir="auto">Check the download: <code class="notranslate">shasum -a 256 -c SHA256SUMS</code>.</p>
-<p dir="auto"><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/WillyRL/agora/compare/v0.1.0-beta.2...v0.1.0-beta.3"><tt>v0.1.0-beta.2...v0.1.0-beta.3</tt></a></p>]]></description>
-      <enclosure url="https://github.com/WillyRL/agora/releases/download/v0.1.0-beta.3/Agora-0.1.0-beta.3.zip" type="application/octet-stream" sparkle:edSignature="i4MtwBoNGy0xoiDMSyUKkqkz5TxRkL69Mdm94G0369334g+2/HLwan5k8o3CxxugVBxT382gBHYBfFb1cMMFCw==" length="5336416"/>
+<p dir="auto"><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/WillyRL/agora/compare/v0.1.0-beta.3...v0.1.0-beta.4"><tt>v0.1.0-beta.3...v0.1.0-beta.4</tt></a></p>]]></description>
+      <enclosure url="https://github.com/WillyRL/agora/releases/download/v0.1.0-beta.4/Agora-0.1.0-beta.4.zip" type="application/octet-stream" sparkle:edSignature="suG0Ancs5G8ejDVd0Gqlu4v30aJYqynaPjMheZS6n9S8mVzAAWoDT/ymmQZr5d1sUJGfUeQ8R+u1mmg/SBa9Bw==" length="5519090"/>
     </item>
 
   </channel>
