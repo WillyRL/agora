@@ -31,7 +31,7 @@ struct ChatItemView: View {
                 IncomingHandoffCard(handoff: Handoff(body: item.text), conversation: conversation)
             }
         case .kanbanUpdate(let update):
-            KanbanUpdateCard(update: update, date: item.date).padding(.leading, 40)
+            KanbanUpdateCard(update: update, date: item.date, bot: bot.name).padding(.leading, 40)
         case .kanbanBrief(let brief):
             KanbanBriefCard(brief: brief, bot: bot, date: item.date).padding(.leading, 40)
         case .routineResult:

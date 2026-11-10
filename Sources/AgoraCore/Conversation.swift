@@ -98,6 +98,8 @@ public final class Conversation: Identifiable {
     public internal(set) var storedSessionID: String
     public internal(set) var title: String
     public var isBotChat: Bool { title == AgoraCore.botChatTitle }
+    /// A kanban card's worker chat, opened read-only: Hermes lets only the board run it.
+    public internal(set) var isKanbanTask = false
     public internal(set) var items: [ChatItem] = []
     public internal(set) var isRunning = false
     /// More (older) history can be loaded.

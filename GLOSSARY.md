@@ -31,3 +31,7 @@ _Avoid_: gateway, backend, server
 **Quick Ask**:
 A small floating panel, opened with a global hotkey, for asking a Bot something without opening the main window.
 _Avoid_: spotlight, launcher, popup
+
+**Kanban Task**:
+A card on Hermes's kanban board, worked on by a Bot in a chat of its own that only the board may run. Bots often create them by themselves. Agora shows the card's chat read-only in that Bot's Side Chats and lets you answer what the card asks of you (comment, unblock, approve); the board itself stays in Hermes. See `docs/adr/0002-kanban-tasks-are-handled-not-managed.md`.
+_Avoid_: job, ticket, kanban session

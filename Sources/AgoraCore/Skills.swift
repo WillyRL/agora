@@ -129,7 +129,7 @@ extension AgoraCore {
     /// Lets the Bot's open chats see skill changes now (new chats always do).
     func reloadSkills(bot: String) async {
         guard let connection else { return }
-        for c in conversations.values where c.bot == bot {
+        for c in conversations.values where c.bot == bot && !c.isKanbanTask {
             _ = try? await connection.call("skills.reload", ["session_id": .string(c.sessionID), "profile": .string(bot)], timeout: .seconds(30))
         }
     }

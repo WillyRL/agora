@@ -9,11 +9,81 @@ struct MarkdownView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            ForEach(Array(MarkdownBlock.parse(text).enumerated()), id: \.offset) { _, block in
-                view(for: block)
+            ForEach(Array(Self.pieces(MarkdownBlock.parse(text)).enumerated()), id: \.offset) { _, piece in
+                switch piece {
+                case .prose(let blocks):
+                    Text(prose(blocks)).foregroundStyle(textColor).fixedSize(horizontal: false, vertical: true)
+                case .block(let block):
+                    view(for: block)
+                }
             }
         }
         .textSelection(.enabled)
+    }
+
+    /// Text you can select across in one go, or a block that has to stand on its own.
+    enum Piece {
+        case prose([MarkdownBlock])
+        case block(MarkdownBlock)
+    }
+
+    /// SwiftUI selects within one `Text` only, so paragraphs, headings and lists that follow each other
+    /// become one `Text`. Quotes, code, tables and rules draw things text can't, and stand alone.
+    static func pieces(_ blocks: [MarkdownBlock]) -> [Piece] {
+        var out: [Piece] = []
+        for block in blocks {
+            switch block {
+            case .paragraph, .heading, .list:
+                if case .prose(let run) = out.last {
+                    out[out.count - 1] = .prose(run + [block])
+                } else {
+                    out.append(.prose([block]))
+                }
+            default:
+                out.append(.block(block))
+            }
+        }
+        return out
+    }
+
+    /// Paragraphs, headings and lists as one string, spaced as they were as separate views.
+    func prose(_ blocks: [MarkdownBlock]) -> AttributedString {
+        func gap(_ points: CGFloat) -> AttributedString {
+            var g = AttributedString("\n")
+            g.font = .system(size: points)
+            return g
+        }
+        var out = AttributedString()
+        for (i, block) in blocks.enumerated() {
+            if i > 0 {
+                out += AttributedString("\n")
+                out += gap(5)
+            }
+            switch block {
+            case .paragraph(let s):
+                out += inline(s)
+            case .heading(let level, let s):
+                var h = inline(s)
+                let size: CGFloat = level == 1 ? 18 : level == 2 ? 16 : 14
+                for run in h.runs where run.font == nil { h[run.range].font = .system(size: size, weight: .semibold) }
+                out += h
+            case .list(let items, let ordered):
+                for (n, item) in items.enumerated() {
+                    if n > 0 {
+                        out += AttributedString("\n")
+                        out += gap(2)
+                    }
+                    let depth = item.prefix(while: { $0 == " " }).count / 2
+                    var marker = AttributedString(String(repeating: "    ", count: depth) + (ordered ? "\(n + 1)." : "•") + "  ")
+                    marker.foregroundColor = .secondary
+                    out += marker
+                    out += inline(String(item.drop(while: { $0 == " " })))
+                }
+            default:
+                break
+            }
+        }
+        return out
     }
 
     @ViewBuilder

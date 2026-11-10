@@ -11,6 +11,8 @@ struct SetupView: View {
     @State private var error: String?
 
     var body: some View {
+        GeometryReader { window in
+        ScrollView {
         VStack(spacing: 22) {
             Spacer(minLength: 30)
             RoundedRectangle(cornerRadius: 18)
@@ -29,7 +31,7 @@ struct SetupView: View {
                     useLocal = true
                 }
                 .disabled(!AgoraCore.localHermesInstalled)
-                ChoiceCard(selected: !useLocal, title: "On another machine", subtitle: "`hermes serve` on another machine. Nothing Hermes-related needed here.") {
+                ChoiceCard(selected: !useLocal, title: "On another machine", subtitle: "Hermes on another machine, through its gateway or `hermes serve`. Nothing Hermes-related needed here.") {
                     useLocal = false
                 }
                 if !useLocal {
@@ -63,7 +65,10 @@ struct SetupView: View {
             Spacer(minLength: 30)
         }
         .padding(40)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // Centred while it fits; scrolls once the form (with its setup guide open) is taller than the window.
+        .frame(maxWidth: .infinity, minHeight: window.size.height)
+        }
+        }
         .background(Theme.contentBackground)
         .onAppear { if app.setupStartsRemote || !AgoraCore.localHermesInstalled { useLocal = false } }
     }
@@ -80,7 +85,7 @@ struct ChoiceCard: View {
                 Image(systemName: selected ? "largecircle.fill.circle" : "circle").foregroundStyle(selected ? Theme.accent : .secondary)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title).font(.system(size: 14, weight: .semibold))
-                    Text(subtitle).font(.system(size: 12)).foregroundStyle(.secondary)
+                    Text(LocalizedStringKey(subtitle)).font(.system(size: 12)).foregroundStyle(.secondary)
                 }
                 Spacer()
             }
@@ -158,6 +163,7 @@ struct RemoteConnectionForm: View {
             }
             if busy { ProgressView().controlSize(.small) }
             if let error { Text(error).font(.system(size: 12)).foregroundStyle(.red) }
+            ServeGuide()
         }
         .sheet(item: $accessLogin) { target in
             let origin = target.origin
@@ -435,14 +441,17 @@ struct ConnectionsSettings: View {
         .sheet(isPresented: $adding) {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Add a Remote Connection").font(.headline)
-                RemoteConnectionForm { adding = false }
+                ScrollView {
+                    RemoteConnectionForm { adding = false }.padding(.trailing, 4)
+                }
+                .frame(minHeight: 200, idealHeight: 480, maxHeight: 560)
                 HStack {
                     Spacer()
                     Button("Close") { adding = false }
                 }
             }
             .padding(24)
-            .frame(width: 460)
+            .frame(width: 480)
         }
         .alert("Rename Connection", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
             TextField("Name", text: $newName)

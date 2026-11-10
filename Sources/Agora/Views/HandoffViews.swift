@@ -94,6 +94,9 @@ struct KanbanUpdateCard: View {
     @Environment(AgoraCore.self) private var core
     let update: KanbanUpdate
     let date: Date?
+    /// The Bot whose chat shows the update.
+    var bot: String = "default"
+    @State private var open: KanbanCardTarget?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
@@ -127,7 +130,13 @@ struct KanbanUpdateCard: View {
                 (Text("Review  ").font(.system(size: 11, weight: .semibold)).foregroundStyle(.secondary) + Text(feedback).font(.system(size: 12.5)))
                     .textSelection(.enabled)
             }
+            Button(update.status == .blocked || update.status == .review ? "Answer the Card…" : "Open Card…") {
+                open = KanbanCardTarget(taskID: update.taskID, bot: bot, board: update.board.isEmpty ? nil : update.board, title: update.title)
+            }
+            .controlSize(.small)
+            .help("See the card's status and comments, and comment, unblock or approve it")
         }
+        .sheet(item: $open) { KanbanCardSheet(target: $0) }
         .padding(12)
         .frame(maxWidth: 560, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 10).fill(Theme.cardBackground))

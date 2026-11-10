@@ -73,13 +73,19 @@ Opens Agora against a made-up Hermes with six example Bots (the screenshots abov
 
 ## Hermes on another machine
 
-On the machine that runs your Bots, serve Hermes where Agora can reach it. Sign-in is always required off loopback; `basic` username/password is fine on a tailnet:
+On the machine that runs your Bots, give Hermes a login, let its gateway take connections, and keep it running in the background (port 9120):
 
 ```sh
-hermes serve --host "$(tailscale ip -4)" --port 9119
+hermes config set dashboard.basic_auth.username me
+hermes config set dashboard.basic_auth.password 'a long password'
+hermes config set webapp.enabled true
+hermes config set webapp.host 0.0.0.0    # behind a Cloudflare Tunnel: webapp.public_url https://… instead
+hermes gateway install                   # or hermes gateway restart if it's already installed
 ```
 
-In Agora, choose **On another machine** (or Settings → Connections → Add Remote…). Agora reads `tailscale status`, asks each online machine for Hermes on `https://<machine>.<tailnet>.ts.net` (Tailscale Serve) and `http://<machine>:9119`, and lists what it finds. **Connect** names the Connection after the machine and opens browser sign-in. You can also add any URL by hand and paste a session token.
+Hermes refuses connections from other machines until it has a login. `hermes serve --host <address> --port 9119` works too and also takes a session token (`HERMES_DASHBOARD_SESSION_TOKEN`), but it stops when you close its terminal. The same steps are in Agora, under **How to set up Hermes on the other machine**.
+
+In Agora, choose **On another machine** (or Settings → Connections → Add Remote…). Agora reads `tailscale status`, asks each online machine for Hermes on `https://<machine>.<tailnet>.ts.net` (Tailscale Serve), `http://<machine>:9119` and `http://<machine>:9120`, and lists what it finds. **Connect** names the Connection after the machine and opens browser sign-in. You can also add any URL by hand and paste a session token.
 
 **Behind Cloudflare Access.** If Hermes sits behind a Cloudflare Tunnel with an Access login, **Check** opens Cloudflare's login in your browser, the way `cloudflared access login` does. Cloudflare hands the token back to Agora, sealed to a one-time key only Agora holds, and Agora keeps it in the Keychain and sends it with every request to that host. Then you sign in to Hermes as usual. If you'd rather not leave Agora, **Log In Here Instead** shows Cloudflare's login page in an Agora window. When Cloudflare's session runs out, Agora asks you to log in again.
 

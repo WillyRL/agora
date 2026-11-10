@@ -83,9 +83,38 @@ extension AgoraCore {
     @discardableResult
     public func openConversation(bot botName: String, sessionID: String, title: String) async throws -> Conversation {
         if let open = conversation(sessionID) { return open }
+        if sideChats[botName]?.first(where: { $0.id == sessionID })?.isKanbanTask == true {
+            return try await openKanbanTask(bot: botName, sessionID: sessionID, title: title)
+        }
         let connection = try requireConnection()
-        let snapshot = try await connection.call("session.resume", ["profile": .string(botName), "session_id": .string(sessionID), "omit_messages": true])
+        let snapshot: JSON
+        do {
+            snapshot = try await connection.call("session.resume", ["profile": .string(botName), "session_id": .string(sessionID), "omit_messages": true])
+        } catch let error as HermesError where error.localizedDescription.localizedCaseInsensitiveContains("kanban worker") {
+            // Hermes refuses to resume a kanban worker's chat (only the board may run it). Read it instead.
+            return try await openKanbanTask(bot: botName, sessionID: sessionID, title: title)
+        }
         return try await adopt(snapshot: snapshot, bot: botName, title: title)
+    }
+
+    /// A kanban card's worker chat, read from Hermes's session store without resuming it:
+    /// resuming would start a second writer the board can't see.
+    func openKanbanTask(bot botName: String, sessionID: String, title: String) async throws -> Conversation {
+        let conversation = Conversation(bot: botName, sessionID: sessionID, title: title)
+        conversation.isKanbanTask = true
+        try await loadNewestHistory(conversation)
+        conversations[sessionID] = conversation
+        return conversation
+    }
+
+    /// Reads a kanban task's chat again: Agora doesn't follow it live.
+    public func reloadKanbanTask(_ c: Conversation) async {
+        guard c.isKanbanTask else { return }
+        do {
+            try await loadNewestHistory(c)
+        } catch {
+            if !isCancellation(error) { notice = "Couldn't reload the task's chat: \(error.localizedDescription)" }
+        }
     }
 
     /// An open conversation by its live or saved session id.
@@ -301,6 +330,7 @@ extension AgoraCore {
     /// Resumes a conversation by its saved id and reloads its newest history. Hermes hands back the
     /// live session if it still holds one, or starts a new one (with a new live id) if it unloaded it.
     func reopen(_ c: Conversation) async throws {
+        if c.isKanbanTask { return try await loadNewestHistory(c) }
         let connection = try requireConnection()
         let snapshot = try await connection.call(
             "session.resume", ["profile": .string(c.bot), "session_id": .string(c.storedSessionID), "omit_messages": true])

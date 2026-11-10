@@ -7,6 +7,8 @@ public struct SideChatSummary: Sendable, Identifiable, Equatable {
     public var title: String
     public var lastActive: Date?
     public var preview: String?
+    /// The chat of a kanban card's worker. Only the board may run it, so Agora shows it read-only.
+    public var isKanbanTask = false
 }
 
 extension AgoraCore {
@@ -38,7 +40,8 @@ extension AgoraCore {
                 SideChatSummary(
                     id: row["id"].string!, bot: bot, title: row["title"].nonEmptyString ?? "",
                     lastActive: (row["last_active"].double ?? row["started_at"].double).map { Date(timeIntervalSince1970: $0) },
-                    preview: row["preview"].string)
+                    preview: row["preview"].string,
+                    isKanbanTask: row["source"].string == "kanban" || row["created_source"].string == "kanban")
             }
             .sorted { ($0.lastActive ?? .distantPast) > ($1.lastActive ?? .distantPast) }
         } catch {

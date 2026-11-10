@@ -4,7 +4,23 @@ What changed in each Agora release. Agora Nightly builds from `main` and has eve
 
 ## Unreleased
 
-Nothing yet.
+## 0.1.0-beta.5 (2026-11-10)
+
+### New
+
+**Answer kanban cards.** Bots put work on Hermes's kanban board by themselves, and a card often waits for you. Under a card's chat, Agora now shows its status, why it's blocked and its latest comment. You can answer it, unblock it, or approve it when it's ready for review, and **Show Card…** opens the whole card. Kanban news in a Bot Chat has an **Open Card…** button. The board itself (creating, moving and assigning cards) stays in Hermes.
+
+<img src="docs/screenshots/0.1.0-beta.5/kanban-card.png" width="540" alt="A blocked kanban card under its chat, waiting for an answer">
+
+**A guide to setting up Hermes on another machine.** **On another machine** (and Settings → Connections → Add Remote…) shows the commands to run there, each with a Copy button: give Hermes a login, let its gateway take connections on a Tailscale tailnet, your network or behind a Cloudflare Tunnel, and keep it running in the background with `hermes gateway install`. Agora's tailnet scan now also finds a gateway on port 9120.
+
+<img src="docs/screenshots/0.1.0-beta.5/setup-guide.png" width="500" alt="The setup guide with copyable commands">
+
+### Fixed
+
+- A kanban task's chat in a Bot's Side Chats failed to open with "is a Kanban worker transcript", because only the kanban board may run it. Agora now marks these chats with a board icon and opens them read-only.
+- You can select and copy across paragraphs, headings and lists in a message, not just one paragraph at a time. Code blocks, tables and quotes are still selected on their own.
+- The setup screen scrolls when it's taller than the window.
 
 ## 0.1.0-beta.4 (2026-11-10)
 

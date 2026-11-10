@@ -94,6 +94,9 @@ public final class DemoHermes: SocketFactory, HTTPClient, ControlSocket, Gateway
         let query = Dictionary((comps?.queryItems ?? []).map { ($0.name, $0.value ?? "") }, uniquingKeysWith: { a, _ in a })
         func json(_ j: JSON) -> HTTPResponse { HTTPResponse(status: 200, body: j.data()) }
 
+        if path.hasPrefix("/api/plugins/kanban/") {
+            return kanban(request, path: String(path.dropFirst("/api/plugins/kanban".count)))
+        }
         if path.hasPrefix("/api/sessions/"), path.hasSuffix("/messages") {
             let id = path.dropFirst("/api/sessions/".count).dropLast("/messages".count)
             return json(["messages": .array(Self.history[String(id)] ?? [])])
@@ -103,7 +106,7 @@ public final class DemoHermes: SocketFactory, HTTPClient, ControlSocket, Gateway
             let bot = query["profile"] ?? ""
             let rows: [JSON] = (Self.sideChats[bot] ?? []).map {
                 [
-                    "id": .string($0.id), "title": .string($0.title), "source": "desktop", "last_active": .number(Self.at($0.minutesAgo)),
+                    "id": .string($0.id), "title": .string($0.title), "source": .string($0.kanban ? "kanban" : "desktop"), "last_active": .number(Self.at($0.minutesAgo)),
                     "message_count": 4, "archived": false, "hidden": 0, "auto_archived": 0, "preview": .string($0.preview), "profile": .string(bot),
                 ]
             }
@@ -118,6 +121,83 @@ public final class DemoHermes: SocketFactory, HTTPClient, ControlSocket, Gateway
             return json([:])
         }
     }
+
+    // MARK: Kanban
+
+    /// The demo's cards. What you do to them (comment, unblock, approve) lasts until Agora quits.
+    let cards = Mutex<[String: JSON]>(DemoHermes.kanbanCards)
+
+    func kanban(_ request: HTTPRequest, path: String) -> HTTPResponse {
+        func json(_ j: JSON) -> HTTPResponse { HTTPResponse(status: 200, body: j.data()) }
+        if path == "/boards" {
+            return json(["boards": [["slug": "default", "name": "Default"], ["slug": "launch", "name": "Launch"]], "current": "default"])
+        }
+        let parts = path.split(separator: "/").map(String.init)
+        guard parts.count >= 2, parts[0] == "tasks" else { return json([:]) }
+        let id = parts[1]
+        let body = request.body.flatMap { try? JSON(data: $0) } ?? [:]
+        return cards.withLock { cards in
+            let board = URLComponents(url: request.url, resolvingAgainstBaseURL: false)?.queryItems?.first { $0.name == "board" }?.value ?? "default"
+            guard var card = cards[id], (card["board"].string ?? "default") == board else { return HTTPResponse(status: 404, body: JSON.object(["detail": .string("task \(id) not found")]).data()) }
+            let now = JSON.number(Date().timeIntervalSince1970)
+            switch (request.method, parts.count > 2 ? parts[2] : "") {
+            case ("POST", "comments"):
+                var comments = card["comments"].array ?? []
+                comments.append([
+                    "id": .number(Double(comments.count + 1)), "task_id": .string(id), "author": body["author"], "body": body["body"], "created_at": now,
+                ])
+                card = card.setting("comments", .array(comments))
+            case ("PATCH", ""):
+                if let status = body["status"].string {
+                    card = card.setting("task", card["task"].setting("status", .string(status)))
+                }
+            default: break
+            }
+            cards[id] = card
+            return json(card)
+        }
+    }
+
+    static func card(_ id: String, _ title: String, status: String, assignee: String, body: String, summary: String? = nil,
+                     blocked: String? = nil, comments: [(String, String, Double)] = [], board: String = "default") -> JSON {
+        [
+            "task": [
+                "id": .string(id), "title": .string(title), "status": .string(status), "assignee": .string(assignee), "body": .string(body),
+                "latest_summary": summary.map { .string($0) } ?? .null,
+            ],
+            "comments": .array(comments.enumerated().map { i, c in
+                ["id": .number(Double(i + 1)), "task_id": .string(id), "author": .string(c.0), "body": .string(c.1), "created_at": .number(at(c.2))]
+            }),
+            "board": .string(board),
+            "events": .array(blocked.map { [["kind": "blocked", "payload": ["reason": .string($0)]]] } ?? []),
+        ]
+    }
+
+    static let kanbanCards: [String: JSON] = [
+        "t_5c21e0b7": card(
+            "t_5c21e0b7", "Five papers on long-context evals", status: "blocked", assignee: "research",
+            body: "Find the five papers worth reading first on long-context evaluation, with one line on each.",
+            blocked: "Should preprints count, or only peer-reviewed papers? Three of my eight candidates are arXiv-only.",
+            comments: [
+                ("default", "Skip anything before 2024.", 99),
+                ("research", """
+                    ## Candidates so far
+
+                    | Paper | Year | Peer-reviewed |
+                    |---|---|---|
+                    | RULER | 2024 | Yes |
+                    | LongBench v2 | 2024 | Yes |
+                    | NoCha | 2024 | No (arXiv) |
+                    | HELMET | 2024 | Yes |
+                    | BABILong | 2024 | No (arXiv) |
+
+                    Three more are arXiv-only. **Waiting on you** before I cut the list to five.
+                    """, 96),
+            ]),
+        "t_3906c4a2": card(
+            "t_3906c4a2", "Chart weekly signups for the launch post", status: "done", assignee: "markets",
+            body: "A chart of weekly signups for the launch post.", summary: "Chart saved to charts/signups.html: 1,240 signups this week, up 38%.", board: "launch"),
+    ]
 
     // MARK: The demo's world
 
@@ -146,6 +226,8 @@ public final class DemoHermes: SocketFactory, HTTPClient, ControlSocket, Gateway
         var title: String
         var preview: String
         var minutesAgo: Double
+        /// A kanban card's worker chat (Hermes's `kanban` source).
+        var kanban = false
     }
 
     static func at(_ minutesAgo: Double) -> Double { Date().timeIntervalSince1970 - minutesAgo * 60 }
@@ -156,7 +238,7 @@ public final class DemoHermes: SocketFactory, HTTPClient, ControlSocket, Gateway
         DemoBot(name: "markets", title: "Markets Analyst", description: "Charts, levels and macro, with sources", color: "#10b981",
                 preview: "Gold held 2,380 into the close; levels are on the chart.", minutesAgo: 4),
         DemoBot(name: "research", title: "Research", description: "Reads papers and the web, cites everything", color: "#3b82f6",
-                preview: "Here are the five papers worth reading first.", minutesAgo: 95),
+                preview: "I put it on the kanban board as a card for me.", minutesAgo: 95),
         DemoBot(name: "coder", title: "Coder", description: "Writes and reviews code in your repos", color: "#a855f7",
                 preview: "Tests pass. I opened a PR with the fix.", minutesAgo: 60 * 26),
         DemoBot(name: "ops", title: "Ops", description: "Servers, logs and deploys (asks before changing anything)", color: "#ef4444",
@@ -170,7 +252,10 @@ public final class DemoHermes: SocketFactory, HTTPClient, ControlSocket, Gateway
             DemoSideChat(id: "side-gold-yields", title: "Gold vs real yields", preview: "The correlation broke in 2022…", minutesAgo: 60 * 3),
             DemoSideChat(id: "side-earnings", title: "Earnings calendar this week", preview: "Five names report…", minutesAgo: 60 * 30),
         ],
-        "research": [DemoSideChat(id: "side-papers", title: "Long-context evals", preview: "Five papers…", minutesAgo: 60 * 8)],
+        "research": [
+            DemoSideChat(id: "side-kanban-evals", title: "Five papers on long-context evals", preview: "Should preprints count…", minutesAgo: 95, kanban: true),
+            DemoSideChat(id: "side-papers", title: "Long-context evals", preview: "Five papers…", minutesAgo: 60 * 8),
+        ],
     ]
 
     static let routine: JSON = [
@@ -245,6 +330,10 @@ public final class DemoHermes: SocketFactory, HTTPClient, ControlSocket, Gateway
                 """, minutesAgo: 12, extra: ["display_kind": "internal_notification"]),
         ],
         "chat-research": [
+            row(1, "user", "Which long-context eval papers should I read first?", minutesAgo: 104),
+            row(2, "assistant", "I put it on the kanban board as a card for me, so it runs on its own. The list will be in the card's chat.", minutesAgo: 103, extra: ["finish_reason": "stop"]),
+        ],
+        "side-kanban-evals": [
             row(1, "user", """
                 # Kanban task t_5c21e0b7: Five papers on long-context evals
 
@@ -262,11 +351,25 @@ public final class DemoHermes: SocketFactory, HTTPClient, ControlSocket, Gateway
                 work kanban task t_5c21e0b7
                 """, minutesAgo: 100),
             row(2, "user", "Message from 🤖 hermes (@default): The card is yours. Skip anything before 2024.\n\nReply needed: The list when it's done", minutesAgo: 99, extra: ["display_kind": "internal_notification"]),
-            row(3, "assistant", "Here are the five papers worth reading first.", minutesAgo: 95, extra: ["finish_reason": "stop"]),
+            row(3, "assistant", "I have eight candidates. Before I cut them to five: should preprints count, or only peer-reviewed papers? Three of the eight are arXiv-only, so I've blocked the card until you say.", minutesAgo: 95, extra: ["finish_reason": "stop"]),
         ],
         "chat-writer": [
             row(1, "user", "Message from 🤖 Hermes (@default): Draft a 150-word launch post for Agora 1.0. Lead with Quick Ask; link the GitHub page.\n\nConstraints: Plain words, no exclamation marks\nReply needed: The draft as Markdown", minutesAgo: 23),
-            row(2, "assistant", "Here's the draft. It leads with Quick Ask and ends on the GitHub link.", minutesAgo: 21, extra: ["finish_reason": "stop"]),
+            row(2, "assistant", """
+                Here's the draft. It leads with Quick Ask and ends on the GitHub link.
+
+                ## Agora 1.0
+
+                Press ⌥Space anywhere on your Mac and ask a Bot. The answer comes back in a small window, and the chat waits for you in Agora.
+
+                Agora is the chat part of Hermes, as a native Mac app. Your Bots keep running on the machine they live on.
+
+                - Every Bot has its own chat, plus Side Chats for separate topics.
+                - Approve a Bot's tool calls from a notification.
+                - Bots hand work to each other, and you see it happen.
+
+                Get it at github.com/WillyRL/agora.
+                """, minutesAgo: 21, extra: ["finish_reason": "stop"]),
         ],
     ]
 

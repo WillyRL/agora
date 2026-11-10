@@ -330,7 +330,8 @@ struct SideChatSidebarRow: View {
         SidebarRow(selected: selected) {
             app.destination = .sideChat(bot: side.bot, session: side.id)
         } content: {
-            Image(systemName: "bubble.left").font(.system(size: 10)).foregroundStyle(.secondary).frame(width: 14)
+            Image(systemName: side.isKanbanTask ? "rectangle.split.3x1" : "bubble.left").font(.system(size: 10)).foregroundStyle(.secondary).frame(width: 14)
+                .help(side.isKanbanTask ? "A kanban task: the board runs it" : "")
             Text(side.title.isEmpty ? "New Side Chat" : side.title).font(.system(size: 12)).lineLimit(1)
             Spacer()
             if hovering {

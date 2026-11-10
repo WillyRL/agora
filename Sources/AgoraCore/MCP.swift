@@ -203,7 +203,7 @@ extension AgoraCore {
             }
             let on = Set(own.filter { $0.enabled && $0.plugin == nil }.map(\.name)).union([server.name])
             try await setMCPServers(bot: bot, enabled: Array(on))
-            for c in conversations.values where c.bot == bot { _ = try? await reloadTools(c) }
+            for c in conversations.values where c.bot == bot && !c.isKanbanTask { _ = try? await reloadTools(c) }
         }
         if let token, server.auth == .header { rememberMCPToken(token, for: server.name) }
     }
@@ -302,7 +302,7 @@ extension AgoraCore {
             try await addMCPServer(NewMCPServer(name: name, url: server.url, auth: .header, token: token), bot: bot)
         }
         try await setMCPServers(bot: bot, enabled: Array(s.picked))
-        for c in conversations.values where c.bot == bot { _ = try? await reloadTools(c) }
+        for c in conversations.values where c.bot == bot && !c.isKanbanTask { _ = try? await reloadTools(c) }
     }
 
     /// Reloads a chat's MCP tools so a change applies now rather than in its next chat. Hermes waits

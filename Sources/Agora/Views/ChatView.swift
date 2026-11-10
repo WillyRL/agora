@@ -26,7 +26,11 @@ struct ChatView: View {
                     if let conversation {
                         // A fresh scroll view per chat, so one chat's scroll offset never carries over to the next.
                         MessageList(conversation: conversation, bot: bot).id(conversation.id)
-                        BottomArea(conversation: conversation, bot: bot, draft: $draft, images: $images)
+                        if conversation.isKanbanTask {
+                            KanbanTaskFooter(conversation: conversation)
+                        } else {
+                            BottomArea(conversation: conversation, bot: bot, draft: $draft, images: $images)
+                        }
                     } else if let loadError {
                         ContentUnavailableView {
                             Label("Couldn't open the chat", systemImage: "exclamationmark.bubble")
@@ -123,6 +127,7 @@ struct ChatHeader: View {
     var subtitle: String {
         guard let conversation else { return bot.description }
         if conversation.isBotChat { return bot.description.isEmpty ? "Bot Chat" : bot.description }
+        if conversation.isKanbanTask { return "Kanban task for \(bot.title)" }
         return "Side Chat with \(bot.title)"
     }
 }
@@ -236,6 +241,69 @@ struct MessageList: View {
                 try? await Task.sleep(for: .seconds(delay))
                 position.scrollTo(edge: .bottom)
             }
+        }
+    }
+}
+
+/// In place of the message box under a kanban card's worker chat. Only the board may run the chat,
+/// so you answer the card instead: comment, unblock or approve it.
+struct KanbanTaskFooter: View {
+    @Environment(AgoraCore.self) private var core
+    let conversation: Conversation
+    @State private var reloading = false
+
+    /// The card's id, from the brief that opens its chat.
+    var taskID: String? {
+        for item in conversation.items {
+            if case .kanbanBrief(let brief) = item.kind { return brief.taskID }
+        }
+        return nil
+    }
+
+    var body: some View {
+        Group {
+            if let taskID {
+                VStack(alignment: .leading, spacing: 8) {
+                    KanbanCardPanel(taskID: taskID, bot: conversation.bot) {
+                        await core.reloadKanbanTask(conversation)
+                    }
+                    Text("Only the kanban board can run this chat, so you answer the card instead.")
+                        .font(.system(size: 11)).foregroundStyle(.tertiary)
+                }
+            } else {
+                readOnlyNote
+            }
+        }
+        .padding(12)
+        .background(RoundedRectangle(cornerRadius: 10).fill(Theme.cardBackground))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Theme.hairline))
+        .frame(maxWidth: 760)
+        .padding(.horizontal, 24)
+        .padding(.bottom, 14)
+        .frame(maxWidth: .infinity)
+    }
+
+    /// When the chat doesn't say which card it's for.
+    var readOnlyNote: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "rectangle.split.3x1").font(.system(size: 13)).foregroundStyle(.secondary).padding(.top, 1)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("A kanban task's chat").font(.system(size: 12.5, weight: .semibold))
+                Text("The kanban board runs this chat, so you can read it here but not reply. To change the task, ask Hermes.")
+                    .font(.system(size: 12)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 8)
+            Button {
+                reloading = true
+                Task {
+                    await core.reloadKanbanTask(conversation)
+                    reloading = false
+                }
+            } label: {
+                if reloading { ProgressView().controlSize(.small) } else { Label("Reload", systemImage: "arrow.clockwise") }
+            }
+            .disabled(reloading)
+            .help("Agora doesn't follow this chat live. Reload to see where the task is.")
         }
     }
 }

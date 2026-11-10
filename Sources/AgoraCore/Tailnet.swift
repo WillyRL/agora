@@ -58,11 +58,15 @@ struct TailnetDevice: Sendable, Equatable {
     var host: String
     var hasDNSName: Bool
 
-    /// `hermes serve` is reached through Tailscale Serve (HTTPS on the MagicDNS name) or on its default port 9119.
+    /// Hermes is reached through Tailscale Serve (HTTPS on the MagicDNS name), on `hermes serve`'s
+    /// default port 9119, or on 9120, where the gateway serves when `webapp.enabled` is on.
     var candidates: [URL] {
         var urls: [URL] = []
         if hasDNSName, let u = URL(string: "https://\(host)") { urls.append(u) }
-        if let u = URL(string: "http://\(host.contains(":") ? "[\(host)]" : host):9119") { urls.append(u) }
+        let h = host.contains(":") ? "[\(host)]" : host
+        for port in [9119, 9120] {
+            if let u = URL(string: "http://\(h):\(port)") { urls.append(u) }
+        }
         return urls
     }
 
@@ -118,7 +122,7 @@ extension AgoraCore {
                     }
                 }
             }
-            // One Hermes per machine: the first candidate that answered (HTTPS before :9119).
+            // One Hermes per machine: the first candidate that answered (HTTPS, then :9119, then :9120).
             var best: [Int: (Int, TailnetGateway)] = [:]
             for await result in group {
                 guard let (d, c, gateway) = result else { continue }

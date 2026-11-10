@@ -100,6 +100,16 @@ enum DebugSnapshot {
                 capture(step.replacingOccurrences(of: ":", with: "-"), in: window)
                 window.orderOut(nil)
                 continue
+            case "card":
+                // A kanban card's sheet (as opened from a card's news), in a window of its own.
+                let window = NSWindow(contentRect: NSRect(x: 200, y: 200, width: 520, height: 460), styleMask: [.titled], backing: .buffered, defer: false)
+                let target = KanbanCardTarget(taskID: arg, bot: "default", board: nil, title: "Five papers on long-context evals")
+                window.contentView = NSHostingView(rootView: KanbanCardSheet(target: target).environment(model.core))
+                window.makeKeyAndOrderFront(nil)
+                try? await Task.sleep(for: .seconds(2))
+                capture("card", in: window)
+                window.orderOut(nil)
+                continue
             case "access":
                 // The Cloudflare Access login sheet, waiting for the browser, in a window of its own.
                 let origin = URL(string: "https://\(arg.isEmpty ? "hermes.example.com" : arg)")!
