@@ -56,11 +56,18 @@ public struct HTTPRequest: Sendable, Equatable {
 public struct HTTPResponse: Sendable {
     public var status: Int
     public var body: Data
-    public init(status: Int, body: Data) {
+    public var headers: [String: String]
+    public init(status: Int, body: Data, headers: [String: String] = [:]) {
         self.status = status
         self.body = body
+        self.headers = headers
     }
     public var json: JSON { (try? JSON(data: body)) ?? .null }
+
+    /// A response header, by name in any case.
+    public func header(_ name: String) -> String? {
+        headers.first { $0.key.caseInsensitiveCompare(name) == .orderedSame }?.value
+    }
 }
 
 public protocol HTTPClient: Sendable {

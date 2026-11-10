@@ -247,6 +247,20 @@ final class SubmitTextView: NSTextView {
         super.keyDown(with: event)
     }
 
+    /// A plain-text view only offers Paste for text. Offer it for images and files too, or ⌘V does nothing
+    /// with a screenshot on the clipboard.
+    override func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {
+        if item.action == #selector(paste(_:)) {
+            let pb = NSPasteboard.general
+            if pb.canReadObject(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true])
+                || pb.canReadObject(forClasses: [NSImage.self], options: nil)
+            {
+                return true
+            }
+        }
+        return super.validateUserInterfaceItem(item)
+    }
+
     override func paste(_ sender: Any?) {
         let pb = NSPasteboard.general
         if let urls = pb.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL], !urls.isEmpty {

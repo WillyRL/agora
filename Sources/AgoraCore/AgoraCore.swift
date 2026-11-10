@@ -14,14 +14,21 @@ public struct AgoraEnvironment: Sendable {
     public var connectionOptions: HermesConnection.Options
     /// Reads your tailnet to find Hermes on your other machines (nil: no Tailscale).
     public var tailnet: TailnetSource?
+    /// Cloudflare Access logins, for Hermes behind a Cloudflare Tunnel.
+    public var accessTokens: AccessTokenStore
+    /// `http` without the Cloudflare Access gate, to read Cloudflare's own answers.
+    let directHTTP: HTTPClient
 
     public init(
         sockets: SocketFactory, http: HTTPClient, control: ControlSocket, starter: GatewayStarter?, credentials: CredentialStore,
-        notifier: Notifier, store: KeyValueStore, connectionOptions: HermesConnection.Options = .init(), tailnet: TailnetSource? = nil
+        notifier: Notifier, store: KeyValueStore, connectionOptions: HermesConnection.Options = .init(), tailnet: TailnetSource? = nil,
+        accessTokens: AccessTokenStore = InMemoryAccessTokenStore()
     ) {
         self.tailnet = tailnet
-        self.sockets = sockets
-        self.http = http
+        self.accessTokens = accessTokens
+        self.sockets = AccessGatedSockets(inner: sockets, tokens: accessTokens)
+        self.http = AccessGatedHTTP(inner: http, tokens: accessTokens)
+        self.directHTTP = http
         self.control = control
         self.starter = starter
         self.credentials = credentials

@@ -103,6 +103,9 @@ struct RemoteConnectionForm: View {
     @State private var status: RemoteAccess.Status?
     @State private var busy = false
     @State private var error: String?
+    /// Cloudflare Access stands in front of this address: its login page, while open.
+    @State private var accessLogin: AccessLoginTarget?
+    @State private var behindAccess: URL?
 
     var url: URL? {
         var s = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -142,8 +145,29 @@ struct RemoteConnectionForm: View {
                     Text("This Hermes offers no login Agora can use.").font(.system(size: 12)).foregroundStyle(.orange)
                 }
             }
+            if let behindAccess, status == nil {
+                Text("\(behindAccess.host ?? "This address") is behind Cloudflare Access. Log in there first, then sign in to Hermes.")
+                    .font(.system(size: 12)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                Button {
+                    accessLogin = AccessLoginTarget(origin: behindAccess)
+                } label: {
+                    Label("Log in to Cloudflare Access", systemImage: "lock.shield")
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(busy)
+            }
             if busy { ProgressView().controlSize(.small) }
             if let error { Text(error).font(.system(size: 12)).foregroundStyle(.red) }
+        }
+        .sheet(item: $accessLogin) { target in
+            let origin = target.origin
+            AccessLoginSheet(origin: origin) { token in
+                core.saveAccessToken(token, for: origin)
+                accessLogin = nil
+                check()
+            } onCancel: {
+                accessLogin = nil
+            }
         }
     }
 
@@ -169,9 +193,18 @@ struct RemoteConnectionForm: View {
         guard let url else { return }
         busy = true
         error = nil
+        status = nil
+        behindAccess = nil
         Task {
             defer { busy = false }
-            do { status = try await core.probeRemote(url) } catch { self.error = error.localizedDescription }
+            do {
+                status = try await core.probeRemote(url)
+            } catch HermesError.accessLoginRequired(let origin) {
+                behindAccess = origin
+                accessLogin = AccessLoginTarget(origin: origin)
+            } catch {
+                self.error = error.localizedDescription
+            }
         }
     }
 
@@ -208,6 +241,7 @@ struct RemoteConnectionForm: View {
         } else {
             switch core.status {
             case .offline(let m), .needsSignIn(let m), .configurationError(let m): error = m
+            case .needsAccessLogin(let origin): behindAccess = origin
             default: break
             }
         }

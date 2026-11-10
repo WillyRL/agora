@@ -100,6 +100,16 @@ enum DebugSnapshot {
                 capture(step.replacingOccurrences(of: ":", with: "-"), in: window)
                 window.orderOut(nil)
                 continue
+            case "access":
+                // The Cloudflare Access login sheet, waiting for the browser, in a window of its own.
+                let origin = URL(string: "https://\(arg.isEmpty ? "hermes.example.com" : arg)")!
+                let window = NSWindow(contentRect: NSRect(x: 200, y: 200, width: 540, height: 330), styleMask: [.titled], backing: .buffered, defer: false)
+                window.contentView = NSHostingView(rootView: AccessLoginSheet(origin: origin, onToken: { _ in }, onCancel: {}).environment(model.core))
+                window.makeKeyAndOrderFront(nil)
+                try? await Task.sleep(for: .seconds(1.5))
+                capture("access", in: window)
+                window.orderOut(nil)
+                continue
             default: break
             }
             try? await Task.sleep(for: .seconds(2.5))

@@ -88,7 +88,8 @@ final class AppModel {
             store = UserDefaultsStore()
             env = AgoraEnvironment(
                 sockets: URLSessionSockets(), http: URLSessionHTTP(), control: UnixControlSocket(), starter: ProcessGatewayStarter(),
-                credentials: KeychainCredentialStore(service: AppFlavor.current.keychainService), notifier: notifier, store: store, tailnet: TailscaleCLI())
+                credentials: KeychainCredentialStore(service: AppFlavor.current.keychainService), notifier: notifier, store: store, tailnet: TailscaleCLI(),
+                accessTokens: KeychainAccessTokenStore(service: AppFlavor.current.keychainService + ".cloudflare-access"))
         }
         let registry = ConnectionRegistry(store: store)
         core = AgoraCore(registry: registry, environment: env)

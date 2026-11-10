@@ -231,7 +231,9 @@ final class FakeHermes: SocketFactory, HTTPClient, ControlSocket, GatewayStarter
             if !s.http[i].repeats { s.http[i].used = true }
             let reply = s.http[i].reply
             let body = reply["body"]
-            return HTTPResponse(status: reply["status"].int ?? 200, body: body.string.map { Data($0.utf8) } ?? body.data())
+            var headers: [String: String] = [:]
+            for (k, v) in reply["headers"].object ?? [:] { headers[k] = v.string }
+            return HTTPResponse(status: reply["status"].int ?? 200, body: body.string.map { Data($0.utf8) } ?? body.data(), headers: headers)
         }
     }
 }

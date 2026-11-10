@@ -11,6 +11,8 @@ public enum ConnectionStatus: Sendable, Equatable {
     case needsSignIn(String)
     /// The Hermes we reach can't be used as configured (4403, Host check …). No retry.
     case configurationError(String)
+    /// Cloudflare Access stands in front of the Remote Hermes; log in at this origin.
+    case needsAccessLogin(URL)
 
     public var isConnected: Bool { self == .connected }
 }
@@ -541,6 +543,9 @@ public actor HermesConnection {
                 case .configurationError(let m):
                     setStatus(.configurationError(m))
                     return
+                case .needsAccessLogin(let url):
+                    setStatus(.needsAccessLogin(url))
+                    return
                 default:
                     if attempt >= 6 { setStatus(.offline(error.localizedDescription)) }
                     continue
@@ -600,6 +605,7 @@ public actor HermesConnection {
     static func status(for error: Error) -> ConnectionStatus {
         switch error {
         case HermesError.signInRequired(let m): return .needsSignIn(m)
+        case HermesError.accessLoginRequired(let url): return .needsAccessLogin(url)
         case HermesError.configuration(let m): return .configurationError(m)
         default: return .offline((error as? LocalizedError)?.errorDescription ?? "\(error)")
         }

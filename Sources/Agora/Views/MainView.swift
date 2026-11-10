@@ -28,6 +28,15 @@ struct MainView: View {
         .sheet(isPresented: Binding(get: { if case .needsSignIn = core.status { true } else { false } }, set: { _ in })) {
             SignInAgainSheet()
         }
+        .sheet(item: Binding(get: { if case .needsAccessLogin(let url) = core.status { AccessLoginTarget(origin: url) } else { nil } }, set: { _ in })) { target in
+            let origin = target.origin
+            AccessLoginSheet(origin: origin) { token in
+                core.saveAccessToken(token, for: origin)
+                Task { await app.connect() }
+            } onCancel: {
+                Task { await core.stop() }
+            }
+        }
         .sheet(isPresented: Binding(get: { (core.shouldAskToTeachBots || teachFollowUp) && !app.showSetup }, set: { _ in })) {
             TeachBotsSheet(taught: $teachFollowUp)
         }
@@ -449,7 +458,7 @@ struct ConnectionSwitcher: View {
         case .connecting: return "\(name) · connecting…"
         case .reconnecting: return "\(name) · reconnecting…"
         case .offline: return "\(name) · offline"
-        case .needsSignIn: return "\(name) · sign in needed"
+        case .needsSignIn, .needsAccessLogin: return "\(name) · sign in needed"
         case .configurationError: return "\(name) · can't connect"
         case .idle: return name
         }
@@ -458,6 +467,7 @@ struct ConnectionSwitcher: View {
     var detail: String {
         switch core.status {
         case .offline(let m), .needsSignIn(let m), .configurationError(let m): return m
+        case .needsAccessLogin(let url): return HermesError.accessLoginRequired(url).localizedDescription
         default: return core.hermesVersion.map { "Hermes \($0)" } ?? ""
         }
     }

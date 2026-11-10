@@ -10,6 +10,17 @@ extension AgoraCore {
         try await RemoteAccess.probe(baseURL: url, http: env.http)
     }
 
+    /// Keeps the Cloudflare Access login for a Hermes behind a Cloudflare Tunnel (see `CloudflareAccess`).
+    public func saveAccessToken(_ token: String, for url: URL) {
+        guard let key = CloudflareAccess.key(for: url) else { return }
+        env.accessTokens.save(token, for: key)
+    }
+
+    /// Logs in to Cloudflare Access in your browser and returns the app token (see `AccessBrowserLogin`).
+    public func accessTokenFromBrowser(for origin: URL, openBrowser: @escaping @Sendable (URL) -> Void) async throws -> String {
+        try await AccessBrowserLogin(origin: origin, http: env.directHTTP).run(openBrowser: openBrowser)
+    }
+
     /// Adds a Local Connection (Hermes on this Mac) and makes it active.
     @discardableResult
     public func addLocalConnection(name: String = "This Mac") async -> SavedConnection {
@@ -67,6 +78,10 @@ extension AgoraCore {
         guard let removed = registry.remove(id) else { return }
         if let url = removed.remoteURL, !registry.connections.contains(where: { $0.remoteURL.map(RemoteAccess.credentialKey(for:)) == RemoteAccess.credentialKey(for: url) }) {
             env.credentials.save(nil, for: RemoteAccess.credentialKey(for: url))
+        }
+        if let url = removed.remoteURL, let key = CloudflareAccess.key(for: url),
+            !registry.connections.contains(where: { $0.remoteURL.flatMap(CloudflareAccess.key(for:)) == key }) {
+            env.accessTokens.save(nil, for: key)
         }
         if wasActive { await start() }
     }

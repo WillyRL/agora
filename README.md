@@ -81,6 +81,8 @@ hermes serve --host "$(tailscale ip -4)" --port 9119
 
 In Agora, choose **On another machine** (or Settings → Connections → Add Remote…). Agora reads `tailscale status`, asks each online machine for Hermes on `https://<machine>.<tailnet>.ts.net` (Tailscale Serve) and `http://<machine>:9119`, and lists what it finds. **Connect** names the Connection after the machine and opens browser sign-in. You can also add any URL by hand and paste a session token.
 
+**Behind Cloudflare Access.** If Hermes sits behind a Cloudflare Tunnel with an Access login, **Check** opens Cloudflare's login in your browser, the way `cloudflared access login` does. Cloudflare hands the token back to Agora, sealed to a one-time key only Agora holds, and Agora keeps it in the Keychain and sends it with every request to that host. Then you sign in to Hermes as usual. If you'd rather not leave Agora, **Log In Here Instead** shows Cloudflare's login page in an Agora window. When Cloudflare's session runs out, Agora asks you to log in again.
+
 ## MCP servers
 
 Settings → MCP Servers manages the servers in the main Hermes profile: switch them on or off, test the connection (and see their tools), add one by URL or command, sign in to OAuth servers in the browser, or remove one. Tokens you type are kept in the Keychain so you enter them once. Each Bot's Configure page picks which servers that Bot uses, and **Add to Bots…** adds one to several Bots at once.

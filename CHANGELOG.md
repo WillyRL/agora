@@ -6,6 +6,18 @@ What changed in each Agora release. Agora Nightly builds from `main` and has eve
 
 Nothing yet.
 
+## 0.1.0-beta.4 (2026-11-10)
+
+### New
+
+**Hermes behind Cloudflare Access.** A Hermes behind a Cloudflare Tunnel with an Access login used to fail with "answered HTTP 302". Agora now opens Cloudflare's login in your browser, as `cloudflared access login` does, or on Cloudflare's page inside Agora if you prefer. It keeps the login in the Keychain and asks again when it runs out.
+
+<img src="docs/screenshots/0.1.0-beta.4/cloudflare-access.png" width="540" alt="Log in to Cloudflare Access in your browser">
+
+### Fixed
+
+- Pasting an image into the message box did nothing when the clipboard held only the image, such as a screenshot. It now becomes an attachment.
+
 ## 0.1.0-beta.3 (2026-11-08)
 
 ### New

@@ -7,11 +7,12 @@ enum TestCore {
     /// An Agora Core whose active Connection is the local Hermes, played by `fake`.
     static func make(
         _ fake: FakeHermes, notifier: RecordingNotifier = RecordingNotifier(), store: InMemoryKeyValueStore = InMemoryKeyValueStore(),
-        credentials: InMemoryCredentialStore = InMemoryCredentialStore(), remote: URL? = nil
+        credentials: InMemoryCredentialStore = InMemoryCredentialStore(), remote: URL? = nil,
+        accessTokens: AccessTokenStore = InMemoryAccessTokenStore()
     ) -> AgoraCore {
         let env = AgoraEnvironment(
             sockets: fake, http: fake, control: fake, starter: fake, credentials: credentials, notifier: notifier,
-            store: store, connectionOptions: .immediate, tailnet: fake)
+            store: store, connectionOptions: .immediate, tailnet: fake, accessTokens: accessTokens)
         let registry = ConnectionRegistry(store: store)
         if let remote {
             let saved = registry.add(name: "Home Server", kind: .remote(remote))

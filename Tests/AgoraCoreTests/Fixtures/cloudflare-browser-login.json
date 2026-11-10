@@ -1,0 +1,46 @@
+{
+ "description": "Cloudflare Access login in the browser: Cloudflare's redirect names the app (aud-123); the login helper answers 404 until you've logged in, then hands over the app token sealed to Agora's one-time key.",
+ "recipientPrivate": "mkaa8Jsuy7jzJisf618mh/6O25hyJcDT+y0M3nlJyxU=",
+ "publicKey": "5_iEUmKgYby-lkrTJ4k5KdYzbkjWSWThmZtbVH-Xmj4=",
+ "http": [
+  {
+   "expect": {
+    "method": "GET",
+    "host": "hermes.example.com",
+    "path": ""
+   },
+   "reply": {
+    "status": 302,
+    "headers": {
+     "Location": "https://example.cloudflareaccess.com/cdn-cgi/access/login/hermes.example.com?kid=aud-123&meta=eyJhbGciOiAiUlMyNTYifQ.eyJ0eXBlIjogIm1ldGEiLCAiYXVkIjogImF1ZC0xMjMiLCAiaG9zdG5hbWUiOiAiaGVybWVzLmV4YW1wbGUuY29tIn0.sig&redirect_url=%2F"
+    },
+    "body": ""
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "host": "login.cloudflareaccess.org",
+    "path": "/transfer/5_iEUmKgYby-lkrTJ4k5KdYzbkjWSWThmZtbVH-Xmj4="
+   },
+   "reply": {
+    "status": 404,
+    "body": ""
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "host": "login.cloudflareaccess.org",
+    "path": "/transfer/5_iEUmKgYby-lkrTJ4k5KdYzbkjWSWThmZtbVH-Xmj4="
+   },
+   "reply": {
+    "status": 200,
+    "headers": {
+     "service-public-key": "8E_RZxvSdYqSXd8KNi_FYMoi7mkYKSq0lPmzZDkpzGI="
+    },
+    "body": "dnIwAD4TYNALbc+t1pA3K4IL0mTlL0PYGkcAaVJpeQnZ0yMkLQQ6xvPIA28NJhwXXsRm3UEDbCzre9pyqdxOb82peRvSOr5rpq2fPCjjVNqU8alwo8Bq271TgsLTzQ=="
+   }
+  }
+ ]
+}

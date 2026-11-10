@@ -13,6 +13,8 @@ public enum HermesError: Error, Sendable, Equatable, LocalizedError {
     case configuration(String)
     /// Remote login expired and couldn't be refreshed: the user must sign in again.
     case signInRequired(String)
+    /// Cloudflare Access stands in front of this Hermes and wants a login (at this origin).
+    case accessLoginRequired(URL)
     /// Hermes isn't running locally and couldn't be started.
     case hermesUnavailable(String)
     /// Something in the protocol didn't look the way Agora expects.
@@ -27,6 +29,7 @@ public enum HermesError: Error, Sendable, Equatable, LocalizedError {
         case .notConnected: return "Not connected to Hermes."
         case .configuration(let m): return m
         case .signInRequired(let m): return m
+        case .accessLoginRequired(let url): return "\(url.host ?? "This Hermes") is behind Cloudflare Access. Log in to reach it."
         case .hermesUnavailable(let m): return m
         case .protocolViolation(let m): return "Unexpected reply from Hermes: \(m)"
         case .timeout(let m): return "Timed out: \(m)"

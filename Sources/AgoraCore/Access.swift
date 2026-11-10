@@ -254,6 +254,8 @@ public actor RemoteAccess: AccessProvider {
         let response: HTTPResponse
         do {
             response = try await http.send(HTTPRequest(method: "GET", url: url))
+        } catch HermesError.accessLoginRequired(let origin) {
+            throw HermesError.accessLoginRequired(origin)
         } catch {
             throw HermesError.hermesUnavailable("Couldn't reach \(baseURL.host ?? baseURL.absoluteString).")
         }

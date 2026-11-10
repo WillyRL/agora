@@ -1,0 +1,398 @@
+{
+ "description": "A Remote Connection behind Cloudflare Access: the first request gets Cloudflare's login redirect, then (after the Access login) the same gated hermes serve as remote-token.",
+ "control": [],
+ "http": [
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/status"
+   },
+   "reply": {
+    "status": 302,
+    "headers": {
+     "Location": "https://example.cloudflareaccess.com/cdn-cgi/access/login/hermes.example.com?redirect_url=%2Fapi%2Fstatus",
+     "WWW-Authenticate": "Cloudflare-Access resource_metadata=\"https://hermes.example.com/.well-known/cloudflare-access-protected-resource/api/status\""
+    },
+    "body": ""
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/status"
+   },
+   "repeat": true,
+   "reply": {
+    "status": 200,
+    "body": {
+     "version": "0.23.0",
+     "auth_required": true,
+     "auth_providers": [
+      "basic",
+      "session-token"
+     ],
+     "auth_flows": [
+      "cookie",
+      "native_pkce"
+     ],
+     "gateway_running": true
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "POST",
+    "path": "/api/auth/ws-ticket"
+   },
+   "repeat": true,
+   "reply": {
+    "status": 200,
+    "body": {
+     "ticket": "wsticket-1",
+     "ttl_seconds": 30
+    }
+   }
+  },
+  {
+   "expect": {
+    "method": "GET",
+    "path": "/api/sessions/r-coder-chat/messages",
+    "query": {
+     "profile": "coder"
+    }
+   },
+   "repeat": true,
+   "reply": {
+    "status": 200,
+    "body": {
+     "messages": [
+      {
+       "id": 5,
+       "role": "assistant",
+       "content": "Hello from the home server.",
+       "timestamp": 1793974000.0
+      }
+     ]
+    }
+   }
+  }
+ ],
+ "connections": [
+  {
+   "onOpen": [
+    {
+     "jsonrpc": "2.0",
+     "method": "event",
+     "params": {
+      "payload": {
+       "change_events": true,
+       "heartbeat": true,
+       "replay_epoch": "3734a12859434bcdb9ac28b6f5ad21bb",
+       "session_authority": true,
+       "skin": {
+        "name": "default"
+       }
+      },
+      "type": "gateway.ready"
+     }
+    }
+   ],
+   "exchanges": [
+    {
+     "expect": {
+      "method": "client.capabilities",
+      "params": {
+       "server_requests": true
+      }
+     },
+     "result": {
+      "canonical_clarify_batch": true,
+      "declines_not_shown": true,
+      "server_requests": [
+       "approval",
+       "clarify",
+       "display.install.sudo",
+       "preview.act",
+       "preview.read",
+       "secret",
+       "setup_beat",
+       "sudo",
+       "terminal.read",
+       "theme.apply",
+       "theme.pick",
+       "tour",
+       "vault.code",
+       "vault.save_login",
+       "vault.unlock_prompt",
+       "window.read"
+      ]
+     },
+     "then": []
+    },
+    {
+     "expect": {
+      "method": "profiles.list",
+      "params": {}
+     },
+     "result": {
+      "bot_mode_protocol": true,
+      "install_id": "df746216f18645d99417dbf6ba47e928",
+      "profiles": [
+       {
+        "canonical_session": null,
+        "description": "",
+        "display_name": "",
+        "has_avatar": true,
+        "is_default": true,
+        "last_session": {
+         "id": "local-20c003d1f002b1e7b737769273cf387140534073284b711cff6a37d701c45e47",
+         "last_active": 1793973646.982031,
+         "message_count": 2,
+         "preview": "Sample preview from default",
+         "resolved_id": "local-20c003d1f002b1e7b737769273cf387140534073284b711cff6a37d701c45e47",
+         "root_title": "Sample session",
+         "started_at": 1793973644.344116,
+         "title": "Sample session"
+        },
+        "model": "claude-opus-5-5",
+        "name": "default",
+        "path": "/Users/me/.hermes",
+        "provider": "anthropic",
+        "skill_count": 96,
+        "ui_meta": {
+         "hermes-bots": {
+          "color": "#8b5cf6",
+          "custom": true,
+          "group": "Hermes, Coder, Reviewer",
+          "groups": [
+           "Hermes, Coder, Reviewer"
+          ],
+          "imageKind": "shape",
+          "shape": "squircle",
+          "title": ""
+         },
+         "hermes-bots-groups": {
+          "rooms": {}
+         }
+        },
+        "ui_meta_revisions": {
+         "hermes-bots": 2,
+         "hermes-bots-groups": 13
+        },
+        "worker_session": null
+       },
+       {
+        "canonical_session": null,
+        "description": "",
+        "display_name": "",
+        "has_avatar": true,
+        "is_default": false,
+        "last_session": null,
+        "model": "",
+        "name": "business-team",
+        "path": "/Users/me/.hermes/profiles/business-team",
+        "provider": "",
+        "skill_count": 0,
+        "ui_meta": {
+         "hermes-bots": {
+          "created": 1789215367013,
+          "imageKind": "shape",
+          "shape": "blobatar",
+          "title": ""
+         }
+        },
+        "ui_meta_revisions": {
+         "hermes-bots": 1
+        },
+        "worker_session": {
+         "id": "20261014_090501_9ad0c5",
+         "last_active": 1791944565.3982441,
+         "preview": "Sample preview from business-team",
+         "root_title": "Sample session",
+         "source": "kanban",
+         "title": "Sample session"
+        }
+       },
+       {
+        "canonical_session": null,
+        "description": "Chart Technical Analysts",
+        "display_name": "",
+        "has_avatar": true,
+        "is_default": false,
+        "last_session": null,
+        "model": "",
+        "name": "chart-technical-analysts",
+        "path": "/Users/me/.hermes/profiles/chart-technical-analysts",
+        "provider": "",
+        "skill_count": 0,
+        "ui_meta": {
+         "hermes-bots": {
+          "created": 1789065792155,
+          "imageKind": "shape",
+          "shape": "blobatar",
+          "title": "Chart Technical Analysts"
+         }
+        },
+        "ui_meta_revisions": {
+         "hermes-bots": 1
+        },
+        "worker_session": null
+       },
+       {
+        "canonical_session": null,
+        "description": "This agent profile dedicated to Coding purposes",
+        "display_name": "",
+        "has_avatar": true,
+        "is_default": false,
+        "last_session": null,
+        "model": "",
+        "name": "coder",
+        "path": "/Users/me/.hermes/profiles/coder",
+        "provider": "",
+        "skill_count": 0,
+        "ui_meta": {
+         "hermes-bots": {
+          "group": "Hermes, Coder, Reviewer",
+          "groups": [
+           "Hermes, Coder, Reviewer"
+          ]
+         }
+        },
+        "ui_meta_revisions": {
+         "hermes-bots": 1
+        },
+        "worker_session": {
+         "id": "local-b0e9e6e0d3b6727783247ad49ebcbdc17154cda0ffd47695a78ba20069c74ed3",
+         "last_active": 1793472132.6316202,
+         "preview": "Sample preview from coder",
+         "root_title": "Sample session",
+         "source": "oneshot",
+         "title": "Sample session"
+        }
+       },
+       {
+        "canonical_session": null,
+        "description": "DevOps/SRE: server health, logs, Docker/Easypanel, AWS, Cloudflare/Tailscale, de",
+        "display_name": "",
+        "has_avatar": true,
+        "is_default": false,
+        "last_session": null,
+        "model": "",
+        "name": "devops",
+        "path": "/Users/me/.hermes/profiles/devops",
+        "provider": "",
+        "skill_count": 0,
+        "ui_meta_revisions": {},
+        "worker_session": null
+       },
+       {
+        "canonical_session": null,
+        "description": "Finance Assistant — Budgets, bills and receipts",
+        "display_name": "",
+        "has_avatar": true,
+        "is_default": false,
+        "last_session": null,
+        "model": "",
+        "name": "finance-assistant",
+        "path": "/Users/me/.hermes/profiles/finance-assistant",
+        "provider": "",
+        "skill_count": 0,
+        "ui_meta": {
+         "hermes-bots": {
+          "color": null,
+          "created": 1788539709939,
+          "imageKind": "photo",
+          "shape": "blobatar",
+          "title": "Finance Assistant"
+         }
+        },
+        "ui_meta_revisions": {
+         "hermes-bots": 1
+        },
+        "worker_session": null
+       },
+       {
+        "canonical_session": null,
+        "description": "Code review specialist. Reviews diffs, PRs, and code quality; finds bugs, securi",
+        "display_name": "",
+        "has_avatar": true,
+        "is_default": false,
+        "last_session": null,
+        "model": "",
+        "name": "reviewer",
+        "path": "/Users/me/.hermes/profiles/reviewer",
+        "provider": "",
+        "skill_count": 0,
+        "ui_meta": {
+         "hermes-bots": {
+          "group": "Hermes, Coder, Reviewer",
+          "groups": [
+           "Hermes, Coder, Reviewer"
+          ],
+          "hidden": true
+         }
+        },
+        "ui_meta_revisions": {
+         "hermes-bots": 1
+        },
+        "worker_session": {
+         "id": "20261004_182456_dc49aa",
+         "last_active": 1791113220.231839,
+         "preview": "Sample preview from reviewer",
+         "root_title": "Sample session",
+         "source": "kanban",
+         "title": "Sample session"
+        }
+       }
+      ]
+     },
+     "then": []
+    },
+    {
+     "expect": {
+      "method": "session.list",
+      "params": {
+       "profile": "coder",
+       "title": "Bot Chat"
+      }
+     },
+     "result": {
+      "sessions": [
+       {
+        "session_id": "r-coder-chat",
+        "resolved_id": "r-coder-chat",
+        "title": "Bot Chat"
+       }
+      ]
+     }
+    },
+    {
+     "expect": {
+      "method": "session.resume",
+      "params": {
+       "profile": "coder",
+       "session_id": "r-coder-chat"
+      }
+     },
+     "result": {
+      "session_id": "r-coder-chat",
+      "stored_session_id": "r-coder-chat",
+      "messages": [],
+      "messages_omitted": true,
+      "message_count": 1,
+      "running": false,
+      "authority_epoch": 3,
+      "replay_epoch": "ep-r-coder-chat",
+      "last_sequence": 0,
+      "subscription_id": "sub-r-coder-chat",
+      "revision": 0,
+      "execution_generation": 1,
+      "pending": [],
+      "prompts": [],
+      "open_requests": []
+     }
+    }
+   ]
+  }
+ ]
+}

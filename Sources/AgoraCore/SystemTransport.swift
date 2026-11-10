@@ -70,7 +70,10 @@ public final class URLSessionHTTP: HTTPClient {
         r.httpBody = request.body
         for (k, v) in request.headers { r.setValue(v, forHTTPHeaderField: k) }
         let (data, response) = try await session.data(for: r)
-        return HTTPResponse(status: (response as? HTTPURLResponse)?.statusCode ?? 0, body: data)
+        let http = response as? HTTPURLResponse
+        var headers: [String: String] = [:]
+        for (k, v) in http?.allHeaderFields ?? [:] { headers["\(k)"] = "\(v)" }
+        return HTTPResponse(status: http?.statusCode ?? 0, body: data, headers: headers)
     }
 
     final class NoRedirects: NSObject, URLSessionTaskDelegate {
