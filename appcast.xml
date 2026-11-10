@@ -4,23 +4,27 @@
     <title>Agora</title>
     <link>https://github.com/WillyRL/agora</link>
     <item>
-      <title>Agora 0.1.0-beta.4</title>
-      <pubDate>Tue, 10 Nov 2026 07:03:59 +0000</pubDate>
-      <sparkle:version>202611100700</sparkle:version>
-      <sparkle:shortVersionString>0.1.0-beta.4</sparkle:shortVersionString>
+      <title>Agora 0.1.0-beta.5</title>
+      <pubDate>Tue, 10 Nov 2026 16:14:26 +0000</pubDate>
+      <sparkle:version>202611101611</sparkle:version>
+      <sparkle:shortVersionString>0.1.0-beta.5</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
       <sparkle:channel>beta</sparkle:channel>
       <description><![CDATA[<h2 dir="auto">What's new</h2>
 <h4 dir="auto">New</h4>
-<p dir="auto"><strong>Hermes behind Cloudflare Access.</strong> A Hermes behind a Cloudflare Tunnel with an Access login used to fail with "answered HTTP 302". Agora now opens Cloudflare's login in your browser, as <code class="notranslate">cloudflared access login</code> does, or on Cloudflare's page inside Agora if you prefer. It keeps the login in the Keychain and asks again when it runs out.</p>
-<p dir="auto"><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WillyRL/agora/v0.1.0-beta.4/docs/screenshots/0.1.0-beta.4/cloudflare-access.png"><img src="https://raw.githubusercontent.com/WillyRL/agora/v0.1.0-beta.4/docs/screenshots/0.1.0-beta.4/cloudflare-access.png" width="540" alt="Log in to Cloudflare Access in your browser" style="max-width: 100%;"></a></p>
+<p dir="auto"><strong>Answer kanban cards.</strong> Bots put work on Hermes's kanban board by themselves, and a card often waits for you. Under a card's chat, Agora now shows its status, why it's blocked and its latest comment. You can answer it, unblock it, or approve it when it's ready for review, and <strong>Show Card…</strong> opens the whole card. Kanban news in a Bot Chat has an <strong>Open Card…</strong> button. The board itself (creating, moving and assigning cards) stays in Hermes.</p>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WillyRL/agora/v0.1.0-beta.5/docs/screenshots/0.1.0-beta.5/kanban-card.png"><img src="https://raw.githubusercontent.com/WillyRL/agora/v0.1.0-beta.5/docs/screenshots/0.1.0-beta.5/kanban-card.png" width="540" alt="A blocked kanban card under its chat, waiting for an answer" style="max-width: 100%;"></a></p>
+<p dir="auto"><strong>A guide to setting up Hermes on another machine.</strong> <strong>On another machine</strong> (and Settings → Connections → Add Remote…) shows the commands to run there, each with a Copy button: give Hermes a login, let its gateway take connections on a Tailscale tailnet, your network or behind a Cloudflare Tunnel, and keep it running in the background with <code class="notranslate">hermes gateway install</code>. Agora's tailnet scan now also finds a gateway on port 9120.</p>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WillyRL/agora/v0.1.0-beta.5/docs/screenshots/0.1.0-beta.5/setup-guide.png"><img src="https://raw.githubusercontent.com/WillyRL/agora/v0.1.0-beta.5/docs/screenshots/0.1.0-beta.5/setup-guide.png" width="500" alt="The setup guide with copyable commands" style="max-width: 100%;"></a></p>
 <h4 dir="auto">Fixed</h4>
 <ul dir="auto">
-<li>Pasting an image into the message box did nothing when the clipboard held only the image, such as a screenshot. It now becomes an attachment.</li>
+<li>A kanban task's chat in a Bot's Side Chats failed to open with "is a Kanban worker transcript", because only the kanban board may run it. Agora now marks these chats with a board icon and opens them read-only.</li>
+<li>You can select and copy across paragraphs, headings and lists in a message, not just one paragraph at a time. Code blocks, tables and quotes are still selected on their own.</li>
+<li>The setup screen scrolls when it's taller than the window.</li>
 </ul>
 <h2 dir="auto">Install</h2>
 <ol dir="auto">
-<li>Download <strong>Agora-0.1.0-beta.4.dmg</strong> below, open it and drag <strong>Agora</strong> into <strong>Applications</strong>.</li>
+<li>Download <strong>Agora-0.1.0-beta.5.dmg</strong> below, open it and drag <strong>Agora</strong> into <strong>Applications</strong>.</li>
 <li>Open Agora and choose where your Hermes runs: on this Mac, or on another machine.</li>
 </ol>
 <p dir="auto">Needs macOS 15 or later and Hermes v0.23 or later. Runs natively on Apple Silicon and Intel.</p>
@@ -31,8 +35,8 @@
 <li>Or in Terminal: <code class="notranslate">xattr -dr com.apple.quarantine /Applications/Agora.app</code></li>
 </ul>
 <p dir="auto">Check the download: <code class="notranslate">shasum -a 256 -c SHA256SUMS</code>.</p>
-<p dir="auto"><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/WillyRL/agora/compare/v0.1.0-beta.3...v0.1.0-beta.4"><tt>v0.1.0-beta.3...v0.1.0-beta.4</tt></a></p>]]></description>
-      <enclosure url="https://github.com/WillyRL/agora/releases/download/v0.1.0-beta.4/Agora-0.1.0-beta.4.zip" type="application/octet-stream" sparkle:edSignature="suG0Ancs5G8ejDVd0Gqlu4v30aJYqynaPjMheZS6n9S8mVzAAWoDT/ymmQZr5d1sUJGfUeQ8R+u1mmg/SBa9Bw==" length="5519090"/>
+<p dir="auto"><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/WillyRL/agora/compare/v0.1.0-beta.4...v0.1.0-beta.5"><tt>v0.1.0-beta.4...v0.1.0-beta.5</tt></a></p>]]></description>
+      <enclosure url="https://github.com/WillyRL/agora/releases/download/v0.1.0-beta.5/Agora-0.1.0-beta.5.zip" type="application/octet-stream" sparkle:edSignature="BaYcmvdI7ZGFNqfyCJ0lJ6tBfJFq1mAvGW4eQpG3HpfCXhiFwZgRzaAwZY5M8RP7vynJ2dwv1VXl2CVugwHfBw==" length="5816258"/>
     </item>
 
   </channel>
