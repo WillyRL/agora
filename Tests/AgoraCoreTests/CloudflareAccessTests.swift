@@ -12,7 +12,7 @@ struct CloudflareAccessTests {
         let fake = try FakeHermes(named: "remote-cloudflare")
 
         await #expect(throws: HermesError.accessLoginRequired(server)) {
-            try await TestCore.make(fake).probeRemote(server.appending(path: "/"))
+            try await TestCore.make(fake).probeRemote(server)
         }
     }
 
