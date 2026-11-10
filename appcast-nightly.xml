@@ -4,21 +4,22 @@
     <title>Agora</title>
     <link>https://github.com/WillyRL/agora</link>
     <item>
-      <title>Agora 0.1.0-nightly.20261108</title>
-      <pubDate>Sun, 08 Nov 2026 22:41:27 +0000</pubDate>
-      <sparkle:version>202611082239</sparkle:version>
-      <sparkle:shortVersionString>0.1.0-nightly.20261108</sparkle:shortVersionString>
+      <title>Agora 0.1.0-nightly.20261110</title>
+      <pubDate>Tue, 10 Nov 2026 23:57:05 +0000</pubDate>
+      <sparkle:version>202611102353</sparkle:version>
+      <sparkle:shortVersionString>0.1.0-nightly.20261110</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
       
-      <description><![CDATA[<p dir="auto">Built every night from <code class="notranslate">main</code> (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/756261e924c330fc2d2e04b4d7ccd65c7e90c73e/hovercard" href="https://github.com/WillyRL/agora/commit/756261e924c330fc2d2e04b4d7ccd65c7e90c73e"><tt>756261e</tt></a>). Newest features, rougher edges: for the tested version, use the <a href="https://github.com/WillyRL/agora/releases/latest">latest release</a>.</p>
+      <description><![CDATA[<p dir="auto">Built every night from <code class="notranslate">main</code> (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/2bde78ef637b4370053d20f38a0c77dfe11fbf64/hovercard" href="https://github.com/WillyRL/agora/commit/2bde78ef637b4370053d20f38a0c77dfe11fbf64"><tt>2bde78e</tt></a>). Newest features, rougher edges: for the tested version, use the <a href="https://github.com/WillyRL/agora/releases/latest">latest release</a>.</p>
 <p dir="auto"><strong>Agora Nightly</strong> is a separate app: it installs next to Agora with its own settings and logins, and updates itself to each new nightly.</p>
 <h2 dir="auto">Changes</h2>
 <ul dir="auto">
-<li>changelog-notes.sh: no blank line at the start (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/756261e924c330fc2d2e04b4d7ccd65c7e90c73e/hovercard" href="https://github.com/WillyRL/agora/commit/756261e924c330fc2d2e04b4d7ccd65c7e90c73e"><tt>756261e</tt></a>)</li>
-<li>Changelog, with screenshots of each version's new features (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/43cedf66e8e91c6e39504e62590f661011359921/hovercard" href="https://github.com/WillyRL/agora/commit/43cedf66e8e91c6e39504e62590f661011359921"><tt>43cedf6</tt></a>)</li>
+<li>Answer kanban cards; guide to setting up Hermes on another machine (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/2bde78ef637b4370053d20f38a0c77dfe11fbf64/hovercard" href="https://github.com/WillyRL/agora/commit/2bde78ef637b4370053d20f38a0c77dfe11fbf64"><tt>2bde78e</tt></a>)</li>
+<li>CloudflareAccessTests: probe the plain address (CI's Foundation doubled the slash) (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/44742b8ba6c1ff446c982b55f15c60fbc8e4cead/hovercard" href="https://github.com/WillyRL/agora/commit/44742b8ba6c1ff446c982b55f15c60fbc8e4cead"><tt>44742b8</tt></a>)</li>
+<li>Reach Hermes behind Cloudflare Access; paste screenshots (<a class="commit-link" data-hovercard-type="commit" data-hovercard-url="https://github.com/WillyRL/agora/commit/96a6aa53f5ebb471350d652bb6a392eba0a84e11/hovercard" href="https://github.com/WillyRL/agora/commit/96a6aa53f5ebb471350d652bb6a392eba0a84e11"><tt>96a6aa5</tt></a>)</li>
 </ul>
 <p dir="auto">This build isn't notarized: on first launch, open it once, then <strong>System Settings → Privacy &amp; Security → Open Anyway</strong> (or <code class="notranslate">xattr -dr com.apple.quarantine /Applications/Agora.app</code>).</p>]]></description>
-      <enclosure url="https://github.com/WillyRL/agora/releases/download/nightly/Agora-0.1.0-nightly.20261108.zip" type="application/octet-stream" sparkle:edSignature="sUJogdabE4qauROMiGkdr7GEN3PLV+9KaxNHqhwUn0Fx1ZqmVOLbUiIOPqRI3A62C4a1zDoMJ02v+f7KCQCmBg==" length="5367209"/>
+      <enclosure url="https://github.com/WillyRL/agora/releases/download/nightly/Agora-0.1.0-nightly.20261110.zip" type="application/octet-stream" sparkle:edSignature="iG3KBTVkQQ0gZpDQ38UG0SYV1D0L1Ari+hDZOYaVnaaZRfLxalVpdeyEpi+upYvwN9p1QoWg/vNPCQ3BJQjkCg==" length="5842054"/>
     </item>
 
   </channel>
